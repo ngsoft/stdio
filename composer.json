@@ -1,0 +1,24 @@
+{
+    "name": "ngsoft/stdio",
+    "description": "Gives The ability to colorize output and to get shell input",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aymeric Anger",
+            "email": "daedelus.git@gmail.com",
+            "homepage": "https://github.com/ngsoft"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "NGSOFT\\": "src/"
+        }
+    }
+    
+}
