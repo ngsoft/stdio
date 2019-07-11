@@ -5,11 +5,10 @@ namespace NGSOFT\Tools\Interfaces;
 /**
  * @link http://www.termsys.demon.co.uk/vtansi.htm
  */
-class Styles {
+interface Styles {
 
     ////////////////////////////   COLORS   ////////////////////////////
-
-    const COLOR_DEFAULT = 39;
+    //const COLOR_DEFAULT = 39;
     const COLOR_BLACK = 30;
     const COLOR_RED = 31;
     const COLOR_GREEN = 32;
@@ -20,7 +19,7 @@ class Styles {
     const COLOR_GRAY = 37;
     ////////////////////////////   COLORS+   ////////////////////////////
 
-    const COLOR_MODIFIER_LIGHT = 60;
+    const COLOR_MODIFIER_TRUECOLOR = 60;
     const COLOR_MODIFIER_BACKGROUND = 10;
     ////////////////////////////   STYLES   ////////////////////////////
 
@@ -34,8 +33,8 @@ class Styles {
     const STYLE_HIDDEN = 8;
     ////////////////////////////   PREFIX/SUFFIX   ////////////////////////////
 
-    const ESCAPE = "\033[";
-    const STYLE_SUFFIX = "m";
+    const PREFIX_ESCAPE = "\033[";
+    const SUFFIX_STYLE = "m";
     const ERASE_CURRENT_LINE = "2K";
 
 }
