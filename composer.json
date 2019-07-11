@@ -6,19 +6,19 @@
     "authors": [
         {
             "name": "Aymeric Anger",
-            "email": "daedelus.git@gmail.com",
+            "role": "Developer",
             "homepage": "https://github.com/ngsoft"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=5.4"
+        "php": ">=7.1"
     },
     "autoload": {
         "psr-4": {
-            "NGSOFT\\": "src/"
+            "NGSOFT\\Tools\\": "src/"
         }
     }
-    
+
 }

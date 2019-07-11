@@ -1,4 +1,8 @@
-composer.phar
-/vendor/
+.*
+!.gitignore
+!composer.json
+*.lock
+*.bak
+/tests/
 /nbproject/
-
+/vendor/
