@@ -7,7 +7,7 @@ use NGSOFT\Tools\IO\Formatters\{
 };
 use RuntimeException;
 
-class StreamOutput extends Output {
+abstract class StreamOutput extends Output {
 
     /** @var resource */
     private $stream;
