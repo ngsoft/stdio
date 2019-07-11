@@ -7,26 +7,17 @@ use NGSOFT\Tools\IO\Formatters\{
 };
 use RuntimeException;
 
-abstract class StreamOutput extends Output {
+class StreamOutput extends Output {
 
     /** @var resource */
-    private $stream;
+    protected $stream;
 
-    public function __construct($stream, Formatter $formatter = null) {
-
+    public function __construct($stream) {
         assert(is_resource($stream) && get_resource_type($stream) === "stream");
         $this->stream = $stream;
-        if ($formatter === null) $formatter = new DefaultFormatter();
-        parent::__construct($formatter);
     }
 
-    /**
-     * @return resource
-     */
-    public function getStream() {
-        return $this->stream;
-    }
-
+    /** {@inheritdoc} */
     protected function doWrite(string $message, bool $newline) {
         $message .= $newline === true ? PHP_EOL : "";
 

@@ -10,13 +10,13 @@ interface OutputInterface {
      * @param string|iterable<string> $messages
      * @param FormatterInterface|null $formatter
      */
-    public function writeln(string $message, FormatterInterface $formatter = null);
+    public function writeln(string $messages, FormatterInterface $formatter = null);
 
     /**
      * Writes a message to the output.
      *
      * @param string|iterable<string> $messages
-     * @param bool            $newline  Whether to add a newline
+     * @param bool $newline  Whether to add a newline
      * @param FormatterInterface|null $formatter
      */
     public function write($messages, $newline = false, FormatterInterface $formatter = null);
