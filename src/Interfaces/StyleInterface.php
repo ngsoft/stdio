@@ -7,8 +7,9 @@ interface StyleInterface {
     /**
      * Set Keyword
      * @param string $name
+     * @return static
      */
-    public function setName(string $name);
+    public function withName(string $name);
 
     /**
      * Get Keyword
@@ -19,25 +20,28 @@ interface StyleInterface {
     /**
      * Set Foreground color
      * @param int $color
+     * @return static
      */
-    public function setColor(int $color);
+    public function withColor(int $color);
 
     /**
      * Set Background Color
      * @param int $color
+     * @return static
      */
-    public function setBackgroundColor(int $color);
+    public function withBackgroundColor(int $color);
 
     /**
      * Set styles Options
      * @param int ...$options
+     * @return static
      */
-    public function setStyleOptions(int ...$options);
+    public function withStyles(int ...$options);
 
     /**
      * Apply style to the given text
      * @param string $message
      * @return string
      */
-    public function apply(string $message): string;
+    public function applyTo(string $message): string;
 }

@@ -2,10 +2,17 @@
 
 namespace NGSOFT\Tools\IO\Formatters;
 
-abstract class Formatter {
+use NGSOFT\Tools\Interfaces\{
+    FormatterInterface, StyleSheetInterface
+};
 
-    /**
-     * Formats a message according to the given styles.
-     */
-    abstract public function format(string $message);
+abstract class Formatter implements FormatterInterface {
+
+    /** @var StyleSheetInterface */
+    protected $stylesheet;
+
+    public function setStyleSheet(StyleSheetInterface $stylesheet) {
+        $this->stylesheet = $stylesheet;
+    }
+
 }
