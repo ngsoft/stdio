@@ -46,6 +46,17 @@ class StyleSheet implements StyleSheetInterface {
     }
 
     /** {@inheritdoc} */
+    public function getStyle(string $keyword): StyleInterface {
+        if (!$this->hasStyle($keyword)) $this->styles[$keyword] = new Style($keyword);
+        return $this->styles[$keyword];
+    }
+
+    /** {@inheritdoc} */
+    public function hasStyle(string $keyword): bool {
+        return isset($this->styles[$keyword]);
+    }
+
+    /** {@inheritdoc} */
     public function getStyles() {
 
         return $this->styles;

@@ -65,7 +65,7 @@ class Style implements StyleInterface {
             $suffix[] = $opt[1];
         }
         if (count($prefix) === 0) return $message;
-        return sprintf("\033[%sm%s\033[%sm", implode(';', $prefix), implode(';', $suffix));
+        return sprintf("\033[%sm%s\033[%sm", implode(';', $prefix), $message, implode(';', $suffix));
     }
 
     /** {@inheritdoc} */
