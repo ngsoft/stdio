@@ -47,6 +47,7 @@ class Style implements StyleInterface {
     /** @var array<int> */
     private $opts = [];
 
+    /** {@inheritdoc} */
     public function applyTo(string $message): string {
         $prefix = [];
         $suffix = [];
@@ -67,30 +68,97 @@ class Style implements StyleInterface {
         return sprintf("\033[%sm%s\033[%sm", implode(';', $prefix), implode(';', $suffix));
     }
 
+    /** {@inheritdoc} */
     public function getName(): string {
         return $this->name;
     }
 
+    /** {@inheritdoc} */
     public function withBackgroundColor(int $color) {
-        $this->assertValidColor($color);
+        return $this->getClone()->setBg($color);
+    }
 
+    /** {@inheritdoc} */
+    public function withColor(int $color) {
+        return $this->getClone()->setColor($color);
+    }
+
+    /** {@inheritdoc} */
+    public function withName(string $name) {
+        return $this->getClone()->setName($name);
+    }
+
+    /** {@inheritdoc} */
+    public function withStyles(int...$options) {
+        if (count($options) > 0) return $this->getClone()->setOpts(... $options);
+        return $this;
+    }
+
+    /** {@inheritdoc} */
+    private function assertValidColor(int $color) {
+        if (!isset(self::$sets["colors"][$color])) {
+            throw new InvalidArgumentException("Invalid Color Supplied");
+        }
+    }
+
+    /** {@inheritdoc} */
+    private function assertValidStyle(int $style) {
+        if (!isset(self::$sets["styles"][$style])) {
+            throw new InvalidArgumentException("Invalid Style Supplied");
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param int $color
+     * @param int $background_color
+     * @param int ...$options
+     */
+    public function __construct(string $name, int $color = null, int $background_color = null, int...$options) {
+        $this->setName($name);
+        $color !== null and $this->setColor($color);
+        $background_color !== null and $this->setBg($background_color);
+        count($options) > 0 and $this->setOpts(...$options);
+    }
+
+    /**
+     * @param string $name
+     * @return static
+     * @throws InvalidArgumentException
+     */
+    private function setName(string $name) {
+        if (preg_match('/^\w+$/', $name)) {
+            $this->name = strtolower($name);
+        } else throw new InvalidArgumentException("Invalid Name $name");
+        return $this;
+    }
+
+    /**
+     * @param int $color
+     * @return static
+     */
+    private function setColor(int $color) {
+        $this->assertValidColor($color);
+        $this->color = self::$sets["colors"][$color];
+        return $this;
+    }
+
+    /**
+     * @param int $color
+     * @return static
+     */
+    private function setBg(int $color) {
+        $this->assertValidColor($color);
         $this->bg = array_map(function (int $c) { return $c + 10; }, self::$sets["colors"][$color]);
         return $this;
     }
 
-    public function withColor(int $color) {
-        $this->assertValidColor($color);
-        $this->bg = self::$sets["colors"][$color];
-        return $this;
-    }
-
-    public function withName(string $name) {
-        if (preg_match('/^\w+$/', $name)) {
-            $this->name = strtolower($name);
-        } else throw new InvalidArgumentException("Invalid Name $name");
-    }
-
-    public function withStyles(int...$options) {
+    /**
+     * @param type $options
+     * @return static
+     */
+    private function setOpts(int ...$options) {
+        if (count($options) > 0) $this->opts = [];
         foreach ($options as $opt) {
             $this->assertValidStyle($opt);
             $this->opts[] = self::$sets["styles"][$opt];
@@ -98,16 +166,8 @@ class Style implements StyleInterface {
         return $this;
     }
 
-    private function assertValidColor(int $color) {
-        if (!isset(self::$sets["colors"][$color])) {
-            throw new InvalidArgumentException("Invalid Color Supplied");
-        }
-    }
-
-    private function assertValidStyle(int $style) {
-        if (!isset(self::$sets["styles"][$style])) {
-            throw new InvalidArgumentException("Invalid Style Supplied");
-        }
+    private function getClone(): self {
+        return clone $this;
     }
 
 }

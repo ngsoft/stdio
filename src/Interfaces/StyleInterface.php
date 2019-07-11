@@ -7,7 +7,7 @@ interface StyleInterface {
     /**
      * Set Keyword
      * @param string $name
-     * @return static
+     * @return static a new instance with the given name
      */
     public function withName(string $name);
 
@@ -20,21 +20,21 @@ interface StyleInterface {
     /**
      * Set Foreground color
      * @param int $color
-     * @return static
+     * @return static a new instance with the given color
      */
     public function withColor(int $color);
 
     /**
      * Set Background Color
      * @param int $color
-     * @return static
+     * @return static a new instance with the given background color
      */
     public function withBackgroundColor(int $color);
 
     /**
      * Set styles Options
      * @param int ...$options
-     * @return static
+     * @return static A new instance with the given styles
      */
     public function withStyles(int ...$options);
 
