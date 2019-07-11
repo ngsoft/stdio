@@ -2,13 +2,10 @@
 
 namespace NGSOFT\Tools\IO\Outputs;
 
-class stdErr {
+class stdErr extends StreamOutput {
 
-    public function __construct(Formatter $formatter = null) {
-
-        $stream = fopen("php://stderr", "w");
-
-        parent::__construct($stream, $formatter);
+    public function __construct() {
+        parent::__construct(fopen("php://stderr", "w"));
     }
 
 }

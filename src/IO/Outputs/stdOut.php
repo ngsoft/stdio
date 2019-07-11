@@ -1,16 +1,14 @@
 <?php
 
-namespace NGSOFT\Tools\IO\Outputs;
+use NGSOFT\Tools\IO\Outputs\StreamOutput;
 
-use NGSOFT\Tools\IO\Formatters\Formatter;
+namespace NGSOFT\Tools\IO\Outputs;
 
 class stdOut extends StreamOutput {
 
-    public function __construct(Formatter $formatter = null) {
+    public function __construct() {
 
-        $stream = fopen("php://stdout", "w");
-
-        parent::__construct($stream, $formatter);
+        parent::__construct(fopen("php://stdout", "w"));
     }
 
 }
