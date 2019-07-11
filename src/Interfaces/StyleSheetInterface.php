@@ -6,12 +6,13 @@ interface StyleSheetInterface {
 
     /**
      * Add a Style
-     * @param StyleInterface $style
+     * @param StyleInterface ...$style
+     * return static;
      */
-    public function addStyle(StyleInterface $style);
+    public function addStyles(StyleInterface ...$style);
 
     /**
-     * @return array<StyleInterface>
+     * @return array<string,StyleInterface>
      */
     public function getStyles();
 }

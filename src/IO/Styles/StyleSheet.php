@@ -2,9 +2,10 @@
 
 namespace NGSOFT\Tools\IO\Styles;
 
-use NGSOFT\Tools\Interfaces\{
-    StyleInterface, StyleSheetInterface
+use NGSOFT\Tools\{
+    Interfaces\StyleInterface, Interfaces\StyleSheetInterface, IO
 };
+use ReflectionClass;
 
 class StyleSheet implements StyleSheetInterface {
 
@@ -16,36 +17,38 @@ class StyleSheet implements StyleSheetInterface {
 
     public function __construct() {
         if (empty(static::$defaults)) $this->addDefaultStyles();
+        $this->styles = self::$defaults;
     }
 
     private function addDefaultStyles() {
         $d = [];
-        foreach ((new ReflectionClass(\NGSOFT\Tools\IO::class))->getReflectionConstants() as $const) {
+        foreach ((new ReflectionClass(IO::class))->getReflectionConstants() as $const) {
 
             if (preg_match('/^(?:(COLOR|STYLE)\_)([A-Z]+)$/', $const->name, $matches)) {
                 list(, $mode, $keyword) = $matches;
-                IO::$keywords[strtolower($keyword)] = $const->getValue();
-
+                $value = $const->getValue();
+                $keyword = strtolower($keyword);
                 if ($mode === 'COLOR') {
-                    IO::$keywords["bg-" . strtolower($keyword)] = IO::COLOR_MODIFIER_BACKGROUND + $const->getValue();
-                    IO::$keywords["tc-" . strtolower($keyword)] = IO::COLOR_MODIFIER_TRUECOLOR + $const->getValue();
-                    IO::$keywords["bg-tc-" . strtolower($keyword)] = (
-                            IO::COLOR_MODIFIER_BACKGROUND + IO::COLOR_MODIFIER_TRUECOLOR + $const->getValue()
-                            );
-                }
+                    static::$defaults[$keyword] = new Style($keyword, $value);
+                    static::$defaults["bg$keyword"] = new Style("bg$keyword", null, $value);
+                } else static::$defaults[$keyword] = new Style($keyword, null, null, $value);
             }
-
-            //$keyword = preg_replace('/^(?:(COLOR|STYLE)\_)([A-Z]+)$/', '$2', $const->name);
-            //if ($keyword !== $const->name) IO::$keywords[strtolower($keyword)] = $const->getValue();
         }
     }
 
-    public function addStyle(StyleInterface $style) {
-
+    /** {@inheritdoc} */
+    public function addStyles(StyleInterface ...$styles) {
+        foreach ($styles as $style) {
+            $name = $style->getName();
+            $this->styles[$name] = $style;
+        }
+        return $this;
     }
 
+    /** {@inheritdoc} */
     public function getStyles() {
 
+        return $this->styles;
     }
 
 }
