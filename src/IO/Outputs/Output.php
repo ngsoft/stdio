@@ -1,6 +1,6 @@
 <?php
 
-namespace NGSOFT\Tools\IO;
+namespace NGSOFT\Tools\IO\Outputs;
 
 use NGSOFT\Tools\IO\Formatters\Formatter;
 

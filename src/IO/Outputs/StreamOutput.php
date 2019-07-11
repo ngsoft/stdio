@@ -1,7 +1,10 @@
 <?php
 
-namespace NGSOFT\Tools\IO;
+namespace NGSOFT\Tools\IO\Outputs;
 
+use NGSOFT\Tools\IO\Formatters\{
+    DefaultFormatter, Formatter
+};
 use RuntimeException;
 
 class StreamOutput extends Output {
@@ -9,10 +12,11 @@ class StreamOutput extends Output {
     /** @var resource */
     private $stream;
 
-    public function __construct($stream, $formatter) {
+    public function __construct($stream, Formatter $formatter = null) {
 
         assert(is_resource($stream) && get_resource_type($stream) === "stream");
         $this->stream = $stream;
+        if ($formatter === null) $formatter = new DefaultFormatter();
         parent::__construct($formatter);
     }
 

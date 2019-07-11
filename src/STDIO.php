@@ -1,7 +1,9 @@
 <?php
 
+use NGSOFT\Tools\Interfaces\Styles;
+
 namespace NGSOFT\Tools;
 
-class STDIO {
-    
+class STDIO implements Styles {
+
 }
