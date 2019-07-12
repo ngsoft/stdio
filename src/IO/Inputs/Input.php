@@ -2,6 +2,13 @@
 
 namespace NGSOFT\Tools\IO\Inputs;
 
-class Input implements \NGSOFT\Tools\Interfaces\InputInterface {
+use NGSOFT\Tools\Interfaces\InputInterface;
+
+abstract class Input implements InputInterface {
+
+    /** {@inheritdoc} */
+    public function readln(): string {
+        return implode("", $this->read());
+    }
 
 }
