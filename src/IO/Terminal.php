@@ -11,7 +11,7 @@ class Terminal {
     private static $height;
 
     public function __construct() {
-        if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
+        if (php_sapi_name() !== "cli") throw new \RuntimeException("Can only be run under CLI Environnement");
     }
 
     /**
@@ -44,7 +44,7 @@ class Terminal {
         }
         if (self::$height === null) {
 
-            $height = @exec('tput lines 2>&1');
+            $height = @shell_exec('tput lines 2>&1');
             if (is_numeric($height)) self::$height = (int) $height;
         }
 
@@ -69,16 +69,17 @@ class Terminal {
         if ('Hyper' === getenv('TERM_PROGRAM')) {
             return true;
         }
+        $stream = fopen("php://stdout", "w");
         if (DIRECTORY_SEPARATOR === '\\') {
             return
-                    (function_exists('sapi_windows_vt100_support') and @ sapi_windows_vt100_support($this->stream))
+                    (function_exists('sapi_windows_vt100_support') and @ sapi_windows_vt100_support($stream))
                     or false !== getenv('ANSICON')
                     or 'ON' === getenv('ConEmuANSI')
                     or in_array(getenv('TERM'), ['xterm', 'cygwin']);
         }
-        if (function_exists('stream_isatty')) return @stream_isatty($this->stream);
+        if (function_exists('stream_isatty')) return @stream_isatty($stream);
 
-        if (function_exists('posix_isatty')) return @posix_isatty($this->stream);
+        if (function_exists('posix_isatty')) return @posix_isatty($stream);
 
         $stream = fopen("php://stdout", "w");
         $stat = @fstat($stream);

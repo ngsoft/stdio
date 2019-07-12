@@ -2,10 +2,8 @@
 
 namespace NGSOFT\Tools\IO\Outputs;
 
-use NGSOFT\Tools\IO\Formatters\{
-    DefaultFormatter, Formatter
-};
-use RuntimeException;
+use NGSOFT\Tools\IO\Outputs\Output,
+    RuntimeException;
 
 class StreamOutput extends Output {
 

@@ -1,7 +1,5 @@
 <?php
 
-use NGSOFT\Tools\IO\Outputs\StreamOutput;
-
 namespace NGSOFT\Tools\IO\Outputs;
 
 class STDOUT extends StreamOutput {

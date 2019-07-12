@@ -6,9 +6,8 @@ namespace NGSOFT\Tools;
 
 use BadMethodCallException;
 use NGSOFT\Tools\{
-    Interfaces\FormatterInterface, Interfaces\InputInterface, Interfaces\OutputInterface, Interfaces\StyleSheetInterface,
-    IO\Formatters\PlainTextFormatter, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT, IO\Styles\Style,
-    IO\Styles\StyleSheet, IO\Terminal
+    Interfaces\FormatterInterface, Interfaces\StyleSheetInterface, IO\Formatters\PlainTextFormatter, IO\Formatters\TagFormatter,
+    IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT, IO\Styles\Style, IO\Styles\StyleSheet, IO\Terminal
 };
 
 /**
@@ -85,7 +84,8 @@ class IO {
         $this->stylesheet = new StyleSheet();
         //defines formatter
         $this->formatter = new PlainTextFormatter();
-
+        $this->formatter = new TagFormatter();
+        $this->formatter->setStyleSheet($this->stylesheet);
         foreach ([$this->stderr, $this->stdout] as $out) {
             $out->setFormatter($this->formatter);
         }
@@ -105,7 +105,7 @@ class IO {
 
     /**
      * Access the stream directly
-     * @return InputInterface
+     * @return STDIN
      */
     public function getSTDIN(): STDIN {
         return $this->stdin;
@@ -113,7 +113,7 @@ class IO {
 
     /**
      * Access the stream directly
-     * @return OutputInterface
+     * @return STDOUT
      */
     public function getSTDOUT(): STDOUT {
         return $this->stdout;
@@ -121,7 +121,7 @@ class IO {
 
     /**
      * Access the stream directly
-     * @return OutputInterface
+     * @return STDERR
      */
     public function getSTDERR(): STDERR {
         return $this->stderr;
@@ -175,7 +175,7 @@ class IO {
 
     /**
      * Prompt for a value
-     * @param string $question
+     * @param string|null $question
      * @param string $classList
      * @return string
      */
@@ -184,7 +184,7 @@ class IO {
             $format = "$question ";
             if (!empty($classList)) $format = sprintf("<span class=\"%s\">%s</span> ", $classList, $format);
 
-            $this->getSTDOUT()->write($format, false, $this->formatter);
+            $this->getSTDOUT()->write($format);
         }
         return $this->getSTDIN()->readln();
     }
@@ -233,8 +233,8 @@ class IO {
     /**
      * Format a message without using tags
      * @param string $message
-     * @param int $color constant IO::COLOR_*
-     * @param int $bg constant IO::COLOR_*
+     * @param int|null $color constant IO::COLOR_*
+     * @param int|null $bg constant IO::COLOR_*
      * @param int ...$styles constant IO::STYLE_*
      * @return string
      */

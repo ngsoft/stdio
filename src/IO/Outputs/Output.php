@@ -25,7 +25,7 @@ abstract class Output implements OutputInterface {
     }
 
     /** {@inheritdoc} */
-    public function writeln(string $messages) {
+    public function writeln($messages) {
         $this->write($messages, true);
     }
 

@@ -44,7 +44,7 @@ class Style implements StyleInterface {
     /** @var array<int>|null */
     protected $bg;
 
-    /** @var array<int> */
+    /** @var array */
     protected $opts = [];
 
     /** @var string */
@@ -114,8 +114,8 @@ class Style implements StyleInterface {
 
     /**
      * @param string $name
-     * @param int $color
-     * @param int $background_color
+     * @param int|null $color
+     * @param int|null $background_color
      * @param int ...$options
      */
     public function __construct(string $name, int $color = null, int $background_color = null, int...$options) {
@@ -161,7 +161,7 @@ class Style implements StyleInterface {
     }
 
     /**
-     * @param type $options
+     * @param int ...$options
      * @return static
      */
     private function setOpts(int ...$options) {
