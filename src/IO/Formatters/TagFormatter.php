@@ -11,7 +11,7 @@ use DOMDocument,
     NGSOFT\Tools\Interfaces\StyleSheetInterface;
 use function mb_convert_encoding;
 
-class TagFormatter extends Formatter {
+class TagFormatter extends PlainTextFormatter {
 
     /**
      * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements
@@ -28,31 +28,7 @@ class TagFormatter extends Formatter {
     /** {@inheritdoc} */
     public function format(string $message): string {
         if ($this->stylesheet and $message !== strip_tags($message)) $message = $this->parseStyles($message);
-
-
-        /* case "space":
-          var_dump($node);
-          $count = $node->getAttribute("count");
-          if (is_numeric($count)) $count = intval($count);
-          else $count = 1;
-          $result .= str_repeat(" ", $count) . $this->parseStyles($node->nodeValue);
-          break;
-          case "tab":
-          var_dump($node);
-
-          $count = $node->getAttribute("count");
-          if (is_numeric($count)) $count = intval($count);
-          else $count = 1;
-          $result .= str_repeat("\t", $count) . $this->parseNodes($node, $stylesheet);
-          break;
-          case "reset":
-          $result .= "\033[0m"; */
-
-
-
-        $message = strip_tags($message);
-        $message = str_replace(['&gt;', '&lt;'], ['>', '<'], $message);
-        return $message;
+        return parent::format($message);
     }
 
     protected function getInnerHTML(DOMNode $node): string {
@@ -69,6 +45,12 @@ class TagFormatter extends Formatter {
         return $doc->saveHTML();
     }
 
+    /**
+     * Parse Tags
+     * @param DOMNode $body
+     * @param StyleSheetInterface $stylesheet
+     * @return string
+     */
     protected function parseNodes(DOMNode $body, StyleSheetInterface $stylesheet) {
         $result = "";
 
@@ -90,7 +72,7 @@ class TagFormatter extends Formatter {
                             $result .= PHP_EOL . str_repeat('-', 64) . PHP_EOL;
                             break;
                         default :
-                            $prefix = $suffix = "";
+                            $prefix = $suffix = ""; $matches = [];
                             if ($classList = $node->getAttribute("class") and preg_match_all('/(\w+)(?:\s+)?/', $classList, $matches)) {
                                 foreach ($matches[1] as $class) {
                                     if ($stylesheet->hasStyle($class)) {

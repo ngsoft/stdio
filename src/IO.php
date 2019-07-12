@@ -13,9 +13,13 @@ use NGSOFT\Tools\{
 /**
  * Basic CLI Formatter
  *  Resources used for this project
- * @link http://www.termsys.demon.co.uk/vtansi.htm
- * @link https://jonasjacek.github.io/colors/
+ * @link http://www.termsys.demon.co.uk/vtansi.htm, https://jonasjacek.github.io/colors/
  * @link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+ *
+ * @method STDIO black(?string $message)
+ *
+ *
+ *
  */
 class IO {
 
@@ -333,6 +337,38 @@ class IO {
         $message = $sheet->getPrefix();
         $message .= (isset($arguments[0]) and is_string($arguments[0])) ? $arguments[0] : "";
         $this->buffer->write($message);
+        return $this;
+    }
+
+    ////////////////////////////   Special Features   ////////////////////////////
+
+    /**
+     * Insert tabulations into buffer
+     * @param int $count
+     * @return static
+     */
+    public function tab(int $count = 1) {
+        if ($count > 0) $this->buffer->write(str_repeat("\t", $count));
+        return $this;
+    }
+
+    /**
+     * Insert Spaces into Buffer
+     * @param int $count
+     * @return static
+     */
+    public function space(int $count = 1) {
+        if ($count > 0) $this->buffer->write(str_repeat(" ", $count));
+        return $this;
+    }
+
+    /**
+     * Insert Line break into buffer
+     * @param int $count
+     * @return static
+     */
+    public function linebreak(int $count = 1) {
+        if ($count > 0) $this->buffer->write(str_repeat(PHP_EOL, $count));
         return $this;
     }
 
