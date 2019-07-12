@@ -110,7 +110,7 @@ class IO {
         $this->stylesheet = new StyleSheet();
         //defines formatter
         $this->formatter = new PlainTextFormatter();
-        $this->formatter = new TagFormatter();
+        if ($this->term->hasColorSupport()) $this->formatter = new TagFormatter();
         $this->formatter->setStyleSheet($this->stylesheet);
         foreach ([$this->stderr, $this->stdout] as $out) {
             $out->setFormatter($this->formatter);
@@ -237,7 +237,7 @@ class IO {
         $norm_yes = array_map("strtolower", $yes);
         $norm_no = array_map("strtolower", $no);
         $prompt = sprintf(
-                '%s [%s|%s] [%s] ',
+                "%s{:tab*2:}[%s|%s][%s] :",
                 $question, implode("/", $yes), implode("/", $no),
                 $default === true ? $yes[0] : $no[0]
         );

@@ -42,7 +42,10 @@ class StyleSheet implements StyleSheetInterface, IteratorAggregate {
             'error' => static::$defaults['gray']->withBackgroundColor(IO::COLOR_RED)->withName('error'),
             'info' => static::$defaults['green']->withName('info'),
             'comment' => static::$defaults['yellow']->withName('comment'),
-            'question' => static::$defaults['black']->withBackgroundColor(IO::COLOR_CYAN)->withName('question'),
+            'question' => static::$defaults['black']
+                    ->withBackgroundColor(IO::COLOR_CYAN)
+                    ->withStyles(IO::STYLE_BRIGHT)
+                    ->withName('question'),
             'notice' => static::$defaults['cyan']->withName('notice'),
         ]);
         ksort(self::$defaults);

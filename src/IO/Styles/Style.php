@@ -6,7 +6,7 @@ namespace NGSOFT\Tools\IO\Styles;
 
 use InvalidArgumentException;
 use NGSOFT\Tools\{
-    Interfaces\StyleInterface, IO
+    Interfaces\StyleInterface, IO, IO\Terminal
 };
 
 class Style implements StyleInterface {
@@ -35,6 +35,9 @@ class Style implements StyleInterface {
         ]
     ];
 
+    /** @var bool Color support detection */
+    protected static $hasColors;
+
     /** @var string */
     protected $name = "";
 
@@ -48,20 +51,21 @@ class Style implements StyleInterface {
     protected $opts = [];
 
     /** @var string */
-    protected $prefix;
+    protected $prefix = "";
 
     /** @var string */
-    protected $suffix;
+    protected $suffix = "";
 
     /** {@inheritdoc} */
     public function getPrefix(): string {
-        $this->update();
+        //do not display escaped chars if ansi is not supported
+        if (self::$hasColors) $this->update();
         return $this->prefix;
     }
 
     /** {@inheritdoc} */
     public function getSuffix(): string {
-        $this->update();
+        if (self::$hasColors) $this->update();
         return $this->suffix;
     }
 
@@ -123,6 +127,7 @@ class Style implements StyleInterface {
         $color !== null and $this->setColor($color);
         $background_color !== null and $this->setBg($background_color);
         count($options) > 0 and $this->setOpts(...$options);
+        if (self::$hasColors === null) self::$hasColors = (new Terminal())->hasColorSupport();
     }
 
     /**
