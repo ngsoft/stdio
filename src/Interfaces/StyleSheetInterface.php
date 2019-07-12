@@ -19,9 +19,9 @@ interface StyleSheetInterface {
     /**
      * Get a style by keyword
      * @param string $keyword
-     * @return StyleInterface
+     * @return StyleInterface|null
      */
-    public function getStyle(string $keyword): StyleInterface;
+    public function getStyle(string $keyword);
 
     /**
      * Check if style exists

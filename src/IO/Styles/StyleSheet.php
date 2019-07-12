@@ -63,8 +63,8 @@ class StyleSheet implements StyleSheetInterface, IteratorAggregate {
     }
 
     /** {@inheritdoc} */
-    public function getStyle(string $keyword): StyleInterface {
-        if (!$this->hasStyle($keyword)) $this->styles[$keyword] = new Style($keyword);
+    public function getStyle(string $keyword) {
+        if (!$this->hasStyle($keyword)) return null;
         return $this->styles[$keyword];
     }
 

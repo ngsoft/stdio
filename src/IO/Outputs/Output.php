@@ -10,20 +10,28 @@ use NGSOFT\Tools\Interfaces\{
 
 abstract class Output implements OutputInterface {
 
+    /** FormatterInterface */
+    protected $formatter;
+
     /** {@inheritdoc} */
-    public function write($messages, $newline = false, FormatterInterface $formatter = null) {
+    public function write($messages, $newline = false) {
         if (is_string($messages)) $messages = [$messages];
         assert(is_iterable($messages));
 
         foreach ($messages as $message) {
-            if ($formatter !== null) $message = $formatter->format($message);
+            if ($this->formatter !== null) $message = $this->formatter->format($message);
             $this->doWrite($message, $newline);
         }
     }
 
     /** {@inheritdoc} */
-    public function writeln(string $messages, FormatterInterface $formatter = null) {
-        $this->write($messages, true, $formatter);
+    public function writeln(string $messages) {
+        $this->write($messages, true);
+    }
+
+    /** {@inheritdoc} */
+    public function setFormatter(FormatterInterface $formatter) {
+        $this->formatter = $formatter;
     }
 
     /**

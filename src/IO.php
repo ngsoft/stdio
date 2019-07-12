@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\Tools;
 
 use NGSOFT\Tools\{
@@ -48,16 +50,16 @@ class IO {
     //const STYLE_RESET = 0;
 
     /** @var STDIN */
-    private static $stdin;
+    private $stdin;
 
     /** @var STDOUT */
-    private static $stdout;
+    private $stdout;
 
     /** @var STDERR */
-    private static $stderr;
+    private $stderr;
 
     /** @var Terminal */
-    private static $term;
+    private $term;
 
     /** @var FormatterInterface */
     private $formatter;
@@ -72,12 +74,19 @@ class IO {
 
 
     private function initialize() {
-        if (!isset(self::$stdin)) {
-            if (php_sapi_name() !== "cli") throw new RuntimeException(__CLASS__ . " can only be run under CLI Environnement");
-            self::$stdout = new STDOUT();
-            self::$stderr = new STDERR();
-            self::$stdin = new STDIN();
-            self::$term = new Terminal();
+
+        if (php_sapi_name() !== "cli") throw new RuntimeException(__CLASS__ . " can only be run under CLI Environnement");
+        $this->stdout = new STDOUT();
+        $this->stderr = new STDERR();
+        $this->stdin = new STDIN();
+        $this->term = new Terminal();
+        $this->buffer = new BufferOutput();
+        $this->stylesheet = new StyleSheet();
+        //defines formatter
+        $this->formatter = new PlainTextFormatter();
+
+        foreach ([$this->stderr, $this->stdout] as $out) {
+            $out->setFormatter($this->formatter);
         }
     }
 
@@ -91,9 +100,6 @@ class IO {
 
     public function __construct() {
         $this->initialize();
-        $this->buffer = new BufferOutput();
-        $this->stylesheet = new StyleSheet();
-        $this->formatter = new PlainTextFormatter();
     }
 
     /**
@@ -101,7 +107,7 @@ class IO {
      * @return InputInterface
      */
     public function getSTDIN(): STDIN {
-        return self::$stdin;
+        return $this->stdin;
     }
 
     /**
@@ -109,7 +115,7 @@ class IO {
      * @return OutputInterface
      */
     public function getSTDOUT(): STDOUT {
-        return self::$stdout;
+        return $this->stdout;
     }
 
     /**
@@ -117,7 +123,7 @@ class IO {
      * @return OutputInterface
      */
     public function getSTDERR(): STDERR {
-        return self::$stderr;
+        return $this->stderr;
     }
 
     /**
@@ -158,24 +164,61 @@ class IO {
 
     ////////////////////////////   Read and Print   ////////////////////////////
 
+    /**
+     * Prompt for a value
+     * @param string $question
+     * @param string $classList
+     * @return string
+     */
     public function prompt(string $question = null, string $classList = "question"): string {
         if ($question !== null) {
-            if (empty($classList)) $format = "$question ";
-            else $format = sprintf("<span class=\"%s\">%s</span> ", $classList, $question);
+            $format = "$question ";
+            if (!empty($classList)) $format = sprintf("<span class=\"%s\">%s</span> ", $classList, $format);
 
             $this->getSTDOUT()->write($format, false, $this->formatter);
         }
         return $this->getSTDIN()->readln();
     }
 
+    /**
+     * Prompt for a confirmation
+     * @param string $question
+     * @param bool $default
+     * @param array $yes
+     * @param array $no
+     * @param string $classList
+     * @return bool
+     */
     public function confirm(
-            string $question = null,
+            string $question = "",
             bool $default = false,
-            array $yes = ["y"],
-            array $no = ["n"],
+            array $yes = [],
+            array $no = [],
             string $classList = "question"
     ): bool {
-        return true;
+
+        if (empty($yes)) $yes = ["yes", "y"];
+        if (empty($no)) $no = ["no", "n"];
+        $norm_yes = array_map("strtolower", $yes);
+        $norm_no = array_map("strtolower", $no);
+        $prompt = sprintf(
+                '%s [%s|%s] [%s] ',
+                $question, implode("/", $yes), implode("/", $no),
+                $default === true ? $yes[0] : $no[0]
+        );
+
+        if (!empty($classList)) $prompt = sprintf('<span class="%s">%s</span>', $classList, $prompt);
+
+        $answer = null;
+        while (!is_bool($answer)) {
+            $this->getSTDOUT()->write($prompt);
+            $line = strtolower($this->getSTDIN()->readln());
+            $answer = empty($line) ? $default :
+                    (in_array($line, $norm_yes) ? true :
+                    (in_array($line, $norm_no) ? false : null));
+        }
+
+        return $answer;
     }
 
 }

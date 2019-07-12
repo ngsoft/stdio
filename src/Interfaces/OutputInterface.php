@@ -10,7 +10,7 @@ interface OutputInterface {
      * @param string|iterable<string> $messages
      * @param FormatterInterface|null $formatter
      */
-    public function writeln(string $messages, FormatterInterface $formatter = null);
+    public function writeln(string $messages);
 
     /**
      * Writes a message to the output.
@@ -19,5 +19,11 @@ interface OutputInterface {
      * @param bool $newline  Whether to add a newline
      * @param FormatterInterface|null $formatter
      */
-    public function write($messages, $newline = false, FormatterInterface $formatter = null);
+    public function write($messages, $newline = false);
+
+    /**
+     * Set the Formatter
+     * @param FormatterInterface $formatter
+     */
+    public function setFormatter(FormatterInterface $formatter);
 }
