@@ -280,6 +280,7 @@ class IO {
      * @return static
      */
     public function write($messages, bool $newline = false) {
+        $messages = ltrim($messages);
         $this->getSTDOUT()->write($messages, $newline);
         return $this;
     }
@@ -301,6 +302,7 @@ class IO {
      * @return static
      */
     public function writeerr($messages, bool $newline = false) {
+        $messages = ltrim($messages);
         $this->getSTDERR()->write($messages, $newline);
         return $this;
     }
@@ -370,7 +372,7 @@ class IO {
      * @return static
      */
     public function tab(int $count = 1) {
-        if ($count > 0) $this->buffer->write(str_repeat("\t", $count));
+        if ($count > 0) $this->space($count * 4);
         return $this;
     }
 
