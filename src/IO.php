@@ -3,8 +3,10 @@
 namespace NGSOFT\Tools;
 
 use NGSOFT\Tools\{
-    Interfaces\InputInterface, Interfaces\OutputInterface, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT
+    Interfaces\InputInterface, Interfaces\OutputInterface, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR,
+    IO\Outputs\STDOUT, IO\Terminal
 };
+use RuntimeException;
 
 /**
  * Basic CLI Formatter
@@ -54,15 +56,33 @@ class IO {
     /** @var OutputInterface */
     private static $stderr;
 
+    /** @var Terminal */
+    private static $term;
+
     /** @var BufferOutput */
-    private static $buffer;
+    private $buffer;
 
     private static function initialize() {
         if (!isset(self::$stdin)) {
+            if (php_sapi_name() !== "cli") throw new RuntimeException(__CLASS__ . " can only be run under CLI Environnement");
             self::$stdout = new STDOUT();
             self::$stderr = new STDERR();
-            self::$buffer = new BufferOutput();
+            self::$stdin = new STDIN();
+            self::$term = new Terminal;
         }
+    }
+
+    /**
+     * Creates a new instance
+     * @return static
+     */
+    public static function create() {
+        return new static();
+    }
+
+    public function __construct() {
+        self::initialize();
+        $this->buffer = new BufferOutput();
     }
 
 }
