@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\Tools\IO\Inputs;
 
 use NGSOFT\Tools\Interfaces\InputInterface;
