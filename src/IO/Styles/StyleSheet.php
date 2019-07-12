@@ -48,7 +48,8 @@ class StyleSheet implements StyleSheetInterface, IteratorAggregate {
             'info' => static::$defaults['green']->withName('info'),
             'comment' => static::$defaults['yellow']->withName('comment'),
             'question' => static::$defaults['black']->withBackgroundColor(IO::COLOR_CYAN)->withName('question'),
-            'notice' => static::$defaults['cyan']->withName('notice')
+            'notice' => static::$defaults['cyan']->withName('notice'),
+            'reset' => new ResetStyle()
         ]);
         ksort(self::$defaults);
     }

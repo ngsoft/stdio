@@ -3,8 +3,8 @@
 namespace NGSOFT\Tools;
 
 use NGSOFT\Tools\{
-    Interfaces\InputInterface, Interfaces\OutputInterface, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR,
-    IO\Outputs\STDOUT, IO\Terminal
+    Interfaces\FormatterInterface, Interfaces\InputInterface, Interfaces\OutputInterface, Interfaces\StyleSheetInterface,
+    IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT, IO\Styles\StyleSheet, IO\Terminal
 };
 use RuntimeException;
 
@@ -24,7 +24,6 @@ class IO {
 
     /**
      * Basic Terminal Colors
-     * @link URL description
      */
     const COLOR_BLACK = 30;
     const COLOR_RED = 31;
@@ -59,16 +58,25 @@ class IO {
     /** @var Terminal */
     private static $term;
 
+    /** @var FormatterInterface */
+    private $formatter;
+
+    /** @var StyleSheetInterface */
+    private $stylesheet;
+
     /** @var BufferOutput */
     private $buffer;
 
-    private static function initialize() {
+    ////////////////////////////   CONFIGURATION   ////////////////////////////
+
+
+    private function initialize() {
         if (!isset(self::$stdin)) {
             if (php_sapi_name() !== "cli") throw new RuntimeException(__CLASS__ . " can only be run under CLI Environnement");
             self::$stdout = new STDOUT();
             self::$stderr = new STDERR();
             self::$stdin = new STDIN();
-            self::$term = new Terminal;
+            self::$term = new Terminal();
         }
     }
 
@@ -81,8 +89,76 @@ class IO {
     }
 
     public function __construct() {
-        self::initialize();
+        $this->initialize();
         $this->buffer = new BufferOutput();
+        $this->stylesheet = new StyleSheet();
+    }
+
+    /**
+     * Access the stream directly
+     * @return InputInterface
+     */
+    public function getSTDIN(): InputInterface {
+        return self::$stdin;
+    }
+
+    /**
+     * Access the stream directly
+     * @return OutputInterface
+     */
+    public function getSTDOUT(): OutputInterface {
+        return self::$stdout;
+    }
+
+    /**
+     * Access the stream directly
+     * @return OutputInterface
+     */
+    public function getSTDERR(): OutputInterface {
+        return self::$stderr;
+    }
+
+    /**
+     * Get Formatter
+     * @return FormatterInterface
+     */
+    public function getFormatter(): FormatterInterface {
+        return $this->formatter;
+    }
+
+    /**
+     * Get Stylesheet
+     * @return StyleSheetInterface
+     */
+    public function getStylesheet(): StyleSheetInterface {
+        return $this->stylesheet;
+    }
+
+    /**
+     * Set the Formatter
+     * @param FormatterInterface $formatter
+     * @return static
+     */
+    public function setFormatter(FormatterInterface $formatter) {
+        $this->formatter = $formatter;
+        return $this;
+    }
+
+    /**
+     * Get the Stylesheet
+     * @param StyleSheetInterface $stylesheet
+     * @return static
+     */
+    public function setStylesheet(StyleSheetInterface $stylesheet) {
+        $this->stylesheet = $stylesheet;
+        return $this;
+    }
+
+    ////////////////////////////   Read and Print   ////////////////////////////
+
+    public function prompt(string $question = null, int $color = null, int $bg = null, int ...$styles): string {
+
+        $format = '{: question :}{:  :}';
     }
 
 }

@@ -36,16 +36,16 @@ class Style implements StyleInterface {
     ];
 
     /** @var string */
-    private $name = "";
+    protected $name = "";
 
     /** @var array<int>|null */
-    private $color;
+    protected $color;
 
     /** @var array<int>|null */
-    private $bg;
+    protected $bg;
 
     /** @var array<int> */
-    private $opts = [];
+    protected $opts = [];
 
     /** {@inheritdoc} */
     public function applyTo(string $message): string {
