@@ -48,24 +48,36 @@ class Style implements StyleInterface {
     protected $opts = [];
 
     /** {@inheritdoc} */
-    public function applyTo(string $message): string {
+    public function getPrefix(): string {
         $prefix = [];
-        $suffix = [];
+        if (is_array($this->color)) $prefix[] = $this->color[0];
+        if (is_array($this->bg)) $prefix [] = $this->bg[0];
 
-        if (is_array($this->color)) {
-            $prefix[] = $this->color[0];
-            $suffix[] = $this->color[1];
-        }
-        if (is_array($this->bg)) {
-            $prefix [] = $this->bg[0];
-            $suffix [] = $this->bg[1];
-        }
         foreach ($this->opts as $opt) {
             $prefix[] = $opt[0];
+        }
+        if (count($prefix) === 0) return "";
+        return sprintf("\033[%sm", implode(';', $prefix));
+    }
+
+    /** {@inheritdoc} */
+    public function getSuffix(): string {
+        $suffix = [];
+        if (is_array($this->color)) $suffix[] = $this->color[1];
+        if (is_array($this->bg)) $suffix [] = $this->bg[1];
+
+        foreach ($this->opts as $opt) {
             $suffix[] = $opt[1];
         }
-        if (count($prefix) === 0) return $message;
-        return sprintf("\033[%sm%s\033[%sm", implode(';', $prefix), $message, implode(';', $suffix));
+        if (count($suffix) === 0) return "";
+        return sprintf("\033[%sm", implode(';', $suffix));
+    }
+
+    /** {@inheritdoc} */
+    public function applyTo(string $message): string {
+        $prefix = $this->getPrefix();
+        if (!empty($prefix)) return sprintf('%s%s%s', $prefix, $message, $this->getSuffix());
+        return $message;
     }
 
     /** {@inheritdoc} */
