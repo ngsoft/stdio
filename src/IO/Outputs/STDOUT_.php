@@ -4,7 +4,7 @@ use NGSOFT\Tools\IO\Outputs\StreamOutput;
 
 namespace NGSOFT\Tools\IO\Outputs;
 
-class stdOut extends StreamOutput {
+class STDOUT extends StreamOutput {
 
     public function __construct() {
 

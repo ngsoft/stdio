@@ -2,17 +2,19 @@
 
 namespace NGSOFT\Tools\IO\Styles;
 
+use ArrayIterator,
+    IteratorAggregate;
 use NGSOFT\Tools\{
     Interfaces\StyleInterface, Interfaces\StyleSheetInterface, IO
 };
 use ReflectionClass;
 
-class StyleSheet implements StyleSheetInterface {
+class StyleSheet implements StyleSheetInterface, IteratorAggregate {
 
-    /** @var array<StyleInterface> */
+    /** @var array<string,StyleInterface> */
     static protected $defaults = [];
 
-    /** @var array<StyleInterface> */
+    /** @var array<string,StyleInterface> */
     protected $styles = [];
 
     public function __construct() {
@@ -21,7 +23,7 @@ class StyleSheet implements StyleSheetInterface {
     }
 
     private function addDefaultStyles() {
-        $d = [];
+
         foreach ((new ReflectionClass(IO::class))->getReflectionConstants() as $const) {
 
             if (preg_match('/^(?:(COLOR|STYLE)\_)([A-Z]+)$/', $const->name, $matches)) {
@@ -34,6 +36,13 @@ class StyleSheet implements StyleSheetInterface {
                 } else static::$defaults[$keyword] = new Style($keyword, null, null, $value);
             }
         }
+        static::$defaults = array_merge(static::$defaults, [
+            'error' => static::$defaults['gray']->withBackgroundColor(IO::COLOR_RED)->withName('error'),
+            'info' => static::$defaults['green']->withName('info'),
+            'comment' => static::$defaults['yellow']->withName('comment'),
+            'question' => static::$defaults['black']->withBackgroundColor(IO::COLOR_CYAN)->withName('question'),
+            'notice' => static::$defaults['cyan']->withName('notice')
+        ]);
     }
 
     /** {@inheritdoc} */
@@ -60,6 +69,15 @@ class StyleSheet implements StyleSheetInterface {
     public function getStyles() {
 
         return $this->styles;
+    }
+
+    /** {@inheritdoc} */
+    public function getKewords(): array {
+        return array_keys($this->styles);
+    }
+
+    public function getIterator() {
+        return new ArrayIterator($this->styles);
     }
 
 }

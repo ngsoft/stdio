@@ -29,4 +29,10 @@ interface StyleSheetInterface {
      * @return bool
      */
     public function hasStyle(string $keyword): bool;
+
+    /**
+     * Get the registered keywords
+     * @return array<string>
+     */
+    public function getKewords(): array;
 }
