@@ -44,7 +44,6 @@ class StyleSheet implements StyleSheetInterface, IteratorAggregate {
             'comment' => static::$defaults['yellow']->withName('comment'),
             'question' => static::$defaults['black']
                     ->withBackgroundColor(IO::COLOR_CYAN)
-                    ->withStyles(IO::STYLE_BRIGHT)
                     ->withName('question'),
             'notice' => static::$defaults['cyan']->withName('notice'),
         ]);
