@@ -1,6 +1,7 @@
 {
     "name": "ngsoft/stdio",
-    "description": "Gives The ability to colorize output and to get shell input",
+    "description": "Format the CLI Output using an easy to use API",
+    "keywords": ["stdio", "stdin", "stdout", "cli", "console", "formatter", "terminal"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -13,7 +14,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "symfony/polyfill-mbstring": "*"
     },
     "autoload": {
         "psr-4": {
