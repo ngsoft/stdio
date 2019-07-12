@@ -4,7 +4,8 @@ namespace NGSOFT\Tools;
 
 use NGSOFT\Tools\{
     Interfaces\FormatterInterface, Interfaces\InputInterface, Interfaces\OutputInterface, Interfaces\StyleSheetInterface,
-    IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT, IO\Styles\StyleSheet, IO\Terminal
+    IO\Formatters\PlainTextFormatter, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT,
+    IO\Styles\StyleSheet, IO\Terminal
 };
 use RuntimeException;
 
@@ -46,13 +47,13 @@ class IO {
 
     //const STYLE_RESET = 0;
 
-    /** @var InputInterface */
+    /** @var STDIN */
     private static $stdin;
 
-    /** @var OutputInterface */
+    /** @var STDOUT */
     private static $stdout;
 
-    /** @var OutputInterface */
+    /** @var STDERR */
     private static $stderr;
 
     /** @var Terminal */
@@ -92,13 +93,14 @@ class IO {
         $this->initialize();
         $this->buffer = new BufferOutput();
         $this->stylesheet = new StyleSheet();
+        $this->formatter = new PlainTextFormatter();
     }
 
     /**
      * Access the stream directly
      * @return InputInterface
      */
-    public function getSTDIN(): InputInterface {
+    public function getSTDIN(): STDIN {
         return self::$stdin;
     }
 
@@ -106,7 +108,7 @@ class IO {
      * Access the stream directly
      * @return OutputInterface
      */
-    public function getSTDOUT(): OutputInterface {
+    public function getSTDOUT(): STDOUT {
         return self::$stdout;
     }
 
@@ -114,7 +116,7 @@ class IO {
      * Access the stream directly
      * @return OutputInterface
      */
-    public function getSTDERR(): OutputInterface {
+    public function getSTDERR(): STDERR {
         return self::$stderr;
     }
 
@@ -156,9 +158,24 @@ class IO {
 
     ////////////////////////////   Read and Print   ////////////////////////////
 
-    public function prompt(string $question = null, int $color = null, int $bg = null, int ...$styles): string {
+    public function prompt(string $question = null, string $classList = "question"): string {
+        if ($question !== null) {
+            if (empty($classList)) $format = "$question ";
+            else $format = sprintf("<span class=\"%s\">%s</span> ", $classList, $question);
 
-        $format = '{: question :}{:  :}';
+            $this->getSTDOUT()->write($format, false, $this->formatter);
+        }
+        return $this->getSTDIN()->readln();
+    }
+
+    public function confirm(
+            string $question = null,
+            bool $default = false,
+            array $yes = ["y"],
+            array $no = ["n"],
+            string $classList = "question"
+    ): bool {
+        return true;
     }
 
 }

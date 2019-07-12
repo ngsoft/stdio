@@ -27,4 +27,12 @@ class StreamOutput extends Output {
         fflush($this->stream);
     }
 
+    /**
+     * Get The Resource directly
+     * @return resource
+     */
+    public function getStream() {
+        return $this->stream;
+    }
+
 }

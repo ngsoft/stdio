@@ -23,4 +23,12 @@ class STDIN extends Input {
         return $result;
     }
 
+    /**
+     * Get The Resource directly
+     * @return resource
+     */
+    public function getStream() {
+        return $this->stream;
+    }
+
 }
