@@ -329,7 +329,9 @@ class IO {
         if (!$this->stylesheet->hasStyle($method)) {
             throw new BadMethodCallException(get_class($this) . "::" . $method . '() does not exists.');
         }
-        $message = (isset($arguments[0]) and is_string($arguments[0])) ? $arguments[0] : "";
+        $sheet = $this->stylesheet->getStyle($method);
+        $message = $sheet->getPrefix();
+        $message .= (isset($arguments[0]) and is_string($arguments[0])) ? $arguments[0] : "";
         $this->buffer->write($message);
         return $this;
     }

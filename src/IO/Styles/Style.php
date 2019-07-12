@@ -47,30 +47,22 @@ class Style implements StyleInterface {
     /** @var array<int> */
     protected $opts = [];
 
+    /** @var string */
+    protected $prefix;
+
+    /** @var string */
+    protected $suffix;
+
     /** {@inheritdoc} */
     public function getPrefix(): string {
-        $prefix = [];
-        if (is_array($this->color)) $prefix[] = $this->color[0];
-        if (is_array($this->bg)) $prefix [] = $this->bg[0];
-
-        foreach ($this->opts as $opt) {
-            $prefix[] = $opt[0];
-        }
-        if (count($prefix) === 0) return "";
-        return sprintf("\033[%sm", implode(';', $prefix));
+        $this->update();
+        return $this->prefix;
     }
 
     /** {@inheritdoc} */
     public function getSuffix(): string {
-        $suffix = [];
-        if (is_array($this->color)) $suffix[] = $this->color[1];
-        if (is_array($this->bg)) $suffix [] = $this->bg[1];
-
-        foreach ($this->opts as $opt) {
-            $suffix[] = $opt[1];
-        }
-        if (count($suffix) === 0) return "";
-        return sprintf("\033[%sm", implode(';', $suffix));
+        $this->update();
+        return $this->suffix;
     }
 
     /** {@inheritdoc} */
@@ -142,6 +134,7 @@ class Style implements StyleInterface {
         if (preg_match('/^\w+$/', $name)) {
             $this->name = strtolower($name);
         } else throw new InvalidArgumentException("Invalid Name $name");
+        $this->prefix = "";
         return $this;
     }
 
@@ -152,6 +145,7 @@ class Style implements StyleInterface {
     private function setColor(int $color) {
         $this->assertValidColor($color);
         $this->color = self::$sets["colors"][$color];
+        $this->prefix = "";
         return $this;
     }
 
@@ -162,6 +156,7 @@ class Style implements StyleInterface {
     private function setBg(int $color) {
         $this->assertValidColor($color);
         $this->bg = array_map(function (int $c) { return $c + 10; }, self::$sets["colors"][$color]);
+        $this->prefix = "";
         return $this;
     }
 
@@ -175,10 +170,37 @@ class Style implements StyleInterface {
             $this->assertValidStyle($opt);
             $this->opts[] = self::$sets["styles"][$opt];
         }
+        $this->prefix = "";
         return $this;
     }
 
-    private function getClone(): self {
+    /**
+     * Updates prefix and suffix
+     */
+    protected function update() {
+        if (!empty($this->prefix)) return;
+        $this->prefix = $this->suffix = "";
+        $prefix = $suffix = [];
+        if (is_array($this->color)) {
+            $prefix[] = $this->color[0];
+            $suffix[] = $this->color[1];
+        }
+        if (is_array($this->bg)) {
+            $prefix [] = $this->bg[0];
+            $suffix [] = $this->bg[1];
+        }
+
+        foreach ($this->opts as $opt) {
+            $prefix[] = $opt[0];
+            $suffix [] = $opt[1];
+        }
+        if (count($prefix) > 0) {
+            $this->prefix = sprintf("\033[%sm", implode(';', $prefix));
+            $this->suffix = sprintf("\033[%sm", implode(';', $suffix));
+        }
+    }
+
+    protected function getClone(): self {
         return clone $this;
     }
 
