@@ -33,13 +33,8 @@ class StyleSheet implements StyleSheetInterface, IteratorAggregate {
                 $value = $const->getValue();
                 $keyword = strtolower($keyword);
                 if ($mode === 'COLOR') {
-
-                    $k = "c$value";
-
-                    static::$defaults[$k] = static::$defaults[$keyword] = new Style($keyword, $value);
-                    $k = "c" . ($value + 10);
-                    var_dump($k);
-                    static::$defaults[$k] = static::$defaults["bg$keyword"] = new Style("bg$keyword", null, $value);
+                    static::$defaults[$keyword] = new Style($keyword, $value);
+                    static::$defaults["bg$keyword"] = new Style("bg$keyword", null, $value);
                 } else static::$defaults[$keyword] = new Style($keyword, null, null, $value);
             }
         }

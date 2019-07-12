@@ -44,4 +44,16 @@ interface StyleInterface {
      * @return string
      */
     public function applyTo(string $message): string;
+
+    /**
+     * Get Prefixed Style
+     * @return string
+     */
+    public function getPrefix(): string;
+
+    /**
+     * Get Suffixed Style
+     * @return string
+     */
+    public function getSuffix(): string;
 }

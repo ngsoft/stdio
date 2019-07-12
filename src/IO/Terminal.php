@@ -10,6 +10,10 @@ class Terminal {
     /** @var int|null */
     private static $height;
 
+    public function __construct() {
+        if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
+    }
+
     /**
      * Get Terminal Width
      * @return int

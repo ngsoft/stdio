@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace NGSOFT\Tools;
 
+use BadMethodCallException;
 use NGSOFT\Tools\{
     Interfaces\FormatterInterface, Interfaces\InputInterface, Interfaces\OutputInterface, Interfaces\StyleSheetInterface,
-    IO\Formatters\PlainTextFormatter, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT,
+    IO\Formatters\PlainTextFormatter, IO\Inputs\STDIN, IO\Outputs\BufferOutput, IO\Outputs\STDERR, IO\Outputs\STDOUT, IO\Styles\Style,
     IO\Styles\StyleSheet, IO\Terminal
 };
-use RuntimeException;
 
 /**
  * Basic CLI Formatter
@@ -75,11 +75,12 @@ class IO {
 
     private function initialize() {
 
-        if (php_sapi_name() !== "cli") throw new RuntimeException(__CLASS__ . " can only be run under CLI Environnement");
+        $this->term = new Terminal();
+
         $this->stdout = new STDOUT();
         $this->stderr = new STDERR();
         $this->stdin = new STDIN();
-        $this->term = new Terminal();
+
         $this->buffer = new BufferOutput();
         $this->stylesheet = new StyleSheet();
         //defines formatter
@@ -162,6 +163,14 @@ class IO {
         return $this;
     }
 
+    /**
+     * Get the Buffer
+     * @return BufferOutput
+     */
+    public function getBuffer(): BufferOutput {
+        return $this->buffer;
+    }
+
     ////////////////////////////   Read and Print   ////////////////////////////
 
     /**
@@ -219,6 +228,110 @@ class IO {
         }
 
         return $answer;
+    }
+
+    /**
+     * Format a message without using tags
+     * @param string $message
+     * @param int $color constant IO::COLOR_*
+     * @param int $bg constant IO::COLOR_*
+     * @param int ...$styles constant IO::STYLE_*
+     * @return string
+     */
+    public function formatMessage(string $message, int $color = null, int $bg = null, int...$styles): string {
+        if (empty($color) and empty($bg) and empty($styles)) return $message;
+        $format = new Style("write");
+        if (isset($color)) $format = $format->withColor($color);
+        if (isset($bg)) $format = $format->withBackgroundColor($bg);
+        if (!empty($styles)) $format = $format->withStyles(...$styles);
+        return $format->applyTo($message);
+    }
+
+    /**
+     * Write messages to the STDOUT
+     * @param string|iterable<string> $messages
+     * @param bool $newline creates newlines after each message
+     * @return static
+     */
+    public function write($messages, bool $newline = false) {
+        $this->getSTDOUT()->write($messages, $newline);
+        return $this;
+    }
+
+    /**
+     * Write messages to the STDOUT and creates new lines between each messages
+     * @param string|iterable<string> $messages
+     * @return static
+     */
+    public function writeln($messages) {
+        $this->getSTDOUT()->writeln($messages);
+        return $this;
+    }
+
+    /**
+     * Write messages to the STDERR
+     * @param string|iterable<string> $messages
+     * @param bool $newline creates newlines after each message
+     * @return static
+     */
+    public function writeerr($messages, bool $newline = false) {
+        $this->getSTDERR()->write($messages, $newline);
+        return $this;
+    }
+
+    /**
+     * Write messages to the STDERR and creates new lines between each messages
+     * @param string|iterable<string> $messages
+     * @return static
+     */
+    public function writeerrln($messages) {
+        $this->getSTDERR()->writeln($messages);
+        return $this;
+    }
+
+    ////////////////////////////   BUFFER   ////////////////////////////
+
+    public function __toString() {
+        return $this->buffer->fetch() . "\033[0m";
+    }
+
+    /**
+     * Flush the buffer into STDOUT
+     * @param string $message
+     * @return static
+     */
+    public function out(string $message = "") {
+        $this->buffer->write($message);
+        return $this->write($this->buffer->fetch());
+    }
+
+    /**
+     * Flush the buffer into STDERR
+     * @param string $message
+     * @return static
+     */
+    public function err(string $message = "") {
+        $this->buffer->write($message);
+        return $this->write($this->buffer->fetch());
+    }
+
+    /**
+     * Set Styles dynamically
+     * Must finish with out() or err() methods
+     * to flush the buffer
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return $this
+     * @throws BadMethodCallException if style does not exists
+     */
+    public function __call($method, $arguments) {
+        if (!$this->stylesheet->hasStyle($method)) {
+            throw new BadMethodCallException(get_class($this) . "::" . $method . '() does not exists.');
+        }
+        $message = (isset($arguments[0]) and is_string($arguments[0])) ? $arguments[0] : "";
+        $this->buffer->write($message);
+        return $this;
     }
 
 }

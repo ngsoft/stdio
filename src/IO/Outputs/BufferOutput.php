@@ -24,7 +24,7 @@ class BufferOutput extends Output {
 
     /** {@inheritdoc} */
     protected function doWrite(string $message, bool $newline) {
-        $this->buffer .= $newline;
+        $this->buffer .= $message;
         if ($newline === true) $this->buffer .= PHP_EOL;
     }
 
