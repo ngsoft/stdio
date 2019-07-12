@@ -11,20 +11,42 @@ use NGSOFT\Tools\{
 };
 
 /**
- * Basic CLI Formatter
- *  Resources used for this project
- * @link http://www.termsys.demon.co.uk/vtansi.htm, https://jonasjacek.github.io/colors/
- * @link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
- *
- * @method STDIO black(?string $message)
- *
- *
- *
+ * @method static black(?string $message) Assign the corresponding Style to the current buffer
+ * @method static red(?string $message) Assign the corresponding Style to the current buffer
+ * @method static green(?string $message) Assign the corresponding Style to the current buffer
+ * @method static yellow(?string $message) Assign the corresponding Style to the current buffer
+ * @method static blue(?string $message) Assign the corresponding Style to the current buffer
+ * @method static magenta(?string $message) Assign the corresponding Style to the current buffer
+ * @method static cyan(?string $message) Assign the corresponding Style to the current buffer
+ * @method static gray(?string $message) Assign the corresponding Style to the current buffer
+ * @method static default(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgblack(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgred(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bggreen(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgyellow(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgblue(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgmagenta(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgcyan(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bggray(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bgdefault(?string $message) Assign the corresponding Style to the current buffer
+ * @method static bright(?string $message) Assign the corresponding Style to the current buffer
+ * @method static underscore(?string $message) Assign the corresponding Style to the current buffer
+ * @method static blink(?string $message) Assign the corresponding Style to the current buffer
+ * @method static reverse(?string $message) Assign the corresponding Style to the current buffer
+ * @method static conceal(?string $message) Assign the corresponding Style to the current buffer
+ * @method static error(?string $message) Assign the corresponding Style to the current buffer
+ * @method static info(?string $message) Assign the corresponding Style to the current buffer
+ * @method static notice(?string $message) Assign the corresponding Style to the current buffer
+ * @method static comment(?string $message) Assign the corresponding Style to the current buffer
+ * @method static question(?string $message) Assign the corresponding Style to the current buffer
  */
 class IO {
 
     /**
      * STDIO Version
+     *  Resources used for this project
+     * @link http://www.termsys.demon.co.uk/vtansi.htm, https://jonasjacek.github.io/colors/
+     * @link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
      */
     const VERSION = '1.0.0';
 
@@ -296,7 +318,7 @@ class IO {
     ////////////////////////////   BUFFER   ////////////////////////////
 
     public function __toString() {
-        return $this->buffer->fetch() . "\033[0m";
+        return $this->buffer->fetch();
     }
 
     /**
@@ -305,7 +327,7 @@ class IO {
      * @return static
      */
     public function out(string $message = "") {
-        $this->buffer->write($message);
+        $this->reset()->buffer->write($message);
         return $this->write($this->buffer->fetch());
     }
 
@@ -315,7 +337,7 @@ class IO {
      * @return static
      */
     public function err(string $message = "") {
-        $this->buffer->write($message);
+        $this->reset()->buffer->write($message);
         return $this->write($this->buffer->fetch());
     }
 
@@ -369,6 +391,15 @@ class IO {
      */
     public function linebreak(int $count = 1) {
         if ($count > 0) $this->buffer->write(str_repeat(PHP_EOL, $count));
+        return $this;
+    }
+
+    /**
+     * Reset The Styles
+     * @return static
+     */
+    public function reset() {
+        $this->buffer->write("\033[0m");
         return $this;
     }
 

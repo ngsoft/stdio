@@ -6,6 +6,7 @@ namespace NGSOFT\Tools\IO\Formatters;
 
 class PlainTextFormatter extends Formatter {
 
+    /** {@inheritdoc} */
     public function format(string $message): string {
         $message = strip_tags($message);
         $message = str_replace(['&gt;', '&lt;', '{:', ':}'], ['>', '<', '', ''], $message);
