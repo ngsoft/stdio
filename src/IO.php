@@ -398,6 +398,15 @@ class IO {
     }
 
     /**
+     * Adds \r to the buffer
+     * @return static
+     */
+    public function returnStartOfLine() {
+        $this->buffer->write("\r");
+        return $this;
+    }
+
+    /**
      * Insert tabulations into buffer
      * @param int $count
      * @return static
