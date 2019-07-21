@@ -45,10 +45,11 @@ class IO {
     /**
      * STDIO Version
      *  Resources used for this project
-     * @link http://www.termsys.demon.co.uk/vtansi.htm, https://jonasjacek.github.io/colors/
+     * @link http://www.termsys.demon.co.uk/vtansi.htm
+     * @link https://jonasjacek.github.io/colors/
      * @link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.1';
 
     /**
      * Basic Terminal Colors
@@ -73,6 +74,9 @@ class IO {
     const STYLE_CONCEAL = 8;
 
     //const STYLE_RESET = 0;
+
+    /** @var bool */
+    private $hasColors;
 
     /** @var STDIN */
     private $stdin;
@@ -101,7 +105,7 @@ class IO {
     private function initialize() {
 
         $this->term = new Terminal();
-
+        $this->hasColors = $this->term->hasColorSupport();
         $this->stdout = new STDOUT();
         $this->stderr = new STDERR();
         $this->stdin = new STDIN();
@@ -280,7 +284,7 @@ class IO {
      * @return static
      */
     public function write($messages, bool $newline = false) {
-        $messages = ltrim($messages);
+        //$messages = ltrim($messages);
         $this->getSTDOUT()->write($messages, $newline);
         return $this;
     }
@@ -302,7 +306,7 @@ class IO {
      * @return static
      */
     public function writeerr($messages, bool $newline = false) {
-        $messages = ltrim($messages);
+        //$messages = ltrim($messages);
         $this->getSTDERR()->write($messages, $newline);
         return $this;
     }
@@ -365,6 +369,33 @@ class IO {
     }
 
     ////////////////////////////   Special Features   ////////////////////////////
+
+    /**
+     * Clears the entire line
+     * @return static
+     */
+    public function clearLine() {
+        if ($this->hasColors) $this->buffer->write("\033[2K");
+        return $this;
+    }
+
+    /**
+     * Clears From the cursor to the start of the line
+     * @return static
+     */
+    public function clearStartOfLine() {
+        if ($this->hasColors) $this->buffer->write("\033[1K");
+        return $this;
+    }
+
+    /**
+     * Clears From the cursor to the end of the line
+     * @return static
+     */
+    public function clearEndOfLine() {
+        if ($this->hasColors) $this->buffer->write("\033[K");
+        return $this;
+    }
 
     /**
      * Insert tabulations into buffer

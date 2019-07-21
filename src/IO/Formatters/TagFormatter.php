@@ -71,6 +71,32 @@ class TagFormatter extends PlainTextFormatter {
                         case "hr":
                             $result .= PHP_EOL . str_repeat('-', 64) . PHP_EOL;
                             break;
+                        case "rect":
+                            $prefix = $suffix = ""; $matches = [];
+                            if ($classList = $node->getAttribute("class") and preg_match_all('/(\w+)(?:\s+)?/', $classList, $matches)) {
+                                foreach ($matches[1] as $class) {
+                                    if ($stylesheet->hasStyle($class)) {
+                                        $suffix .= $stylesheet->getStyle($class)->getSuffix();
+                                        $prefix .= $stylesheet->getStyle($class)->getPrefix();
+                                    }
+                                }
+                            }
+                            if ($w = $node->getAttribute("width") and preg_match('/^\d+$/', $w)) $width = intval($w);
+                            else $width = 64;
+                            $message = $this->parseNodes($node, $stylesheet);
+                            $len = mb_strlen($message);
+                            if ($width > $len) {
+                                $repeats = (int) ceil(($width - $len) / 2);
+                                $message = str_repeat(" ", $repeats) . $message . str_repeat(" ", $repeats);
+                                $len = mb_strlen($message);
+                            }
+
+                            $result .= PHP_EOL . $prefix;
+                            $result .= "{:\t\t:}" . str_repeat(" ", $len + 8) . PHP_EOL;
+                            $result .= "{:\t\t:}{:space*4:}" . $message . "{:space*4:}" . PHP_EOL;
+                            $result .= "{:\t\t:}" . str_repeat(" ", $len + 8) . $suffix . PHP_EOL;
+
+                            break;
                         default :
                             $prefix = $suffix = ""; $matches = [];
                             if ($classList = $node->getAttribute("class") and preg_match_all('/(\w+)(?:\s+)?/', $classList, $matches)) {
@@ -82,6 +108,7 @@ class TagFormatter extends PlainTextFormatter {
                                 }
                             }
                             if (in_array($tag, $this->blocktags)) {
+
                                 $prefix .= PHP_EOL;
                                 $suffix .= PHP_EOL;
                             }
