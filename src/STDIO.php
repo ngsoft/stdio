@@ -14,6 +14,9 @@ final class STDIO {
     /** @var Terminal */
     private $terminal;
 
+    /** @var bool */
+    private $supportsColors;
+
     /** @var array<string,STDIO\Interfaces\Input> */
     private $inputs = [];
 
@@ -31,6 +34,7 @@ final class STDIO {
 
     public function __construct() {
         $this->terminal = new Terminal();
+        $this->supportsColors = $this->terminal->hasColorSupport();
         $this->inputs['in'] = new StreamInput();
         $stdout = new StreamOutput();
         $this->outputs['out'] = $stdout;
@@ -38,7 +42,7 @@ final class STDIO {
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
 
-        if ($this->terminal->hasColorSupport()) $formatter = new STDIO\Formatters\Tags();
+        if ($this->supportsColors) $formatter = new STDIO\Formatters\Tags();
         else $formatter = new STDIO\Formatters\PlainText();
         $formatter->setStyles($this->styles);
         $formatter->setTerminal($this->terminal);
@@ -146,6 +150,7 @@ final class STDIO {
             $this->buffer->clear();
             $this->writeln($message);
         }
+        if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
         $this->buffer->flush($this->getOutput('out'));
         return $this;
     }
@@ -160,6 +165,7 @@ final class STDIO {
             $this->buffer->clear();
             $this->writeln($message);
         }
+        if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
         $this->buffer->flush($this->getOutput('err'));
         return $this;
     }

@@ -14,35 +14,39 @@ class Tags implements Formatter {
     /** @var Terminal */
     protected $term;
 
+    /** @var SpecialTags */
+    protected $specials;
+
     /** @var array<string,string> */
     protected $tags = [];
+
+    /** @var array<string,string> */
+    protected $replacements = [
+        "\s" => " ",
+        "\t" => "    ",
+        '&gt;' => '>',
+        '&lt;' => '<'
+    ];
 
     /** {@inheritdoc} */
     public function format(string $message): string {
 
+        $message = $this->specials->format($message);
         $message = str_replace(array_keys($this->tags), array_values($this->tags), $message);
-        $message = $this->parseSpecialTags($message);
-        $message = strip_tags($message);
+        $message = strip_tags($message); //removes not managed tags
+        $message = str_replace(array_keys($this->replacements), array_values($this->replacements), $message);
         return $message;
-    }
-
-    protected function parseSpecialTags(string $message): string {
-
-        return preg_replace_callback('/([<](?:\\\)*(?P<end>\/)*(\w+)[>])/', function($matches) {
-
-            var_dump($matches);
-
-            return $matches[0];
-        }, $message);
     }
 
     public function setTerminal(Terminal $terminal) {
         $this->term = $terminal;
+        $this->specials->setTerminal($terminal);
     }
 
     /** {@inheritdoc} */
     public function setStyles(Styles $styles) {
         $this->styles = $styles;
+        $this->specials->setStyles($styles);
         $this->build($styles);
     }
 
@@ -52,8 +56,13 @@ class Tags implements Formatter {
 
         foreach ($styles as $name => $style) {
             $tags[sprintf('<%s>', $name)] = $style->getPrefix();
+            $tags[sprintf('<\\%s>', $name)] = $style->getPrefix();
             $tags[sprintf('</%s>', $name)] = $style->getSuffix();
         }
+    }
+
+    public function __construct() {
+        $this->specials = new SpecialTags();
     }
 
 }
