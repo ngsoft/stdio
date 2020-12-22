@@ -8,9 +8,7 @@ interface Output {
 
     /**
      * Writes a message to the output.
-     *
      * @param string $message
-     * @param bool $newline  Whether to add a newline
      */
     public function write(string $message);
 

@@ -2,6 +2,11 @@
 
 namespace NGSOFT\STDIO\Outputs;
 
+use NGSOFT\STDIO\Interfaces\{
+    Formatter, Output, Stream
+};
+use RuntimeException;
+
 class StreamOutput implements Stream, Output {
 
     /** @var Formatter */
