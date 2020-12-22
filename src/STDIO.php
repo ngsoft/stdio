@@ -120,8 +120,8 @@ final class STDIO {
 
     /**
      * Prompt for a value
+     * @suppress PhanTypeMismatchReturnNullable
      * @param string $prompt
-     * @param string $classList
      * @return string
      */
     public function prompt(string $prompt): string {
@@ -141,6 +141,7 @@ final class STDIO {
 
     /**
      * Prompt for a confirmation
+     * @suppress PhanTypeMismatchReturnNullable
      * @param string $prompt
      * @param bool $default
      * @return bool
@@ -247,6 +248,83 @@ final class STDIO {
         $progress = new ProgressBar($total, $this->getOutput(), $onComplete);
         $progress->setStyles($this->styles);
         return $progress;
+    }
+
+    ////////////////////////////   Special Features   ////////////////////////////
+
+    /**
+     * Insert tabulations into buffer
+     * @param int $count
+     * @return static
+     */
+    public function tab(int $count = 1) {
+        if ($count > 0) $this->write(str_repeat("\t", $count));
+        return $this;
+    }
+
+    /**
+     * Insert Spaces into Buffer
+     * @param int $count
+     * @return static
+     */
+    public function space(int $count = 1) {
+        if ($count > 0) $this->write(str_repeat(" ", $count));
+        return $this;
+    }
+
+    /**
+     * Insert Line break into buffer
+     * @param int $count
+     * @return static
+     */
+    public function linebreak(int $count = 1) {
+        if ($count > 0) $this->write(str_repeat("\n", $count));
+        return $this;
+    }
+
+    /**
+     * Adds \r to the buffer
+     * @return static
+     */
+    public function returnStartOfLine() {
+        $this->write("\r");
+        return $this;
+    }
+
+    /**
+     * Reset The Styles
+     * @return static
+     */
+    public function reset() {
+        $this->write("\033[0m");
+        return $this;
+    }
+
+    /**
+     * Clears the entire line
+     * @return static
+     */
+    public function clearLine() {
+        if ($this->supportsColors) $this->write("\033[2K");
+        return $this;
+    }
+
+    /**
+     * Clears From the cursor to the start of the line
+     * @return static
+     */
+    public function clearStartOfLine() {
+        if ($this->supportsColors) $this->write("\033[1K");
+        return $this;
+    }
+
+    /**
+     * Clears From the cursor to the end of the line
+     * @return static
+     */
+    public function clearEndOfLine() {
+        if ($this->supportsColors) $this->write("\033[K");
+        return $this;
     }
 
 }

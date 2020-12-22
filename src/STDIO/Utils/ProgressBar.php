@@ -92,7 +92,7 @@ class ProgressBar implements Renderer {
                 $label = $label . str_repeat(" ", $repeats);
             } else $label = str_repeat(" ", (int) floor($available / 2));
             $line = sprintf("\r%s%s%s", Styles::CLEAR_END_LINE, $label, $progress);
-        } else $line = sprintf("\r%s%s", Styles::CLEAR_END_LINE, $progress);;
+        } else $line = sprintf("\r%s%s", Styles::CLEAR_END_LINE, $progress);
         return $line;
     }
 
