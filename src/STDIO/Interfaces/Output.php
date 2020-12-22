@@ -25,4 +25,11 @@ interface Output {
      * @return Formatter
      */
     public function getFormatter(): Formatter;
+
+    /**
+     * Get new instance using defined formatter
+     * @param Formatter $formatter
+     * @return static
+     */
+    public function withFormatter(Formatter $formatter);
 }

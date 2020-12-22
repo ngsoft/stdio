@@ -8,9 +8,8 @@ interface Buffer {
      * Adds Message to the buffer
      *
      * @param string $message
-     * @param bool $newline  Whether to add a newline
      */
-    public function write(string $message, bool $newline = false);
+    public function write(string $message);
 
     /**
      * Output and empties the Buffer
