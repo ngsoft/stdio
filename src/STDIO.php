@@ -170,4 +170,14 @@ final class STDIO {
         return $this;
     }
 
+    ////////////////////////////   Utils  ////////////////////////////
+
+
+    public function createRect(): STDIO\Utils\Rect {
+
+        $rect = new STDIO\Utils\Rect();
+        $rect->setStyles($this->styles);
+        return $rect;
+    }
+
 }
