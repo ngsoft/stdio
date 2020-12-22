@@ -6,7 +6,7 @@ use NGSOFT\STDIO\{
     Interfaces\Formatter, Styles
 };
 
-class Style implements Formatter {
+class Style {
 
     private $prefix = [];
     private $suffix = [];
@@ -69,7 +69,11 @@ class Style implements Formatter {
         return $suffix;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * Format the string using current style
+     * @param string $message
+     * @return string
+     */
     public function format(string $message): string {
         return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
     }
