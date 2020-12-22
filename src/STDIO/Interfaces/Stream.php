@@ -8,12 +8,12 @@ interface Stream {
      * Get the stream
      * @return resource
      */
-    public function getStream(): resource;
+    public function getStream();
 
     /**
      * Gets a new instance with defined stream
      * @param resource $stream
      * @return static
      */
-    public function withStream(resource $stream);
+    public function withStream($stream);
 }
