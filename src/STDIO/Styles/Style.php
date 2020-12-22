@@ -2,9 +2,7 @@
 
 namespace NGSOFT\STDIO\Styles;
 
-use NGSOFT\STDIO\{
-    Interfaces\Formatter, Styles
-};
+use NGSOFT\STDIO\Styles;
 
 class Style {
 

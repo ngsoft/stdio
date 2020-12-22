@@ -7,7 +7,7 @@ use NGSOFT\STDIO\{
     Outputs\StreamOutput, Styles, Terminal
 };
 
-class STDIO {
+final class STDIO {
 
     const VERSION = '2.0';
 
@@ -37,6 +37,12 @@ class STDIO {
         $this->outputs['err'] = $stdout->withStream(fopen('php://stderr', 'w'));
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
+
+        if ($this->terminal->hasColorSupport()) $formatter = new STDIO\Formatters\Tags();
+        else $formatter = new STDIO\Formatters\PlainText();
+        $formatter->setStyles($this->styles);
+        $formatter->setTerminal($this->terminal);
+        $this->formatter = $formatter;
     }
 
     ////////////////////////////   GETTERS   ////////////////////////////
@@ -104,6 +110,58 @@ class STDIO {
      */
     public function getOutput(string $index = 'out'): ?Output {
         return $this->outputs[$index] ?? null;
+    }
+
+    ////////////////////////////   Read and Write   ////////////////////////////
+
+    /**
+     * Adds Message to the Buffer
+     * @param string $message
+     * @return static
+     */
+    public function write(string $message): self {
+        $message = $this->formatter->format($message);
+        $this->buffer->write($message);
+        return $this;
+    }
+
+    /**
+     * Adds Line to the Buffer
+     * @param string $message
+     * @return static
+     */
+    public function writeln(string $message): self {
+        $this->write($message);
+        $this->buffer->write("\n");
+        return $this;
+    }
+
+    /**
+     * Output the Buffer
+     * @param string|null $message
+     * @return static
+     */
+    public function out(?string $message = null): self {
+        if (is_string($message)) {
+            $this->buffer->clear();
+            $this->writeln($message);
+        }
+        $this->buffer->flush($this->getOutput('out'));
+        return $this;
+    }
+
+    /**
+     * Output the Buffer to STDERR
+     * @param string|null $message
+     * @return static
+     */
+    public function err(?string $message = null): self {
+        if (is_string($message)) {
+            $this->buffer->clear();
+            $this->writeln($message);
+        }
+        $this->buffer->flush($this->getOutput('err'));
+        return $this;
     }
 
 }
