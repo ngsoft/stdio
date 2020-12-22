@@ -20,23 +20,6 @@ class StreamOutput implements Stream, Output {
     }
 
     /** {@inheritdoc} */
-    public function getFormatter(): Formatter {
-        return $this->formatter;
-    }
-
-    /** {@inheritdoc} */
-    public function setFormatter(Formatter $formatter) {
-        $this->formatter = $formatter;
-    }
-
-    /** {@inheritdoc} */
-    public function withFormatter(Formatter $formatter) {
-        $i = clone $this;
-        $i->formatter = $formatter;
-        return $i;
-    }
-
-    /** {@inheritdoc} */
     public function write(string $message) {
         if (false === @fwrite($this->stream, $message)) {
             throw new RuntimeException('Unable to write output.');

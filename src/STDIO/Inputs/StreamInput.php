@@ -6,7 +6,7 @@ use NGSOFT\STDIO\Interfaces\{
     Input, Stream
 };
 
-class StdIN implements Input, Stream {
+class StreamInput implements Stream, Input {
 
     /** @var resource */
     private $stream;

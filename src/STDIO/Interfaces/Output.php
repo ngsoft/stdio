@@ -11,23 +11,4 @@ interface Output {
      * @param string $message
      */
     public function write(string $message);
-
-    /**
-     * Set the Formatter
-     * @param Formatter $formatter
-     */
-    public function setFormatter(Formatter $formatter);
-
-    /**
-     * Get the Formatter
-     * @return Formatter
-     */
-    public function getFormatter(): Formatter;
-
-    /**
-     * Get new instance using defined formatter
-     * @param Formatter $formatter
-     * @return static
-     */
-    public function withFormatter(Formatter $formatter);
 }
