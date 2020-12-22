@@ -20,6 +20,7 @@ class StreamInput implements Stream, Input {
         $result = [];
         do {
             $line = fgets($this->stream);
+            $line = rtrim($line, "\r\n");
             $result[] = rtrim($line, "\r\n");
         } while (count($result) !== $lines);
         return $result;

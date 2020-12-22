@@ -3,8 +3,8 @@
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Inputs\StreamInput, Interfaces\Buffer, Interfaces\Formatter, Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer,
-    Outputs\StreamOutput, Styles, Terminal
+    Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Buffer, Interfaces\Formatter, Interfaces\Input,
+    Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\ProgressBar, Utils\Rect
 };
 
 final class STDIO {
@@ -42,8 +42,8 @@ final class STDIO {
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
 
-        if ($this->supportsColors) $formatter = new STDIO\Formatters\Tags();
-        else $formatter = new STDIO\Formatters\PlainText();
+        if ($this->supportsColors) $formatter = new Tags();
+        else $formatter = new PlainText();
         $formatter->setStyles($this->styles);
         $formatter->setTerminal($this->terminal);
         $this->formatter = $formatter;
@@ -119,6 +119,60 @@ final class STDIO {
     ////////////////////////////   Read and Write   ////////////////////////////
 
     /**
+     * Prompt for a value
+     * @param string $prompt
+     * @param string $classList
+     * @return string
+     */
+    public function prompt(string $prompt): string {
+
+        $result = null;
+        do {
+            $this->buffer->clear();
+            $this->write($prompt)->write(' ')->out();
+            $lines = $this->getInput()->read();
+            $line = $lines[0];
+            if (!empty($line)) $result = $line;
+        } while ($result === null);
+
+
+        return $result;
+    }
+
+    /**
+     * Prompt for a confirmation
+     * @param string $prompt
+     * @param bool $default
+     * @return bool
+     */
+    public function confirm(
+            string $prompt,
+            bool $default = false
+    ): bool {
+        $yes = ["yes", "y"];
+        $no = ["no", "n"];
+
+        $ynprompt = $default === true ? ' [Y/n]: ' : ' [y/N]: ';
+
+
+        $result = null;
+        do {
+            $this->buffer->clear();
+            $this->write($prompt)->write($ynprompt)->out();
+            $response = $this->getInput()->read();
+            $line = $response[0];
+            if (empty($line)) $result = $default;
+            else {
+                $line = strtolower($line);
+                if (in_array($line, $yes)) $result = true;
+                elseif (in_array($line, $no)) $result = false;
+            }
+        } while (!is_bool($result));
+
+        return $result;
+    }
+
+    /**
      * Adds Message to the Buffer
      * @param string $message
      * @return static
@@ -172,12 +226,27 @@ final class STDIO {
 
     ////////////////////////////   Utils  ////////////////////////////
 
+    /**
+     * Creates Rectangle Object
+     * @return Rect
+     */
+    public function createRect(): Rect {
 
-    public function createRect(): STDIO\Utils\Rect {
-
-        $rect = new STDIO\Utils\Rect();
+        $rect = new Rect();
         $rect->setStyles($this->styles);
         return $rect;
+    }
+
+    /**
+     * Creates a Progress Bar
+     * @param int $total
+     * @param callable|null $onComplete
+     * @return ProgressBar
+     */
+    public function createProgressBar(int $total = 100, ?callable $onComplete = null): ProgressBar {
+        $progress = new ProgressBar($total, $this->getOutput(), $onComplete);
+        $progress->setStyles($this->styles);
+        return $progress;
     }
 
 }

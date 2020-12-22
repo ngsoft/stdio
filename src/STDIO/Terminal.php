@@ -22,10 +22,22 @@ class Terminal {
      */
     public function getWidth(): int {
         if ($width = getenv('COLUMNS')) return (int) trim($width);
-        @exec('tput cols 2>&1', $out, $retval);
-        if ($retval == 0) return (int) trim($out[0]);
 
-        return 80;
+        if (DIRECTORY_SEPARATOR === '\\') { // Windows
+            @exec('mode con /status', $out, $retval);
+            if ($retval == 0) {
+                $line = $out[4];
+                if (preg_match('/(\d+)/', $line, $matches) !== false) return (int) $matches[1];
+            }
+        } else {
+            @exec('stty size 2>&1', $out, $retval);
+            if ($retval == 0) {
+                $list = explode(' ', $out[0]);
+                return (int) trim($list[1]);
+            }
+        }
+
+        return 120;
     }
 
     /**
@@ -34,9 +46,21 @@ class Terminal {
      */
     public function getHeight(): int {
         if ($height = getenv('LINES')) return (int) trim($height);
-        @exec('tput lines 2>&1', $out, $retval);
-        if ($retval == 0) return (int) trim($out[0]);
-        return 24;
+        if (DIRECTORY_SEPARATOR === '\\') { // Windows
+            @exec('mode con /status', $out, $retval);
+            if ($retval == 0) {
+                $line = $out[4];
+                if (preg_match('/(\d+)/', $line, $matches) !== false) return (int) $matches[1];
+            }
+        } else {
+            @exec('stty size 2>&1', $out, $retval);
+            if ($retval == 0) {
+                $list = explode(' ', $out[0]);
+                return (int) trim($list[0]);
+            }
+        }
+
+        return 30;
     }
 
     /**

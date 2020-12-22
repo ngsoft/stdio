@@ -3,8 +3,9 @@
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
-    Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles as Styles2, Styles\Style, Terminal
+    Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
 };
+use function mb_strlen;
 
 class Rect implements Renderer {
 
@@ -13,7 +14,7 @@ class Rect implements Renderer {
     /** @var Terminal */
     private $term;
 
-    /** @var Styles2 */
+    /** @var Styles */
     private $styles;
 
     /** @var int */
@@ -61,7 +62,7 @@ class Rect implements Renderer {
      */
     public function setBackground(string $color) {
         if (isset($this->styles["bg$color"])) $this->background = $this->styles["bg$color"];
-        if (isset($this->styles)) return $this;
+        return $this;
     }
 
     /**
@@ -100,7 +101,6 @@ class Rect implements Renderer {
         $maxlen = 64;
 
         $rectlines = [""];
-
         foreach ($lines as $line) {
             if (mb_strlen($line) > $maxlen) $maxlen = mb_strlen($line);
             $rectlines[] = $line;
@@ -108,7 +108,7 @@ class Rect implements Renderer {
 
         $rectlines[] = "";
 
-        $margin_left = floor(($this->term->width - $maxlen) / 2);
+        $margin_left = (int) floor(($this->term->width - $maxlen) / 2);
         foreach ($rectlines as $line) {
             $message = $clear . str_repeat(" ", $margin_left);
             $len = mb_strlen($line);

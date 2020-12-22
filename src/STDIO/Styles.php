@@ -52,6 +52,7 @@ class Styles extends ArrayObject {
 
     const BG_COLOR_MODIFIER = 10;
     const TRUE_COLOR_MODIFIER = 60;
+    //const ESCAPE = "\u001B[";
     const ESCAPE = "\033[";
     const STYLE_SUFFIX = "m";
     const CLEAR_LINE = self::ESCAPE . "2K";

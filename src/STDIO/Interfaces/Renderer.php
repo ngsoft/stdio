@@ -2,8 +2,6 @@
 
 namespace NGSOFT\STDIO\Interfaces;
 
-use NGSOFT\STDIO\Styles;
-
 interface Renderer {
 
     /**
@@ -11,10 +9,4 @@ interface Renderer {
      * @param Output $output
      */
     public function render(Output $output);
-
-    /**
-     * Set Styles
-     * @param \NGSOFT\STDIO\Interfaces\Styles $styles
-     */
-    public function setStyles(Styles $styles);
 }
