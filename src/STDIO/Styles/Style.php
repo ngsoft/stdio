@@ -11,15 +11,26 @@ class Style implements Formatter {
     private $prefix = [];
     private $suffix = [];
 
-    /** @return \NGSOFT\STDIO\Styles\Style */
+    /** @return Style */
     private function getClone(): Style {
         return clone $this;
     }
 
     /**
+     * Reset Styles
+     * @internal
+     * @return Style
+     */
+    public function reset(): Style {
+        $this->prefix = [];
+        $this->suffix = [];
+        return $this;
+    }
+
+    /**
      * Get a clone with defined prefix
      * @param array $codes
-     * @return \NGSOFT\STDIO\Styles\Style
+     * @return Style
      */
     public function withPrefix(array $codes): Style {
         $clone = $this->getClone();
@@ -30,7 +41,7 @@ class Style implements Formatter {
     /**
      * Get a clone with defined suffix
      * @param array $codes
-     * @return \NGSOFT\STDIO\Styles\Style
+     * @return Style
      */
     public function withSuffix(array $codes): Style {
         $clone = $this->getClone();
@@ -38,12 +49,29 @@ class Style implements Formatter {
         return $clone;
     }
 
+    /**
+     * Get Prefix as string
+     * @return string
+     */
+    public function getPrefix(): string {
+        $prefix = '';
+        if (count($this->prefix) > 0) $prefix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->prefix));
+        return $prefix;
+    }
+
+    /**
+     * Get Suffix as string
+     * @return string
+     */
+    public function getSuffix(): string {
+        $suffix = '';
+        if (count($this->suffix) > 0) $suffix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->suffix));
+        return $suffix;
+    }
+
     /** {@inheritdoc} */
     public function format(string $message): string {
-        $prefix = $suffix = '';
-        if (count($this->prefix) > 0) $prefix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->prefix));
-        if (count($this->suffix) > 0) $suffix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->prefix));
-        return sprintf("%s%s%s", $prefix, $message, $suffix);
+        return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
     }
 
 }

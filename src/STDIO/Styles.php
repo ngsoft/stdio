@@ -2,20 +2,11 @@
 
 namespace NGSOFT\STDIO;
 
-use NGSOFT\STDIO\Utils\ArrayObject;
+use NGSOFT\STDIO\{
+    Styles\Style, Utils\ArrayObject
+};
 
 class Styles extends ArrayObject {
-
-    // Colors
-    const COLOR_DEFAULT = 39;
-    const COLOR_BLACK = 30;
-    const COLOR_RED = 31;
-    const COLOR_GREEN = 32;
-    const COLOR_YELLOW = 33;
-    const COLOR_BLUE = 34;
-    const COLOR_MAGENTA = 35;
-    const COLOR_CYAN = 36;
-    const COLOR_GRAY = 37;
 
     public static $colors = [
         //color => [set, unset]
@@ -36,25 +27,6 @@ class Styles extends ArrayObject {
         'BRIGHTCYAN' => [96, 39],
         'BRIGHTWHITE' => [97, 39],
     ];
-    public static $bg = [
-        //color => [set, unset]
-        'BLACK' => [40, 49],
-        'RED' => [41, 49],
-        'GREEN' => [42, 49],
-        'YELLOW' => [43, 49],
-        'BLUE' => [44, 49],
-        'MAGENTA' => [45, 49],
-        'CYAN' => [46, 49],
-        'WHITE' => [47, 49],
-        'GRAY' => [100, 49],
-        'BRIGHTRED' => [101, 49],
-        'BRIGHTGREEN' => [102, 49],
-        'BRIGHTYELLOW' => [103, 49],
-        'BRIGHTBLUE' => [104, 49],
-        'BRIGHTMAGENTA' => [105, 49],
-        'BRIGHTCYAN' => [106, 49],
-        'BRIGHTWHITE' => [107, 49],
-    ];
     public static $styles = [
         //style => [set, unset]
         'RESET' => [0, 0],
@@ -65,6 +37,13 @@ class Styles extends ArrayObject {
         'INVERSE' => [7, 27],
         'HIDDEN' => [8, 28],
         'STRIKETROUGH' => [9, 29]
+    ];
+    public static $custom = [
+        'error' => [[37, 41], [39, 49]],
+        'info' => [[32, 49], [39, 49]],
+        'comment' => [[33, 49], [39, 49]],
+        'question' => [[30, 46], [39, 49]],
+        'notice' => [[36, 49], [39, 49]],
     ];
     public static $replacements = [
         "\t" => "    ",
@@ -82,7 +61,39 @@ class Styles extends ArrayObject {
     const RETURN = "\r";
 
     public function __construct() {
-        //parent::__construct($array);
+        parent::__construct($this->build());
+    }
+
+    /**
+     * Build defaults themes
+     * @return array
+     */
+    private function build(): array {
+        $result = [];
+        $style = new Style();
+
+        foreach (self::$colors as $name => $params) {
+            $name = strtolower($name);
+            list($set, $unset) = $params;
+            //build colors
+            $result[$name] = $style->withPrefix([$set])->withSuffix([$unset]);
+            //build bgcolors
+            $result["bg$name"] = $style->withPrefix([$set + 10])->withSuffix([$unset + 10]);
+        }
+
+        foreach (self::$styles as $name => $params) {
+            $name = strtolower($name);
+            list($set, $unset) = $params;
+            //build styles
+            $result[$name] = $style->withPrefix([$set])->withSuffix([$unset]);
+        }
+        foreach (self::$custom as $name => $params) {
+            $name = strtolower($name);
+            list($set, $unset) = $params;
+            $result[$name] = $style->withPrefix($set)->withSuffix($unset);
+        }
+
+        return $result;
     }
 
 }

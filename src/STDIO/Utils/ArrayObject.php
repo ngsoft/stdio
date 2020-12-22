@@ -47,8 +47,8 @@ class ArrayObject implements ArrayAccess, Countable, Iterator, JsonSerializable,
      * Creates an Object
      * @param array $array
      */
-    public function __construct(array &$array = []) {
-        $this->storage = &$array;
+    public function __construct(array $array = []) {
+        $this->storage = $array;
     }
 
     /** {@inheritdoc} */
