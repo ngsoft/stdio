@@ -12,7 +12,7 @@ interface Output {
      * @param string $message
      * @param bool $newline  Whether to add a newline
      */
-    public function write(string $message, bool $newline = false);
+    public function write(string $message);
 
     /**
      * Set the Formatter

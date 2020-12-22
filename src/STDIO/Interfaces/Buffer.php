@@ -12,6 +12,12 @@ interface Buffer {
     public function write(string $message);
 
     /**
+     * Get Current Buffer
+     * @return array<string>
+     */
+    public function getBuffer(): array;
+
+    /**
      * Output and empties the Buffer
      * @param Output $output
      */
