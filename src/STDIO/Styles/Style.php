@@ -1,12 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\STDIO\Styles;
 
 use NGSOFT\STDIO\Styles;
 
-class Style {
+final class Style {
 
+    public static $validColors = [
+        30, 31, 32, 33, 34, 35, 36, 37, 39,
+        90, 91, 92, 93, 94, 95, 96, 97
+    ];
+    public static $validStyles = [
+        0, 1, 2, 3, 4, 7, 8, 9
+    ];
+
+    /** @var int[] */
     private $prefix = [];
+
+    /** @var int[] */
     private $suffix = [];
 
     /** @return Style */
