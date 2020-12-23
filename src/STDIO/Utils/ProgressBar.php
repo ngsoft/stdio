@@ -10,20 +10,10 @@ use function mb_strlen;
 class ProgressBar implements Renderer {
 
     // Style
-    const ICON_DONE = "▓";
+    const ICON_PROGRESS = "▓";
+    const ICON_DONE = "█";
     const ICON_LEFT = "░";
     const ICON_BORDER = "|";
-    // Configuration
-    const D_STATUS = 8;
-    const D_LABEL = 16;
-    const D_PROGRESS = 32;
-    const D_PERCENT = 64;
-    const DEFAULT_DISPLAY = [
-        self::D_STATUS,
-        self::D_LABEL,
-        self::D_PROGRESS,
-        self::D_PERCENT
-    ];
 
     /** @var Terminal */
     private $term;
@@ -56,12 +46,20 @@ class ProgressBar implements Renderer {
         $this->term = new Terminal();
         $this->output = new StreamOutput();
         $this->progressBarStyles = new ProgressBarStyles();
+
+        $this->progressBarStyles
+                ->setBarColor('cyan')
+                ->setPercentColor('white')
+                ->setStatusColor('yellow')
+                ->setLabelColor('green');
     }
 
     ////////////////////////////   Render  ////////////////////////////
 
-
-
+    /**
+     * Build the string to display into the terminal
+     * @return string
+     */
     private function build(): string {
 
         $result = [
@@ -71,8 +69,10 @@ class ProgressBar implements Renderer {
         $width = $this->term->width - 1;
 
         $reserved = 0;
+        $barDisplayed = false;
         if (in_array(ProgressBarStyles::DISPLAY_BAR, $components)) {
             $reserved += 54;
+            $barDisplayed = true;
         }
         if (in_array(ProgressBarStyles::DISPLAY_PERCENT, $components)) {
             $reserved += 6;
@@ -89,31 +89,41 @@ class ProgressBar implements Renderer {
 
             if ($data = $this->{$method}()) {
 
-
-                $result[] = sprintf("%s ", $data['text']);
-
-
-                if ($component == ProgressBarStyles::DISPLAY_LABEL) {
+                if (
+                        $component == ProgressBarStyles::DISPLAY_LABEL
+                        and $barDisplayed
+                ) {
+                    //centers the label
                     $repeats = $available - 1;
                     $repeats -= $data['len'];
-                    $result [] = str_repeat(' ', $repeats);
-                }
+
+                    switch ($this->progressBarStyles->getLabelPosition()) {
+                        case ProgressBarStyles::LABEL_POSITION_LEFT:
+                            $result[] = sprintf("%s%s ", $data['text'], str_repeat(' ', $repeats));
+                            break;
+                        case ProgressBarStyles::LABEL_POSITION_RIGHT:
+                            $result[] = sprintf("%s%s ", str_repeat(' ', $repeats), $data['text']);
+                            break;
+                        case ProgressBarStyles::LABEL_POSITION_CENTER:
+                            $padding_left = (int) ceil($repeats / 2);
+                            $padding_right = $repeats - $padding_left;
+                            $result[] = sprintf("%s%s%s ", str_repeat(' ', $padding_left), $data['text'], str_repeat(' ', $padding_right));
+                            break;
+                        default :
+                            //no padding
+                            $result[] = sprintf("%s ", $data['text']);
+                    }
+                } else $result[] = sprintf("%s ", $data['text']);
             }
-
-
-
-
-
-
-
-            //$next = $components[$index + 1] ?? null;
-            //var_dump([$component, $next]);
-            //$result[] = "$component\n";
         }
 
         return implode('', $result);
     }
 
+    /**
+     * Build the Label
+     * @return array
+     */
     private function buildLabel(): array {
         $result = $this->label;
 
@@ -131,6 +141,10 @@ class ProgressBar implements Renderer {
         ];
     }
 
+    /**
+     * Build the Status Text
+     * @return array
+     */
     private function buildStatus(): array {
 
         $tot = $this->total;
@@ -153,6 +167,10 @@ class ProgressBar implements Renderer {
         ];
     }
 
+    /**
+     * Build the Percentage Display
+     * @return array
+     */
     private function buildPercent(): array {
 
         $percent = $this->getPercent();
@@ -177,6 +195,10 @@ class ProgressBar implements Renderer {
         ];
     }
 
+    /**
+     * Build the progress Bar
+     * @return array
+     */
     private function buildBar(): array {
         $percent = $this->getPercent();
         $len_done = (int) floor($percent / 2);
@@ -209,7 +231,7 @@ class ProgressBar implements Renderer {
     public function increment(int $value = 1, ?string $label = null) {
         $current = $this->current;
         $current += $value;
-        $this->label = '';
+
         if (is_string($label)) $this->setLabel($label);
         $this->setCurrent($current);
         return $this;
@@ -333,6 +355,7 @@ class ProgressBar implements Renderer {
      * @return $this
      */
     public function setLabel(string $label) {
+        $this->progressBarStyles->displayLabel(true);
         $this->label = $label;
         return $this;
     }

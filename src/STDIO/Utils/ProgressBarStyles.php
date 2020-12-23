@@ -2,6 +2,7 @@
 
 namespace NGSOFT\STDIO\Utils;
 
+use InvalidArgumentException;
 use NGSOFT\STDIO\{
     Styles, Styles\Style
 };
@@ -12,6 +13,10 @@ class ProgressBarStyles {
     const DISPLAY_LABEL = 'label';
     const DISPLAY_BAR = 'bar';
     const DISPLAY_PERCENT = 'percent';
+    const LABEL_POSITION_LEFT = 'left';
+    const LABEL_POSITION_RIGHT = 'right';
+    const LABEL_POSITION_CENTER = 'center';
+    const LABEL_NOPADDING = 'nopadding';
 
     /** @var Styles */
     private $styles;
@@ -27,6 +32,9 @@ class ProgressBarStyles {
 
     /** @var Style|null */
     private $statusColor;
+
+    /** @var string */
+    private $labelPosition = self::LABEL_POSITION_CENTER;
 
     /** @var bool */
     private $displayBar = true;
@@ -45,9 +53,17 @@ class ProgressBarStyles {
 
     public function __construct() {
         $this->styles = new Styles();
+        $this->resetStyles();
+    }
+
+    /**
+     * Reset Styles (Monochrome)
+     */
+    public function resetStyles() {
+        $this->statusColor = $this->labelColor = $this->barColor = $this->percentColor = null;
         $this->displayOrder = [
-            self::DISPLAY_STATUS,
             self::DISPLAY_LABEL,
+            self::DISPLAY_STATUS,
             self::DISPLAY_BAR,
             self::DISPLAY_PERCENT,
         ];
@@ -75,6 +91,19 @@ class ProgressBarStyles {
      */
     public function setDisplayOrder(array $displayOrder) {
         $this->displayOrder = $displayOrder;
+        return $this;
+    }
+
+    public function getLabelPosition(): string {
+        return $this->labelPosition;
+    }
+
+    public function setLabelPosition(string $labelPosition) {
+        $accepted = [self::LABEL_POSITION_CENTER, self::LABEL_POSITION_LEFT, self::LABEL_POSITION_RIGHT, self::LABEL_NOPADDING];
+        if (!in_array($labelPosition, $accepted)) {
+            throw new InvalidArgumentException(sprintf("Invalid Label Position %s, accepted: %s.", $labelPosition, implode(', ', $accepted)));
+        }
+        $this->labelPosition = $labelPosition;
         return $this;
     }
 
