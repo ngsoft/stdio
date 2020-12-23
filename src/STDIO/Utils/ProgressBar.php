@@ -324,8 +324,8 @@ class ProgressBar implements Renderer {
             if ($current >= $this->total) {
                 $this->complete = true;
                 $this->output->write("\n");
-                if (is_callable($this->onComplete)) {
-                    call_user_func($this->onComplete);
+                foreach ($this->onComplete as $callback) {
+                    if (is_callable($callback)) call_user_func($callback);
                 }
             }
         }
