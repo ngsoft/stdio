@@ -3,20 +3,30 @@
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
-    Interfaces\Ansi, Interfaces\Output, Interfaces\Renderer, Outputs\StreamOutput, Styles, Terminal
+    Interfaces\Ansi, Interfaces\Output, Interfaces\Renderer, Outputs\StreamOutput, Terminal
 };
 use function mb_strlen;
 
 class ProgressBar implements Renderer {
 
+    // Style
+    const ICON_DONE = "▓";
+    const ICON_LEFT = "░";
+    const ICON_BORDER = "|";
+    // Configuration
+    const D_STATUS = 8;
+    const D_LABEL = 16;
+    const D_PROGRESS = 32;
+    const D_PERCENT = 64;
+    const DEFAULT_DISPLAY = [
+        self::D_STATUS,
+        self::D_LABEL,
+        self::D_PROGRESS,
+        self::D_PERCENT
+    ];
+
     /** @var Terminal */
     private $term;
-
-    /** @var Styles */
-    private $styles;
-
-    /** @var string */
-    private $color = 'cyan';
 
     /** @var int */
     private $total = 100;
@@ -33,70 +43,159 @@ class ProgressBar implements Renderer {
     /** @var bool */
     private $complete = false;
 
-    /** @var callable|null */
-    private $onComplete;
+    /** @var callable[] */
+    private $onComplete = [];
 
     /** @var Output */
     private $output;
 
-    const ICON_DONE = "▓";
-    const ICON_LEFT = "░";
-    const ICON_BORDER = "|";
+    /** @var ProgressBarStyles */
+    private $progressBarStyles;
 
-    public function __construct(int $total = 100, ?Output $output = null, ?callable $onComplete = null) {
+    public function __construct() {
         $this->term = new Terminal();
-        $this->total = $total;
-        if ($output instanceof Output) $this->output = $output;
-        else $this->output = new StreamOutput();
-        if (is_callable($onComplete)) $this->onComplete($onComplete);
+        $this->output = new StreamOutput();
+        $this->progressBarStyles = new ProgressBarStyles();
     }
 
-    /**
-     * Build the progress bar
-     * @return string
-     */
+    ////////////////////////////   Render  ////////////////////////////
+
+
+
     private function build(): string {
 
-        $percent = $this->getPercent();
-        $label = $this->getLabel();
-        $progress_bar_len = 60;
-        $len = 50;
-        $len_done = (int) floor($percent / 2);
-        $len -= $len_done;
-
+        $result = [
+            sprintf("\r%s", Ansi::CLEAR_END_LINE)
+        ];
+        $components = $this->progressBarStyles->getDisplayOrder();
         $width = $this->term->width - 1;
 
-        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, str_repeat(self::ICON_DONE, $len_done), str_repeat(self::ICON_LEFT, $len), self::ICON_BORDER);
+        $reserved = 0;
+        if (in_array(ProgressBarStyles::DISPLAY_BAR, $components)) {
+            $reserved += 54;
+        }
+        if (in_array(ProgressBarStyles::DISPLAY_PERCENT, $components)) {
+            $reserved += 6;
+        }
+        if (in_array(ProgressBarStyles::DISPLAY_STATUS, $components)) {
+            $reserved += strlen('' . $this->total) * 2;
+            $reserved += 4;
+        }
+        $available = $width - $reserved;
+
+        foreach ($components as $component) {
+
+            $method = sprintf('build%s', ucfirst($component));
+
+            if ($data = $this->{$method}()) {
+
+
+                $result[] = sprintf("%s ", $data['text']);
+
+
+                if ($component == ProgressBarStyles::DISPLAY_LABEL) {
+                    $repeats = $available - 1;
+                    $repeats -= $data['len'];
+                    $result [] = str_repeat(' ', $repeats);
+                }
+            }
+
+
+
+
+
+
+
+            //$next = $components[$index + 1] ?? null;
+            //var_dump([$component, $next]);
+            //$result[] = "$component\n";
+        }
+
+        return implode('', $result);
+    }
+
+    private function buildLabel(): array {
+        $result = $this->label;
+
+        $strlen = mb_strlen($result);
+        if (
+                !empty($result)
+                and $this->term->hasColorSupport()
+                and ($style = $this->progressBarStyles->getLabelColor())
+        ) {
+            $result = $style->format($result);
+        }
+        return [
+            'len' => $strlen,
+            'text' => $result,
+        ];
+    }
+
+    private function buildStatus(): array {
+
+        $tot = $this->total;
+        $cur = $this->current;
+        while (strlen("$cur") < strlen("$tot")) {
+            $cur = sprintf('0%s', "$cur");
+        }
+        $result = sprintf('[%s/%s]', "$cur", "$tot");
+        $strlen = mb_strlen($result);
 
         if (
                 $this->term->hasColorSupport()
-                and $this->styles instanceof Styles
-                and isset($this->styles[$this->color])
+                and ($style = $this->progressBarStyles->getStatusColor())
         ) {
-            $style = $this->styles[$this->color];
-            $progress = $style->format($progress);
+            $result = $style->format($result);
         }
-
-        $progress .= " ";
-        $cnt = strlen("$percent");
-        while ($cnt < 3) {
-            $progress .= " ";
-            $cnt++;
-        }
-        $progress .= sprintf('%u', $percent);
-        $progress .= '% ';
-
-        $available = $width - $progress_bar_len;
-        if ($available > 0) {
-            if ($available > mb_strlen($label)) {
-                $repeats = $available - mb_strlen($label) - 1;
-                $label = $label . str_repeat(" ", $repeats);
-            } else $label = str_repeat(" ", (int) floor($available / 2));
-            $line = sprintf("\r%s%s%s", Ansi::CLEAR_END_LINE, $label, $progress);
-        } else $line = sprintf("\r%s%s", Ansi::CLEAR_END_LINE, $progress);
-        return $line;
+        return [
+            'len' => $strlen,
+            'text' => $result,
+        ];
     }
 
+    private function buildPercent(): array {
+
+        $percent = $this->getPercent();
+        $result = '';
+        $cnt = strlen("$percent");
+        while ($cnt < 3) {
+            $result .= " ";
+            $cnt++;
+        }
+        $result .= "$percent";
+        $result .= '%';
+        $strlen = mb_strlen($result);
+        if (
+                $this->term->hasColorSupport()
+                and ($style = $this->progressBarStyles->getPercentColor())
+        ) {
+            $result = $style->format($result);
+        }
+        return [
+            'len' => $strlen,
+            'text' => $result,
+        ];
+    }
+
+    private function buildBar(): array {
+        $percent = $this->getPercent();
+        $len_done = (int) floor($percent / 2);
+        $len = 50 - $len_done;
+        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, str_repeat(self::ICON_DONE, $len_done), str_repeat(self::ICON_LEFT, $len), self::ICON_BORDER);
+        $strlen = mb_strlen($progress);
+        if (
+                $this->term->hasColorSupport()
+                and ($style = $this->progressBarStyles->getBarColor())
+        ) {
+            $progress = $style->format($progress);
+        }
+        return [
+            'len' => $strlen,
+            'text' => $progress,
+        ];
+    }
+
+    /** {@inheritdoc} */
     public function render(Output $output) {
         $output->write($this->build());
     }
@@ -115,6 +214,61 @@ class ProgressBar implements Renderer {
         $this->setCurrent($current);
         return $this;
     }
+
+    ////////////////////////////   Configure  ////////////////////////////
+
+    /**
+     * Callable to execute on Complete
+     * @param callable $onComplete
+     * @return static
+     */
+    public function onComplete(callable $onComplete) {
+        $this->onComplete[] = $onComplete;
+        return $this;
+    }
+
+    /**
+     * Set Bar Color
+     * @param string $barColor
+     * @return static
+     */
+    public function setBarColor(string $barColor) {
+        $this->progressBarStyles->setBarColor($barColor);
+
+        return $this;
+    }
+
+    /**
+     * Set Percent Color
+     * @param string $percentColor
+     * @return static
+     */
+    public function setPercentColor(string $percentColor) {
+        $this->progressBarStyles->setPercentColor($percentColor);
+        return $this;
+    }
+
+    /**
+     * Set Label Color
+     * @param string $labelColor
+     * @return static
+     */
+    public function setLabelColor(string $labelColor) {
+        $this->progressBarStyles->setLabelColor($labelColor);
+        return $this;
+    }
+
+    /**
+     * Set Status Color
+     * @param string $statusColor
+     * @return static
+     */
+    public function setStatusColor(string $statusColor) {
+        $this->progressBarStyles->setStatusColor($statusColor);
+        return $this;
+    }
+
+    ////////////////////////////   Setters/Getters  ////////////////////////////
 
     /**
      * Set Max Number of items
@@ -166,26 +320,11 @@ class ProgressBar implements Renderer {
     }
 
     /**
-     * Get string representation of current staus
-     * @return string
-     */
-    public function getStatus(): string {
-        $tot = $this->total;
-        $cur = $this->current;
-        while (strlen("$cur") < strlen("$tot")) {
-            $cur = sprintf('0%s', "$cur");
-        }
-        return sprintf('[ %s / %s ]', "$cur", "$tot");
-    }
-
-    /**
      * Get Current Label
      * @return string
      */
     public function getLabel(): string {
-        $label = $this->getStatus();
-        if (!empty($this->label)) $label .= ' ' . $this->label;
-        return $label;
+        return $this->label;
     }
 
     /**
@@ -217,33 +356,29 @@ class ProgressBar implements Renderer {
     }
 
     /**
-     * Set Styles
-     * @param Styles $styles
+     * Get Current Output
+     * @return Output
+     */
+    public function getOutput(): Output {
+        return $this->output;
+    }
+
+    /**
+     * Set The Output to use
+     * @param Output $output
      * @return static
      */
-    public function setStyles(Styles $styles) {
-        $this->styles = $styles;
+    public function setOutput(Output $output) {
+        $this->output = $output;
         return $this;
     }
 
     /**
-     * Set Progress Bar Color
-     * @param string $color
-     * @return $this
+     * Get the Stylesheet
+     * @return ProgressBarStyles
      */
-    public function setColor(string $color) {
-        $this->color = $color;
-        return $this;
-    }
-
-    /**
-     * Callable to execute on Complete
-     * @param callable $onComplete
-     * @return $this
-     */
-    public function onComplete(callable $onComplete) {
-        $this->onComplete = $onComplete;
-        return $this;
+    public function getProgressBarStyles(): ProgressBarStyles {
+        return $this->progressBarStyles;
     }
 
 }

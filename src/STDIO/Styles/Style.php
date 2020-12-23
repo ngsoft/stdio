@@ -23,6 +23,12 @@ final class Style {
     /** @var int[] */
     private $formats = [];
 
+    /** @var string|null */
+    private $prefix;
+
+    /** @var string|null */
+    private $suffix;
+
     ////////////////////////////   Configurators   ////////////////////////////
 
     /**
@@ -141,6 +147,7 @@ final class Style {
      * @return Style
      */
     public function setName(string $name): Style {
+        $this->prefix = $this->suffix = null;
         $this->name = $name;
         return $this;
     }
@@ -179,6 +186,7 @@ final class Style {
         if (!in_array($color, Colors::COLOR_VALID)) {
             throw new InvalidArgumentException("Invalid Color code $color");
         }
+        $this->prefix = $this->suffix = null;
 
         $this->color = $color;
         return $this;
@@ -194,6 +202,7 @@ final class Style {
         if (!in_array($background, Colors::COLOR_VALID)) {
             throw new InvalidArgumentException("Invalid Color code $background");
         }
+        $this->prefix = $this->suffix = null;
         $this->background = $background;
         return $this;
     }
@@ -209,6 +218,7 @@ final class Style {
                 throw new InvalidArgumentException("Invalid Format code $format");
             }
         }
+        $this->prefix = $this->suffix = null;
         $this->formats = $formats;
         return $this;
     }
@@ -216,20 +226,35 @@ final class Style {
     ////////////////////////////   Formatters   ////////////////////////////
 
     /**
+     * Compile the prefix and suffix
+     * @internal
+     * @return Style
+     */
+    public function compile(): Style {
+        $this->prefix = $this->suffix = null;
+        $this->getPrefix();
+        $this->getSuffix();
+        return $this;
+    }
+
+    /**
      * Get Prefix as string
      * @return string
      */
     public function getPrefix(): string {
-        $prefix = '';
-        $params = [];
-        if (count($this->formats)) $params = $this->formats;
-        if (is_int($this->color)) $params[] = $this->color;
-        if (is_int($this->background)) $params[] = $this->background + Colors::BACKGROUND_COLOR_MODIFIER;
-        if (count($params) > 0) {
-            $prefix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+        //compile prefix
+        if ($this->prefix === null) {
+            $prefix = '';
+            $params = [];
+            if (count($this->formats)) $params = $this->formats;
+            if (is_int($this->color)) $params[] = $this->color;
+            if (is_int($this->background)) $params[] = $this->background + Colors::BACKGROUND_COLOR_MODIFIER;
+            if (count($params) > 0) {
+                $prefix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+            }
+            $this->prefix = $prefix;
         }
-
-        return $prefix;
+        return $this->prefix;
     }
 
     /**
@@ -237,20 +262,24 @@ final class Style {
      * @return string
      */
     public function getSuffix(): string {
-        $suffix = '';
-        $params = [];
-        if (count($this->formats)) {
-            $params = array_map(function($val) {
-                return Formats::FORMAT_UNSET[$val];
-            }, $this->formats);
-        }
+        if ($this->suffix === null) {
+            $suffix = '';
+            $params = [];
+            if (count($this->formats)) {
+                $params = array_map(function($val) {
+                    return Formats::FORMAT_UNSET[$val];
+                }, $this->formats);
+            }
 
-        if (is_int($this->color)) $params[] = Colors::COLOR_UNSET[$this->color];
-        if (is_int($this->background)) $params[] = Colors::COLOR_UNSET[$this->background] + Colors::BACKGROUND_COLOR_MODIFIER;
-        if (count($params) > 0) {
-            $suffix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+            if (is_int($this->color)) $params[] = Colors::COLOR_UNSET[$this->color];
+            if (is_int($this->background)) $params[] = Colors::COLOR_UNSET[$this->background] + Colors::BACKGROUND_COLOR_MODIFIER;
+            if (count($params) > 0) {
+                $suffix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+            }
+
+            $this->suffix = $suffix;
         }
-        return $suffix;
+        return $this->suffix;
     }
 
     /**

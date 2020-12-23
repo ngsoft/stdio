@@ -245,8 +245,10 @@ final class STDIO {
      * @return ProgressBar
      */
     public function createProgressBar(int $total = 100, ?callable $onComplete = null): ProgressBar {
-        $progress = new ProgressBar($total, $this->getOutput(), $onComplete);
-        $progress->setStyles($this->styles);
+        $progress = new ProgressBar();
+        $progress->setTotal($total);
+        if (is_callable($onComplete)) $progress->onComplete($onComplete);
+        $progress->getProgressBarStyles()->setStyles($this->styles);
         return $progress;
     }
 

@@ -37,7 +37,7 @@ class Terminal {
             }
         }
 
-        return 120;
+        return 80;
     }
 
     /**
@@ -60,7 +60,7 @@ class Terminal {
             }
         }
 
-        return 30;
+        return 24;
     }
 
     /**
