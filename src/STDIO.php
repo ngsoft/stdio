@@ -2,12 +2,48 @@
 
 namespace NGSOFT;
 
+use BadMethodCallException,
+    InvalidArgumentException;
 use NGSOFT\STDIO\{
-    Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Buffer, Interfaces\Formatter, Interfaces\Input,
-    Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\ProgressBar, Utils\Rect
+    Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors,
+    Interfaces\Formats, Interfaces\Formatter, Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles,
+    Terminal, Utils\ProgressBar, Utils\Rect
 };
 
-final class STDIO {
+/**
+ * @method STDIO black(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO red(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO green(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO yellow(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO blue(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO purple(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO cyan(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO white(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO gray(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightred(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightgreen(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightyellow(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightblue(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightpurple(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightcyan(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO brightwhite(?string $message) Adds the corresponding Style to the buffer
+ *
+ * @method STDIO info(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO comment(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO whisper(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO shout(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO error(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO notice(?string $message) Adds the corresponding Style to the buffer
+ *
+ * @method STDIO bold(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO dim(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO italic(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO underline(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO inverse(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO hidden(?string $message) Adds the corresponding Style to the buffer
+ * @method STDIO striketrough(?string $message) Adds the corresponding Style to the buffer
+ */
+final class STDIO implements Ansi, Colors, Formats {
 
     const VERSION = '2.0';
 
@@ -47,6 +83,48 @@ final class STDIO {
         $formatter->setStyles($this->styles);
         $formatter->setTerminal($this->terminal);
         $this->formatter = $formatter;
+    }
+
+    ////////////////////////////   Magics   ////////////////////////////
+
+    /**
+     * Outputs a message
+     * @param string $message
+     * @return static
+     */
+    public function __invoke(string $message) {
+        return $this->out($message);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws InvalidArgumentException
+     * @throws BadMethodCallException
+     */
+    public function __call($method, $arguments) {
+
+        if ($this->styles->offsetExists($method)) {
+            $message = null;
+            if (array_key_exists(0, $arguments)) {
+                $message = $arguments[0];
+                if (
+                        !is_string($message)
+                        and $message !== null
+                ) {
+                    throw new InvalidArgumentException(sprintf('%s::%s($message) Invalid argument $message, string|null requested but %s given.', get_class($this), $method, gettype($message)));
+                }
+            }
+            if ($this->supportsColors) {
+                if (is_string($message)) $message = $this->styles[$method]->format($message);
+                else $message = $this->styles[$method]->getPrefix();
+                return $this->write($message);
+            } elseif (is_string($message)) {
+                $this->write($message);
+            } else return $this;
+        }
+
+
+        throw new BadMethodCallException(sprintf('%s::%s() does not exists.', get_class($this), $method));
     }
 
     ////////////////////////////   GETTERS   ////////////////////////////
@@ -205,7 +283,7 @@ final class STDIO {
             $this->buffer->clear();
             $this->writeln($message);
         }
-        if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
+        if ($this->supportsColors) $this->buffer->write($this->styles->reset->getSuffix());
         $this->buffer->flush($this->getOutput('out'));
         return $this;
     }

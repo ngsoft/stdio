@@ -3,53 +3,77 @@
 namespace NGSOFT\STDIO;
 
 use NGSOFT\STDIO\{
-    Styles\Style, Utils\ArrayObject
+    Interfaces\Colors, Interfaces\Formats, Styles\Style, Utils\ArrayObject
 };
 
+/**
+ * @property Style $black
+ * @property Style $red
+ * @property Style $green
+ * @property Style $yellow
+ * @property Style $blue
+ * @property Style $purple
+ * @property Style $cyan
+ * @property Style $white
+ * @property Style $gray
+ * @property Style $brightred
+ * @property Style $brightgreen
+ * @property Style $brightyellow
+ * @property Style $brightblue
+ * @property Style $brightpurple
+ * @property Style $brightcyan
+ * @property Style $brightwhite
+ * @property Style $info
+ * @property Style $comment
+ * @property Style $whisper
+ * @property Style $shout
+ * @property Style $error
+ * @property Style $notice
+ * @property Style $reset
+ * @property Style $bold
+ * @property Style $dim
+ * @property Style $italic
+ * @property Style $underline
+ * @property Style $inverse
+ * @property Style $hidden
+ * @property Style $striketrough
+ */
 class Styles extends ArrayObject {
 
     const DEFAULT_COLORS = [
-        'black' => Interfaces\Colors::BLACK,
-        'red' => Interfaces\Colors::RED,
-        'green' => Interfaces\Colors::GREEN,
-        'yellow' => Interfaces\Colors::YELLOW,
-        'blue' => Interfaces\Colors::BLUE,
-        'purple' => Interfaces\Colors::PURPLE,
-        'cyan' => Interfaces\Colors::CYAN,
-        'white' => Interfaces\Colors::WHITE,
-        'gray' => Interfaces\Colors::GRAY,
-        'brightred' => Interfaces\Colors::BRIGHTRED,
-        'brightgreen' => Interfaces\Colors::BRIGHTGREEN,
-        'brightyellow' => Interfaces\Colors::BRIGHTYELLOW,
-        'brightblue' => Interfaces\Colors::BRIGHTBLUE,
-        'brightpurple' => Interfaces\Colors::BRIGHTPURPLE,
-        'brightcyan' => Interfaces\Colors::BRIGHTCYAN,
-        'brightwhite' => Interfaces\Colors::BRIGHTWHITE,
+        'black' => Colors::BLACK,
+        'red' => Colors::RED,
+        'green' => Colors::GREEN,
+        'yellow' => Colors::YELLOW,
+        'blue' => Colors::BLUE,
+        'purple' => Colors::PURPLE,
+        'cyan' => Colors::CYAN,
+        'white' => Colors::WHITE,
+        'gray' => Colors::GRAY,
+        'brightred' => Colors::BRIGHTRED,
+        'brightgreen' => Colors::BRIGHTGREEN,
+        'brightyellow' => Colors::BRIGHTYELLOW,
+        'brightblue' => Colors::BRIGHTBLUE,
+        'brightpurple' => Colors::BRIGHTPURPLE,
+        'brightcyan' => Colors::BRIGHTCYAN,
+        'brightwhite' => Colors::BRIGHTWHITE,
         //custom
-        'info' => Interfaces\Colors::GREEN,
-        'comment' => Interfaces\Colors::YELLOW,
-        'whisper' => Interfaces\Colors::WHITE,
-        'shout' => Interfaces\Colors::RED,
-        'error' => Interfaces\Colors::BRIGHTRED,
-        'notice' => Interfaces\Colors::CYAN,
+        'info' => Colors::GREEN,
+        'comment' => Colors::YELLOW,
+        'whisper' => Colors::WHITE,
+        'shout' => Colors::RED,
+        'error' => Colors::BRIGHTRED,
+        'notice' => Colors::CYAN,
     ];
     const DEFAULT_FORMATS = [
-        'reset' => Interfaces\Formats::RESET,
-        'bold' => Interfaces\Formats::BOLD,
-        'dim' => Interfaces\Formats::DIM,
-        'italic' => Interfaces\Formats::ITALIC,
-        'underline' => Interfaces\Formats::UNDERLINE,
-        'inverse' => Interfaces\Formats::INVERSE,
-        'hidden' => Interfaces\Formats::HIDDEN,
-        'striketrough' => Interfaces\Formats::STRIKETROUGH,
-    ];
-
-    public static $custom = [
-        'error' => [[37, 41], [39, 49]],
-        'info' => [[32, 49], [39, 49]],
-        'comment' => [[33, 49], [39, 49]],
-        'question' => [[30, 46], [39, 49]],
-        'notice' => [[36, 49], [39, 49]],
+        'reset' => Formats::RESET,
+        'bold' => Formats::BOLD,
+        'dim' => Formats::DIM,
+        'italic' => Formats::ITALIC,
+        'underline' => Formats::UNDERLINE,
+        'inverse' => Formats::INVERSE,
+        'hidden' => Formats::HIDDEN,
+        'striketrough' => Formats::STRIKETROUGH,
     ];
 
     public function __construct() {
