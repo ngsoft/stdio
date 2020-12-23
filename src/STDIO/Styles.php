@@ -81,6 +81,17 @@ class Styles extends ArrayObject {
     }
 
     /**
+     * Adds a Custom Style
+     * @param string $name name to use to access it (Styles and STDIO)
+     * @param Style $style
+     * @return static
+     */
+    public function addStyle(string $name, Style $style) {
+        $this[$name] = $style->withName($name);
+        return $this;
+    }
+
+    /**
      * Build defaults themes
      * @suppress PhanAccessMethodInternal
      * @return array

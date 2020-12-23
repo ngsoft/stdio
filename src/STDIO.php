@@ -118,9 +118,8 @@ final class STDIO implements Ansi, Colors, Formats {
                 if (is_string($message)) $message = $this->styles[$method]->format($message);
                 else $message = $this->styles[$method]->getPrefix();
                 return $this->write($message);
-            } elseif (is_string($message)) {
-                $this->write($message);
-            } else return $this;
+            } elseif (is_string($message)) return $this->write($message);
+            else return $this; //no text to render and no color support, so do nothing
         }
 
 

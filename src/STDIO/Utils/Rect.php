@@ -9,16 +9,11 @@ use function mb_strlen;
 
 class Rect implements Renderer {
 
-    const DEFAULT_PADDING = 8;
-
     /** @var Terminal */
     private $term;
 
     /** @var Styles */
     private $styles;
-
-    /** @var int */
-    private $padding;
 
     /** @var Buffer */
     private $buffer;
@@ -31,18 +26,8 @@ class Rect implements Renderer {
 
     public function __construct() {
         $this->term = new Terminal();
-        $this->setPadding();
         $this->buffer = new OutputBuffer();
-    }
-
-    /**
-     * Set rectangle Padding
-     * @param int $padding
-     * @return static
-     */
-    public function setPadding(int $padding = self::DEFAULT_PADDING) {
-        $this->padding = $padding;
-        return $this;
+        $this->styles = new Styles();
     }
 
     /**
@@ -86,7 +71,7 @@ class Rect implements Renderer {
 
         $prefix = $suffix = $clear = '';
         if ($this->term->hasColorSupport()) {
-            $clear = Ansi::ESCAPE . '0' . Ansi::STYLE_SUFFIX;
+            $clear = $this->styles->reset->getSuffix();
             if ($this->color instanceof Style) {
                 $prefix .= $this->color->getPrefix();
                 $suffix .= $this->color->getSuffix();
