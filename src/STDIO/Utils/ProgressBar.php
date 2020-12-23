@@ -3,8 +3,9 @@
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
-    Interfaces\Output, Interfaces\Renderer, Outputs\StreamOutput, Styles, Terminal
+    Interfaces\Ansi, Interfaces\Output, Interfaces\Renderer, Outputs\StreamOutput, Styles, Terminal
 };
+use function mb_strlen;
 
 class ProgressBar implements Renderer {
 
@@ -91,8 +92,8 @@ class ProgressBar implements Renderer {
                 $repeats = $available - mb_strlen($label) - 1;
                 $label = $label . str_repeat(" ", $repeats);
             } else $label = str_repeat(" ", (int) floor($available / 2));
-            $line = sprintf("\r%s%s%s", Styles::CLEAR_END_LINE, $label, $progress);
-        } else $line = sprintf("\r%s%s", Styles::CLEAR_END_LINE, $progress);
+            $line = sprintf("\r%s%s%s", Ansi::CLEAR_END_LINE, $label, $progress);
+        } else $line = sprintf("\r%s%s", Ansi::CLEAR_END_LINE, $progress);
         return $line;
     }
 

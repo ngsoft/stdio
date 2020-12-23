@@ -3,7 +3,7 @@
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
-    Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
+    Interfaces\Ansi, Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
 };
 use function mb_strlen;
 
@@ -86,7 +86,7 @@ class Rect implements Renderer {
 
         $prefix = $suffix = $clear = '';
         if ($this->term->hasColorSupport()) {
-            $clear = Styles::ESCAPE . '0' . Styles::STYLE_SUFFIX;
+            $clear = Ansi::ESCAPE . '0' . Ansi::STYLE_SUFFIX;
             if ($this->color instanceof Style) {
                 $prefix .= $this->color->getPrefix();
                 $suffix .= $this->color->getSuffix();

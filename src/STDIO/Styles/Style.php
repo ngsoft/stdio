@@ -4,61 +4,216 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
-use NGSOFT\STDIO\Styles;
+use InvalidArgumentException;
+use NGSOFT\STDIO\Interfaces\{
+    Ansi, Colors, Formats
+};
 
 final class Style {
 
-    public static $validColors = [
-        30, 31, 32, 33, 34, 35, 36, 37, 39,
-        90, 91, 92, 93, 94, 95, 96, 97
-    ];
-    public static $validStyles = [
-        0, 1, 2, 3, 4, 7, 8, 9
-    ];
+    /** @var string|null */
+    private $name = 'style';
+
+    /** @var int|null */
+    private $color;
+
+    /** @var int|null */
+    private $background;
 
     /** @var int[] */
-    private $prefix = [];
+    private $formats = [];
 
-    /** @var int[] */
-    private $suffix = [];
+    ////////////////////////////   Configurators   ////////////////////////////
+
+    /**
+     * Returns a clone with declared name
+     * @param string $name
+     * @return Style
+     */
+    public function withName(string $name): Style {
+        return $this->getClone()->setName($name);
+    }
+
+    /**
+     * Returns a clone with declared color
+     * @param int $color
+     * @return Style
+     */
+    public function withColor(int $color): Style {
+        return $this->getClone()->setColor($color);
+    }
+
+    /**
+     * Returns a clone without color
+     * @return Style
+     */
+    public function withoutColor(): Style {
+        $clone = $this->getClone();
+        $clone->color = null;
+        return $clone;
+    }
+
+    /**
+     * Returns a clone with declared background
+     * @param int $background
+     * @return Style
+     */
+    public function withBackground(int $background): Style {
+        return $this->getClone()->setBackground($background);
+    }
+
+    /**
+     * Returns a clone without background
+     * @return Style
+     */
+    public function withoutBackground(): Style {
+        $clone = $this->getClone();
+        $clone->background = null;
+        return $clone;
+    }
+
+    /**
+     * Returns a clone with declared formats
+     * @param array $formats
+     * @return Style
+     */
+    public function withFormats(array $formats): Style {
+        return $this->getClone()->setFormats($formats);
+    }
+
+    /**
+     *  Returns a clone without formats
+     * @return Style
+     */
+    public function withoutFormats(): Style {
+        $clone = $this->getClone();
+        $clone->formats = [];
+        return $clone;
+    }
+
+    /**
+     * Returns a clone with single format added
+     * @param int $format
+     * @return Style
+     * @throws InvalidArgumentException
+     */
+    public function withAddedFormat(int $format): Style {
+
+        if (!in_array($format, Formats::FORMAT_VALID)) {
+            throw new InvalidArgumentException("Invalid Format code $format");
+        }
+        $clone = $this->getClone();
+        $clone->formats [] = $format;
+        return $clone;
+    }
+
+    /**
+     * Returns a clone with multiple formats added
+     * @param array $formats
+     * @return Style
+     */
+    public function withAddedFormats(array $formats): Style {
+        $clone = $this->getClone();
+        foreach ($formats as $format) {
+            $clone = $clone->withAddedFormat($format);
+        }
+        return $clone;
+    }
 
     /** @return Style */
     private function getClone(): Style {
         return clone $this;
     }
 
+    ////////////////////////////   GETTERS/SETTERS   ////////////////////////////
+
     /**
-     * Reset Styles
-     * @internal
+     * Get Style Name
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
+    }
+
+    /**
+     * Set Style Name
+     * @param string $name
      * @return Style
      */
-    public function reset(): Style {
-        $this->prefix = [];
-        $this->suffix = [];
+    public function setName(string $name): Style {
+        $this->name = $name;
         return $this;
     }
 
     /**
-     * Get a clone with defined prefix
-     * @param array $codes
-     * @return Style
+     * Get Current Set Color
+     * @return int|null
      */
-    public function withPrefix(array $codes): Style {
-        $clone = $this->getClone();
-        $clone->prefix = $codes;
-        return $clone;
+    public function getColor(): ?int {
+        return $this->color;
     }
 
     /**
-     * Get a clone with defined suffix
-     * @param array $codes
+     * Get Current Set Background
+     * @return int|null
+     */
+    public function getBackground(): ?int {
+        return $this->background;
+    }
+
+    /**
+     * Get Current Formats
+     * @return array
+     */
+    public function getFormats(): array {
+        return $this->formats;
+    }
+
+    /**
+     *  Set the Color
+     * @param int $color
+     * @return Style
+     * @throws InvalidArgumentException
+     */
+    public function setColor(int $color): Style {
+        if (!in_array($color, Colors::COLOR_VALID)) {
+            throw new InvalidArgumentException("Invalid Color code $color");
+        }
+
+        $this->color = $color;
+        return $this;
+    }
+
+    /**
+     * Set the Background
+     * @param int $background
+     * @return Style
+     * @throws InvalidArgumentException
+     */
+    public function setBackground(int $background): Style {
+        if (!in_array($background, Colors::COLOR_VALID)) {
+            throw new InvalidArgumentException("Invalid Color code $background");
+        }
+        $this->background = $background;
+        return $this;
+    }
+
+    /**
+     * Set the Formats
+     * @param int[] $formats
      * @return Style
      */
-    public function withSuffix(array $codes): Style {
-        $clone = $this->getClone();
-        $clone->suffix = $codes;
-        return $clone;
+    public function setFormats(array $formats): Style {
+        foreach ($formats as $format) {
+            if (!in_array($format, Formats::FORMAT_VALID)) {
+                throw new InvalidArgumentException("Invalid Format code $format");
+            }
+        }
+        $this->formats = $formats;
+        return $this;
     }
+
+    ////////////////////////////   Formatters   ////////////////////////////
 
     /**
      * Get Prefix as string
@@ -66,7 +221,14 @@ final class Style {
      */
     public function getPrefix(): string {
         $prefix = '';
-        if (count($this->prefix) > 0) $prefix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->prefix));
+        $params = [];
+        if (count($this->formats)) $params = $this->formats;
+        if (is_int($this->color)) $params[] = $this->color;
+        if (is_int($this->background)) $params[] = $this->background + Colors::BACKGROUND_COLOR_MODIFIER;
+        if (count($params) > 0) {
+            $prefix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+        }
+
         return $prefix;
     }
 
@@ -76,7 +238,18 @@ final class Style {
      */
     public function getSuffix(): string {
         $suffix = '';
-        if (count($this->suffix) > 0) $suffix = sprintf(Styles::ESCAPE . '%s' . Styles::STYLE_SUFFIX, implode(';', $this->suffix));
+        $params = [];
+        if (count($this->formats)) {
+            $params = array_map(function($val) {
+                return Formats::FORMAT_UNSET[$val];
+            }, $this->formats);
+        }
+
+        if (is_int($this->color)) $params[] = Colors::COLOR_UNSET[$this->color];
+        if (is_int($this->background)) $params[] = Colors::COLOR_UNSET[$this->background] + Colors::BACKGROUND_COLOR_MODIFIER;
+        if (count($params) > 0) {
+            $suffix = sprintf(Ansi::ESCAPE . '%s' . Ansi::STYLE_SUFFIX, implode(';', $params));
+        }
         return $suffix;
     }
 
