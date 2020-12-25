@@ -111,6 +111,7 @@ class Rect implements Renderer {
 
         $text = $this->build();
         $output->write($text);
+        $output->write("\n");
         $this->buffer->clear();
     }
 

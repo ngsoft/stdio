@@ -20,11 +20,8 @@ abstract class CommandAbstract implements Command {
 
         $result = [];
         $options = $this->getOptions();
-
         $requested = [];
-
         $parser = [];
-
         $annon = [];
 
 
@@ -59,8 +56,10 @@ abstract class CommandAbstract implements Command {
             if ($option === null) {
                 if (count($annon) > 0) {
                     $option = array_shift($annon);
-                    $result[$option->getName()] = $arg;
-                    continue;
+                    if ($option->checkValue($arg)) {
+                        $result[$option->getName()] = $arg;
+                        continue;
+                    } else throw new RuntimeException(sprintf('Invalid value for cli argument "%s"', $option->getName()));
                 } else throw new RuntimeException(sprintf('Cannot parse cli argument "%s"', $arg));
             }
 
@@ -72,29 +71,18 @@ abstract class CommandAbstract implements Command {
             $next = $i + 1;
 
             if (isset($args[$next])) {
-
-                $result[$option->getName()] = $args[$next];
-
+                if ($option->checkValue($args[$next])) {
+                    $result[$option->getName()] = $args[$next];
+                } else throw new RuntimeException(sprintf('Invalid value for cli argument "%s"', $option->getName()));
                 $i = $next; //jump one arg
             } else throw new RuntimeException(sprintf('Invalid value for argument %s', $option->getName()));
-
-
-
-
-
-
-
-
-
-
-            echo "$i\n";
-            if ($i == 5) $i++;
         }
 
-
-
-
-
+        foreach ($requested as $opt) {
+            if (!array_key_exists($opt->getName(), $result)) {
+                throw new RuntimeException(sprintf('Required argument "%s" not defined.', $opt->getName()));
+            }
+        }
 
         return $result;
     }
