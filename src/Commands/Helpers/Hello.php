@@ -10,8 +10,6 @@ class Hello extends CommandAbstract {
 
     public function command(array $args) {
 
-
-        var_dump($args);
         $name = $args['name'];
         $str = "Hello $name !";
 
