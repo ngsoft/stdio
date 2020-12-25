@@ -2,8 +2,22 @@
 
 namespace NGSOFT\Commands\Helpers;
 
-use NGSOFT\Commands\Interfaces\Command;
+use NGSOFT\Commands\{
+    CommandAbstract, Option
+};
 
-class Help implements Command {
+class Help extends CommandAbstract {
+
+    public function command(array $args) {
+
+    }
+
+    public function getOptions(): array {
+
+        return [
+                    (new Option('command'))
+                    ->withDefaultValue('help')
+        ];
+    }
 
 }

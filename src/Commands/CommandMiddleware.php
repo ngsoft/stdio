@@ -25,7 +25,10 @@ class CommandMiddleware implements MiddlewareInterface {
     protected $responsefactory;
 
     /** @var array<string,string> */
-    protected $commands = [];
+    protected $commands = [
+        '__default' => Help::class,
+        'help' => Help::class,
+    ];
 
     public function __construct(
             ContainerInterface $container,
@@ -37,6 +40,7 @@ class CommandMiddleware implements MiddlewareInterface {
         if ($container->has('commands')) {
             $commands = $container->get('commands');
             if (is_array($commands)) {
+
                 foreach ($commands as $command => $classname) {
                     if (
                             is_string($command)
@@ -47,10 +51,6 @@ class CommandMiddleware implements MiddlewareInterface {
                         }
                     }
                 }
-            }
-
-            if (!isset($this->commands['__default'])) {
-                $this->commands['__default'] = Help::class;
             }
         }
     }
@@ -79,14 +79,17 @@ class CommandMiddleware implements MiddlewareInterface {
                 throw new RuntimeException("Command $command does not exists");
             }
             $classname = $this->commands[$command];
+            /** @var Command $task */
             $task = $this->container->get($classname);
+            $arguments = $task->parseArguments($args);
+
             if (
-                    ($result = $task->command())
-                    and is_string($result) //Basic Render (for simple commands)
-            ) $io->out($result);
+                    ($result = $task->command($arguments))
+                    and is_string($result)
+            ) $io->out($result); //Basic Render (for simple commands)
         } catch (Throwable $error) {
             //command has thrown an error
-            $errorHandler->write($error);
+            $errorHandler->write($error->getMessage());
             $errorHandler->render($stderr);
         }
 

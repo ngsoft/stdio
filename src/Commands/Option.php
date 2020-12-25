@@ -41,7 +41,28 @@ class Option {
     /** @var int */
     protected $type = self::TYPE_ANONYMOUS;
 
+    /** @var bool */
+    protected $requested = false;
+
     ////////////////////////////   Getters/Setter   ////////////////////////////
+
+    /**
+     * Option is needed
+     * @return bool
+     */
+    public function getRequested(): bool {
+        return $this->requested;
+    }
+
+    /**
+     * Defines if option is needed
+     * @param bool $requested
+     * @return $this
+     */
+    public function setRequested(bool $requested = true) {
+        $this->requested = $requested;
+        return $this;
+    }
 
     /**
      * Get Option Type
@@ -194,7 +215,7 @@ class Option {
      * @param bool $isBoolean
      * @return Option
      */
-    public function setIsBoolean(bool $isBoolean) {
+    public function setIsBoolean(bool $isBoolean = true) {
         $this->isBoolean = $isBoolean;
         return $this;
     }
@@ -298,7 +319,7 @@ class Option {
      * @param bool $isBoolean
      * @return Option
      */
-    public function withIsBoolean(bool $isBoolean): Option {
+    public function withIsBoolean(bool $isBoolean = true): Option {
         return $this->getClone()->setIsBoolean($isBoolean);
     }
 
@@ -318,6 +339,15 @@ class Option {
      */
     public function withType(int $type): Option {
         return $this->getClone()->setType($type);
+    }
+
+    /**
+     * Get a clone with declared requested value
+     * @param bool $requested
+     * @return type
+     */
+    public function withRequested(bool $requested = true) {
+        return $this->getClone()->setRequested($requested);
     }
 
     ////////////////////////////   Magics   ////////////////////////////
