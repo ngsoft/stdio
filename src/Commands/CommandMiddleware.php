@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\Commands;
 
 use NGSOFT\{
-    Commands\Helpers\Help, Commands\Interfaces\Command, STDIO
+    Commands\Helpers\Hello, Commands\Helpers\Help, Commands\Interfaces\Command, STDIO
 };
 use Psr\{
     Container\ContainerInterface, Http\Message\ResponseFactoryInterface, Http\Message\ResponseInterface,
@@ -30,6 +30,7 @@ class CommandMiddleware implements MiddlewareInterface {
     protected $commands = [
         '__default' => Help::class,
         'help' => Help::class,
+        'hello' => Hello::class,
     ];
 
     public function __construct(
@@ -42,7 +43,6 @@ class CommandMiddleware implements MiddlewareInterface {
         if ($container->has('commands')) {
             $commands = $container->get('commands');
             if (is_array($commands)) {
-
                 foreach ($commands as $command => $classname) {
                     if (
                             is_string($command)
