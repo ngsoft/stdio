@@ -35,9 +35,6 @@ class Option {
     /** @var callable[] */
     protected $must = [];
 
-    /** @var array */
-    protected $values = [];
-
     /** @var int */
     protected $type = self::TYPE_ANONYMOUS;
 
@@ -166,24 +163,6 @@ class Option {
      */
     public function getShortArgument(): string {
         return $this->short;
-    }
-
-    /**
-     * Get Values for Option
-     * @return array
-     */
-    public function getValues(): array {
-        return $this->values;
-    }
-
-    /**
-     * Get the first value
-     * @return mixed|null
-     */
-    public function getValue() {
-        $value = null;
-        if (array_key_exists(0, $this->values)) $value = $this->values[0];
-        return $value;
     }
 
     /**
@@ -335,7 +314,7 @@ class Option {
     /**
      * Get a clone with declared type
      * @param int $type
-     * @return \NGSOFT\Commands\Option
+     * @return Option
      */
     public function withType(int $type): Option {
         return $this->getClone()->setType($type);
@@ -344,9 +323,9 @@ class Option {
     /**
      * Get a clone with declared requested value
      * @param bool $requested
-     * @return type
+     * @return Option
      */
-    public function withRequested(bool $requested = true) {
+    public function withRequested(bool $requested = true): Option {
         return $this->getClone()->setRequested($requested);
     }
 
