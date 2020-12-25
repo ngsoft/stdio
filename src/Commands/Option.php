@@ -84,7 +84,7 @@ class Option {
      * Get Short Argument
      * @return string
      */
-    public function getShortArgument(): ?string {
+    public function getShortArgument(): string {
         return $this->short;
     }
 

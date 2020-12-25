@@ -3,7 +3,7 @@
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
-    Interfaces\Ansi, Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
+    Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
 };
 use function mb_strlen;
 
