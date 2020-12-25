@@ -36,6 +36,9 @@ class Help extends CommandAbstract {
                     Option::create('command')
                     ->withDefaultValue('help')
                     ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
+                    Option::create('verbose')
+                    ->withShortArgument('-v')
+                    ->withIsBoolean(),
         ];
     }
 
@@ -50,8 +53,8 @@ class Help extends CommandAbstract {
     }
 
     public function command(array $args) {
-        var_dump($args);
 
+        var_dump($args);
         $command = $args['command'];
 
         if (

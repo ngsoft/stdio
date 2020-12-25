@@ -33,7 +33,7 @@ abstract class CommandAbstract implements Command {
                 $result[$opt->getName()] = $def;
             } elseif ($opt->getIsBoolean() === true) {
                 $requested[] = $opt;
-                $result = $opt->getDefaultValue() === true;
+                $result[$opt->getName()] = $opt->getDefaultValue() === true;
             } elseif ($opt->getRequested() === true) $requested[] = $opt;
 
             if ($opt->getType() === Option::TYPE_SHORT) $parser[$opt->getShortArgument()] = $opt;
