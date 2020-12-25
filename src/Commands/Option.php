@@ -356,4 +356,13 @@ class Option {
         $this->setName($name);
     }
 
+    /**
+     * Creates a new Instance with set name
+     * @param string $name
+     * @return Option
+     */
+    public static function create(string $name): Option {
+        return new static($name);
+    }
+
 }

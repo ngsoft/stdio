@@ -33,9 +33,9 @@ class Help extends CommandAbstract {
     public function getOptions(): array {
 
         return [
-                    (new Option('command'))
+                    Option::create('command')
                     ->withDefaultValue('help')
-                    ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0)
+                    ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
         ];
     }
 
@@ -50,6 +50,7 @@ class Help extends CommandAbstract {
     }
 
     public function command(array $args) {
+        var_dump($args);
 
         $command = $args['command'];
 
@@ -59,11 +60,55 @@ class Help extends CommandAbstract {
         ) {
             return $this->renderFor($this->commands[$command]);
         }
+
         throw new RuntimeException(sprintf('Command "%s" not found.', $command));
+    }
+
+    protected function renderCommandList() {
+
+        global $argv;
+        $io = \NGSOFT\STDIO::create();
+
+        $io
+                ->yellow("Usage:")
+                ->linebreak()
+                ->write(sprintf('  %s ', $argv[0]))
+                ->green('help [command]')
+                ->linebreak();
+
+        $io
+                ->linebreak()
+                ->yellow("Available Commands:")
+                ->linebreak();
+
+        $maxlen = 0;
+        foreach (array_keys($this->commands) as $name) {
+            if (mb_strlen($name) > $maxlen) {
+                $maxlen = mb_strlen($name);
+            }
+        }
+        $maxlen += 4;
+        /** @var Command $command */
+        foreach ($this->commands as $name => $command) {
+            $len = mb_strlen($name) + 2;
+            $repeats = $maxlen - $len;
+            $io
+                    ->green(sprintf('  %s', $name))
+                    ->space($repeats)
+                    ->write($command->getDescription())
+                    ->linebreak();
+        }
+
+
+
+        $io
+                ->linebreak()
+                ->out();
     }
 
     public function renderFor(Command $command) {
 
+        if ($command === $this) return $this->renderCommandList();
     }
 
 }
