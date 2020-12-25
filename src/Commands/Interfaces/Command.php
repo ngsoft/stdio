@@ -24,4 +24,16 @@ interface Command {
      * @return array
      */
     public function parseArguments(array $args): array;
+
+    /**
+     * Get Command Name
+     * @return string
+     */
+    public function getName(): string;
+
+    /**
+     * Get Command Description
+     * @return string
+     */
+    public function getDescription(): string;
 }

@@ -2,7 +2,6 @@
 
 namespace NGSOFT\Commands\Helpers;
 
-use InvalidArgumentException;
 use NGSOFT\Commands\{
     CommandAbstract, Interfaces\Command, Option
 };
@@ -12,35 +11,44 @@ class Help extends CommandAbstract {
     /** @var array<string,Command> */
     protected $commands = [];
 
-    /**  @return Command[] */
+    /**  @return array<string,Command> */
     public function getCommands(): array {
         return $this->commands;
     }
 
     /**
-     * Set Commands to parse arguments
-     * @param Command[] $commands
+     * Add a Command to the stack
+     * @param Command $command
+     * @param string|null $name
      * @return Help
-     * @throws InvalidArgumentException
      */
-    public function setCommands(array $commands) {
-        foreach ($commands as $command) {
-            if (!($command instanceof Command)) throw new InvalidArgumentException('Invalid Command added.');
-        }
-        $this->commands = $commands;
+    public function addCommand(Command $command, ?string $name = null): Help {
+        if ($name === null) $name = $command->getName();
+        $this->commands[$name] = $command;
         return $this;
     }
 
-    public function command(array $args) {
-        var_dump($args);
-    }
-
+    /** {@inheritdoc} */
     public function getOptions(): array {
 
         return [
                     (new Option('command'))
                     ->withDefaultValue('help')
         ];
+    }
+
+    /** {@inheritdoc} */
+    public function getDescription(): string {
+        return "This help screen";
+    }
+
+    /** {@inheritdoc} */
+    public function getName(): string {
+        return "help";
+    }
+
+    public function command(array $args) {
+        var_dump($args);
     }
 
 }

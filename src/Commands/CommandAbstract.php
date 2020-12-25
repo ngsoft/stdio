@@ -87,4 +87,13 @@ abstract class CommandAbstract implements Command {
         return $result;
     }
 
+    /**
+     * Render Help for current Command
+     */
+    public function renderHelp() {
+        $help = new Helpers\Help();
+        $help->addCommand($this);
+        $help->command(['command' => $this->getName()]);
+    }
+
 }
