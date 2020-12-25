@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\Commands;
 
 use InvalidArgumentException,
@@ -217,11 +219,11 @@ class Option {
      * @throws InvalidArgumentException
      */
     public function setLongArgument(string $long) {
-        if (preg_match(self::VALID_LONG_REGEX, $long) === false) {
-            throw new InvalidArgumentException("Invalid long option $long");
+        if (preg_match(self::VALID_LONG_REGEX, $long) > 0) {
+            $this->long = $long;
+            return $this->autosetType();
         }
-        $this->long = $long;
-        return $this->autosetType();
+        throw new InvalidArgumentException("Invalid long option $long");
     }
 
     /**
@@ -231,11 +233,11 @@ class Option {
      * @throws InvalidArgumentException
      */
     public function setShortArgument(string $short) {
-        if (preg_match(self::VALID_SHORT_REGEX, $short) === false) {
-            throw new InvalidArgumentException("Invalid short option $short");
+        if (preg_match(self::VALID_SHORT_REGEX, $short) > 0) {
+            $this->short = $short;
+            return $this->autosetType();
         }
-        $this->short = $short;
-        return $this->autosetType();
+        throw new InvalidArgumentException("Invalid short option $short");
     }
 
     ////////////////////////////   Parser   ////////////////////////////

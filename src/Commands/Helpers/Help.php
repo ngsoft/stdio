@@ -2,10 +2,11 @@
 
 namespace NGSOFT\Commands\Helpers;
 
-use NGSOFT\Commands\{
-    CommandAbstract, Interfaces\Command, Option
+use NGSOFT\{
+    Commands\CommandAbstract, Commands\Interfaces\Command, Commands\Option, STDIO
 };
 use RuntimeException;
+use function mb_strlen;
 
 class Help extends CommandAbstract {
 
@@ -36,9 +37,6 @@ class Help extends CommandAbstract {
                     Option::create('command')
                     ->withDefaultValue('help')
                     ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
-                    Option::create('verbose')
-                    ->withShortArgument('-v')
-                    ->withIsBoolean(),
         ];
     }
 
@@ -54,7 +52,6 @@ class Help extends CommandAbstract {
 
     public function command(array $args) {
 
-        var_dump($args);
         $command = $args['command'];
 
         if (
@@ -70,7 +67,7 @@ class Help extends CommandAbstract {
     protected function renderCommandList() {
 
         global $argv;
-        $io = \NGSOFT\STDIO::create();
+        $io = STDIO::create();
 
         $io
                 ->yellow("Usage:")
@@ -102,11 +99,7 @@ class Help extends CommandAbstract {
                     ->linebreak();
         }
 
-
-
-        $io
-                ->linebreak()
-                ->out();
+        $io->out();
     }
 
     public function renderFor(Command $command) {
