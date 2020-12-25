@@ -68,6 +68,16 @@ final class STDIO implements Ansi, Colors, Formats {
     /** @var Formatter */
     private $formatter;
 
+    ////////////////////////////   Initialisation   ////////////////////////////
+
+    /**
+     * Creates STDIO Instance
+     * @return STDIO
+     */
+    public static function create(): STDIO {
+        return new static();
+    }
+
     public function __construct() {
         $this->terminal = new Terminal();
         $this->supportsColors = $this->terminal->hasColorSupport();
