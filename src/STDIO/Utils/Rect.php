@@ -87,7 +87,7 @@ class Rect implements Renderer {
 
         $rectlines = [""];
         foreach ($lines as $line) {
-            if (mb_strlen($line) > $maxlen) $maxlen = mb_strlen($line);
+            if (mb_strlen($line) > $maxlen) $maxlen = mb_strlen($line) + 8;
             $rectlines[] = $line;
         }
 

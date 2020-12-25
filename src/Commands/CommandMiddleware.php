@@ -82,14 +82,11 @@ class CommandMiddleware implements MiddlewareInterface {
             /** @var Command $task */
             $task = $this->container->get($classname);
             if ($classname == Help::class) {
-                $commands = [];
+                /** @var Help $task */
                 foreach ($this->commands as $commandName => $commandClassname) {
-
-                    if ($commandClassname !== Help::class) {
-                        $commands[$commandName] = $this->container->get($commandClassname);
-                    }
+                    if ($commandName === '__default') continue;
+                    $task->addCommand($this->container->get($commandClassname), $commandName);
                 }
-                $task->setCommands($commands);
             }
             $arguments = $task->parseArguments($args);
 

@@ -5,6 +5,7 @@ namespace NGSOFT\Commands\Helpers;
 use NGSOFT\Commands\{
     CommandAbstract, Interfaces\Command, Option
 };
+use RuntimeException;
 
 class Help extends CommandAbstract {
 
@@ -34,6 +35,7 @@ class Help extends CommandAbstract {
         return [
                     (new Option('command'))
                     ->withDefaultValue('help')
+                    ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0)
         ];
     }
 
@@ -48,7 +50,20 @@ class Help extends CommandAbstract {
     }
 
     public function command(array $args) {
-        var_dump($args);
+
+        $command = $args['command'];
+
+        if (
+                isset($this->commands[$command])
+                and ($this->commands[$command] instanceof Command)
+        ) {
+            return $this->renderFor($this->commands[$command]);
+        }
+        throw new RuntimeException(sprintf('Command "%s" not found.', $command));
+    }
+
+    public function renderFor(Command $command) {
+
     }
 
 }

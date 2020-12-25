@@ -56,10 +56,11 @@ abstract class CommandAbstract implements Command {
             if ($option === null) {
                 if (count($annon) > 0) {
                     $option = array_shift($annon);
+
                     if ($option->checkValue($arg)) {
                         $result[$option->getName()] = $arg;
                         continue;
-                    } else throw new RuntimeException(sprintf('Invalid value for cli argument "%s"', $option->getName()));
+                    } else throw new RuntimeException(sprintf('Invalid value "%s" for cli argument "%s"', $arg, $option->getName()));
                 } else throw new RuntimeException(sprintf('Cannot parse cli argument "%s"', $arg));
             }
 
@@ -88,12 +89,13 @@ abstract class CommandAbstract implements Command {
     }
 
     /**
-     * Render Help for current Command
+     * Render Help screen for defined Command
+     * @param Command $command
      */
-    public function renderHelp() {
+    public function getHelpFor(Command $command) {
         $help = new Helpers\Help();
-        $help->addCommand($this);
-        $help->command(['command' => $this->getName()]);
+        $help->addCommand($command);
+        $help->renderFor($command);
     }
 
 }
