@@ -2,7 +2,8 @@
 
 namespace NGSOFT\Commands;
 
-use InvalidArgumentException;
+use InvalidArgumentException,
+    RuntimeException;
 
 class Option {
 
@@ -235,6 +236,25 @@ class Option {
         }
         $this->short = $short;
         return $this->autosetType();
+    }
+
+    ////////////////////////////   Parser   ////////////////////////////
+
+    /**
+     * Checks Argument Value using $must callable
+     * @param mixed $value
+     * @return bool
+     * @throws RuntimeException
+     */
+    public function checkValue($value): bool {
+        foreach ($this->must as $callback) {
+            $retval = $callback($value);
+            if (!is_bool($retval)) {
+                throw new RuntimeException(sprintf('Invalid return value for callable in Option "%s", boolean requested but %s given.', $this->getName(), gettype($retval)));
+            }
+            if (false === $retval) return false;
+        }
+        return true;
     }
 
     ////////////////////////////   Configurator   ////////////////////////////

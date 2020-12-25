@@ -72,8 +72,13 @@ abstract class CommandAbstract implements Command {
             $next = $i + 1;
 
             if (isset($args[$next])) {
-                $value = $args[$next];
+
+                $result[$option->getName()] = $args[$next];
+
+                $i = $next; //jump one arg
             } else throw new RuntimeException(sprintf('Invalid value for argument %s', $option->getName()));
+
+
 
 
 
