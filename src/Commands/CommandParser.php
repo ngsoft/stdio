@@ -45,8 +45,7 @@ class CommandParser implements Parser {
             }
             if ($option === null) {
                 if (
-                        preg_match(Option::VALID_SHORT_REGEX, $arg) < 1
-                        and preg_match(Option::VALID_LONG_REGEX, $arg) < 1
+                        $arg[0] != '-'
                         and count($annon) > 0
                 ) {
 
