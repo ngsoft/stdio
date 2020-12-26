@@ -2,12 +2,15 @@
 
 namespace NGSOFT\Commands\Interfaces;
 
+use NGSOFT\Commands\Option;
+
 interface Parser {
 
     /**
      * Parse Arguments and returns key value pair to use with command
      * @param array $args
-     * @return array
+     * @param Option[] $options
+     * @return array<string,mixed>
      */
-    public function parseArguments(array $args): array;
+    public function parseArguments(array $args, array $options): array;
 }

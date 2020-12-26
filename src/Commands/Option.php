@@ -296,4 +296,30 @@ class Option {
         return $result;
     }
 
+    ////////////////////////////   Getters   ////////////////////////////
+
+    /**
+     * Get Option Type
+     * @return int
+     */
+    public function getType(): int {
+        return $this->type;
+    }
+
+    /**
+     * Get Option Value Type
+     * @return string
+     */
+    public function getValueType(): string {
+        return $this->valueType;
+    }
+
+    /**
+     * Get Option Name
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
+    }
+
 }

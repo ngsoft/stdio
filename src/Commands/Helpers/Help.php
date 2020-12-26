@@ -34,9 +34,10 @@ class Help extends CommandAbstract {
     public function getOptions(): array {
 
         return [
-                    Option::create('command', 'Command to get help screen for.')
-                    ->withDefaultValue('help')
-                    ->withMustBe(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
+                    Option::create('command')
+                    ->description('Command to get help screen for.')
+                    ->defaultValue('help')
+                    ->validateWith(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
         ];
     }
 

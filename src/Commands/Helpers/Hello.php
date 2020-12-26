@@ -3,7 +3,7 @@
 namespace NGSOFT\Commands\Helpers;
 
 use NGSOFT\Commands\{
-    CommandAbstract, Option
+    BooleanOption, CommandAbstract, Option
 };
 
 class Hello extends CommandAbstract {
@@ -32,14 +32,13 @@ class Hello extends CommandAbstract {
     public function getOptions(): array {
 
         return [
-                    Option::create("name", 'Name to display')
-                    ->withDefaultValue("World"),
-                    Option::create("uppercase", 'Transform to uppercase.')
-                    ->withIsBoolean()
-                    ->withShortArgument('-u'),
-                    Option::create("lowercase", 'Transform to lowercase.')
-                    ->withIsBoolean()
-                    ->withShortArgument('-l'),
+                    Option::create("name")
+                    ->description('Name to display')
+                    ->defaultValue("World"),
+                    BooleanOption::create("uppercase", '-u')
+                    ->description('Transform to uppercase.'),
+                    BooleanOption::create("lowercase", '-l')
+                    ->description('Transform to lowercase.'),
         ];
     }
 

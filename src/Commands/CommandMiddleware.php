@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\Commands;
 
 use NGSOFT\{
-    Commands\Helpers\Hello, Commands\Helpers\Help, Commands\Interfaces\Command, STDIO
+    Commands\Helpers\Hello, Commands\Helpers\Help, Commands\Interfaces\Command, Commands\Interfaces\Parser, STDIO
 };
 use Psr\{
     Container\ContainerInterface, Http\Message\ResponseFactoryInterface, Http\Message\ResponseInterface,
@@ -26,12 +26,25 @@ class CommandMiddleware implements MiddlewareInterface {
     /** @var ResponseFactoryInterface */
     protected $responsefactory;
 
+    /** @var Parser|null */
+    protected $parser;
+
     /** @var array<string,string> */
     protected $commands = [
         '__default' => Help::class,
         'help' => Help::class,
         'hello' => Hello::class,
     ];
+
+    /**
+     * Set a custom Argument Parser
+     * @param Parser $parser
+     * @return static
+     */
+    public function setArgumentParser(Parser $parser) {
+        $this->parser = $parser;
+        return $this;
+    }
 
     public function __construct(
             ContainerInterface $container,
@@ -40,6 +53,7 @@ class CommandMiddleware implements MiddlewareInterface {
 
         $this->container = $container;
         $this->responsefactory = $responsefactory;
+        $this->parser = new CommandParser();
         if ($container->has('commands')) {
             $commands = $container->get('commands');
             if (is_array($commands)) {
@@ -61,6 +75,8 @@ class CommandMiddleware implements MiddlewareInterface {
         //not in cli mode
         if (php_sapi_name() !== 'cli') return $handler->handle($request);
         global $argv;
+
+
 
         $io = STDIO::create();
         $stderr = $io->getOutput('err');
@@ -90,7 +106,7 @@ class CommandMiddleware implements MiddlewareInterface {
                     $task->addCommand($this->container->get($commandClassname), $commandName);
                 }
             }
-            $arguments = $task->parseArguments($args);
+            $arguments = $this->parser->parseArguments($args, $task->getOptions());
 
             if (
                     ($result = $task->command($arguments))
