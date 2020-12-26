@@ -89,7 +89,7 @@ class Option {
      * @param string|null $long Long Argument
      * @return static
      */
-    public static function create(string $name, ?string $short = null, ?string $long = null) {
+    public static function create(string $name, ?string $short = null, ?string $long = null): self {
         return new static($name, $short, $long);
     }
 
@@ -111,7 +111,7 @@ class Option {
      * Auto Set Type
      * @return static
      */
-    protected function autosetType(): Option {
+    protected function autosetType(): self {
 
         $type = self::TYPE_ANONYMOUS;
         if (
@@ -126,10 +126,10 @@ class Option {
     /**
      * Set Short argument
      * @param string $short
-     * @return $this
+     * @return static
      * @throws InvalidArgumentException
      */
-    public function short(string $short): Option {
+    public function short(string $short): self {
         if (preg_match(self::VALID_SHORT_REGEX, $short) > 0) {
             $this->short = $short;
         } else throw new InvalidArgumentException(sprintf('Invalid argument short="%s".', $short));
@@ -139,10 +139,10 @@ class Option {
     /**
      * Set Long Argument
      * @param string $long
-     * @return Option
+     * @return static
      * @throws InvalidArgumentException
      */
-    public function long(string $long): Option {
+    public function long(string $long): self {
         if (preg_match(self::VALID_LONG_REGEX, $long) > 0) {
             $this->long = $long;
         } else throw new InvalidArgumentException(sprintf('Invalid argument long="%s".', $long));
@@ -153,10 +153,10 @@ class Option {
     /**
      * Set Option Type
      * @param int $type
-     * @return Option
+     * @return static
      * @throws InvalidArgumentException
      */
-    public function type(int $type): Option {
+    public function type(int $type): self {
         $valid = [self::TYPE_SHORT, self::TYPE_VERBOSE, self::TYPE_NAMED, self::TYPE_ANONYMOUS];
         if (!in_array($type, $valid)) {
             throw new InvalidArgumentException('Invalid argument type');
@@ -169,10 +169,10 @@ class Option {
     /**
      * Set Value Type
      * @param string $valueType
-     * @return Option
+     * @return static
      * @throws InvalidArgumentException
      */
-    public function valueType(string $valueType): Option {
+    public function valueType(string $valueType): self {
         $valid = [self::VALUE_TYPE_STRING, self::VALUE_TYPE_INT, self::VALUE_TYPE_FLOAT, self::VALUE_TYPE_BOOLEAN];
         if (!in_array($valueType, $valid)) {
             throw new InvalidArgumentException(sprintf('Invalid argument valueType="%s" specified(valid: %s)', $valueType, implode(', ', $valid)));
@@ -184,9 +184,9 @@ class Option {
     /**
      * Set Description
      * @param string $description
-     * @return Option
+     * @return static
      */
-    public function description(string $description): Option {
+    public function description(string $description): self {
         $this->description = $description;
         return $this;
     }
@@ -194,9 +194,9 @@ class Option {
     /**
      * Set Default Value
      * @param mixed $defaultValue
-     * @return Option
+     * @return static
      */
-    public function defaultValue($defaultValue): Option {
+    public function defaultValue($defaultValue): self {
         $this->defaultValue = $defaultValue;
         return $this;
     }
@@ -204,9 +204,9 @@ class Option {
     /**
      * Argument value not null
      * @param bool $required
-     * @return Option
+     * @return static
      */
-    public function isRequired(bool $required = true): Option {
+    public function isRequired(bool $required = true): self {
         $this->required = $required;
         return $this;
     }
@@ -214,9 +214,9 @@ class Option {
     /**
      * Set the User Defined Validation Callback
      * @param callable $callback
-     * @return Option
+     * @return static
      */
-    public function validateWith(callable $callback): Option {
+    public function validateWith(callable $callback): self {
         $this->validate = $callback;
         return $this;
     }
@@ -224,9 +224,9 @@ class Option {
     /**
      * Set the User Defined Transform Callback
      * @param callable $callback
-     * @return Option
+     * @return static
      */
-    public function transformWith(callable $callback): Option {
+    public function transformWith(callable $callback): self {
         $this->transform = $callback;
         return $this;
     }
@@ -235,25 +235,25 @@ class Option {
 
     /**
      * Set Option Value as Boolean
-     * @return Option
+     * @return static
      */
-    public function isBoolean(): Option {
+    public function isBoolean(): self {
         return $this->valueType(self::VALUE_TYPE_BOOLEAN);
     }
 
     /**
      * Set Option Value as integer
-     * @return Option
+     * @return static
      */
-    public function isInt(): Option {
+    public function isInt(): self {
         return $this->valueType(self::VALUE_TYPE_INT);
     }
 
     /**
      * Set Option Value as Float
-     * @return Option
+     * @return static
      */
-    public function isFloat(): Option {
+    public function isFloat(): self {
         return $this->valueType(self::VALUE_TYPE_FLOAT);
     }
 
@@ -328,6 +328,14 @@ class Option {
      */
     public function getDescription(): string {
         return $this->description;
+    }
+
+    /**
+     * Get Default Value
+     * @return mixed
+     */
+    public function getDefaultValue() {
+        return $this->defaultValue;
     }
 
 }

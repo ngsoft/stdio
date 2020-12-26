@@ -43,7 +43,7 @@ class Help extends CommandAbstract {
 
     /** {@inheritdoc} */
     public function getDescription(): string {
-        return "This help screen";
+        return "Help Screen";
     }
 
     /** {@inheritdoc} */
@@ -81,7 +81,8 @@ class Help extends CommandAbstract {
                 ->linebreak();
         if (!empty($name)) $io->green("  $name ");
         else $io->write('  command ');
-        $io->write('[options] [arguments]')->linebreak(2);
+
+        $argsStr = '';
 
         $opts = [];
         $args = [];
@@ -100,6 +101,8 @@ class Help extends CommandAbstract {
                     'left' => sprintf('  [%s]', $option->getName()),
                     'right' => $option->getDescription()
                 ];
+
+                $argsStr .= sprintf('[%s] ', $option->getName());
             } else {
                 $opts[] = $optName;
                 $params = $option->getParams();
@@ -115,6 +118,10 @@ class Help extends CommandAbstract {
             $len = mb_strlen($desc[$optName]['left']) + 4;
             if ($len > $maxlen) $maxlen = $len;
         }
+
+        if (count($opts) > 0) $io->write('[options] ');
+        if (!empty($argsStr)) $io->write($argsStr);
+        $io->linebreak(2);
 
         if (count($opts) > 0) {
             $io

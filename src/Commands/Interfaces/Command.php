@@ -8,7 +8,7 @@ use NGSOFT\Commands\Option;
 
 interface Command {
 
-    const VALID_COMMAND_NAME_REGEX = '/^[a-z][a-z0-9\_\:]+$/i';
+    const VALID_COMMAND_NAME_REGEX = '/^[a-z][a-z0-9\_\-\:]+$/i';
 
     /**
      * Command to Execute

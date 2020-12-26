@@ -14,15 +14,17 @@ class Hello extends CommandAbstract {
             $help = new Help();
             return $help->renderFor($this);
         }
-
         $name = $args['name'];
+        $result = '';
         $str = "Hello $name !";
-
         if ($args['uppercase'] === true) $str = strtoupper($str);
         elseif ($args['lowercase'] === true) $str = strtolower($str);
 
-
-        return $str;
+        for ($i = 0; $i < $args['repeat']; $i++) {
+            if (!empty($result)) $result .= "\n";
+            $result .= $str;
+        }
+        return $result;
     }
 
     public function getDescription(): string {
@@ -42,10 +44,14 @@ class Hello extends CommandAbstract {
                     ->defaultValue("World"),
                     BooleanOption::create('help', '-h', '--help')
                     ->description('Display this help message'),
-                    BooleanOption::create("uppercase", '-u')
+                    BooleanOption::create("uppercase", '-u', '--upper')
                     ->description('Transform to uppercase.'),
-                    BooleanOption::create("lowercase", '-l')
+                    BooleanOption::create("lowercase", '-l', '--lower')
                     ->description('Transform to lowercase.'),
+                    Option::create('repeat', '-r', '--repeat')
+                    ->isInt()
+                    ->description('Number of repeats')
+                    ->defaultValue(1)
         ];
     }
 
