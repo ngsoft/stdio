@@ -43,7 +43,8 @@ class StandaloneCommand implements Command {
     /** @param callable $callback */
     public function __construct(callable $callback) {
         $this->options = [
-            BooleanOption::create('help', '-h', '--help')
+                    BooleanOption::create('help', '-h', '--help')
+                    ->setDescription('Display this help message')
         ];
         $this->setCallback($callback);
         $this->parser = new CommandParser();

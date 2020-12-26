@@ -10,6 +10,11 @@ class Hello extends CommandAbstract {
 
     public function command(array $args) {
 
+        if ($args['help'] === true) {
+            $help = new Help();
+            return $help->renderFor($this);
+        }
+
         $name = $args['name'];
         $str = "Hello $name !";
 
@@ -22,7 +27,7 @@ class Hello extends CommandAbstract {
 
     public function getDescription(): string {
 
-        return "A simple Hello World";
+        return "A simple hello world";
     }
 
     public function getName(): string {
@@ -35,6 +40,8 @@ class Hello extends CommandAbstract {
                     Option::create("name")
                     ->description('Name to display')
                     ->defaultValue("World"),
+                    BooleanOption::create('help', '-h', '--help')
+                    ->description('Display this help message'),
                     BooleanOption::create("uppercase", '-u')
                     ->description('Transform to uppercase.'),
                     BooleanOption::create("lowercase", '-l')

@@ -46,8 +46,8 @@ class Option {
     /** @var string|null */
     protected $long;
 
-    /** @var string|null */
-    protected $description;
+    /** @var string */
+    protected $description = '';
 
     /** @var mixed|null */
     protected $defaultValue = null;
@@ -320,6 +320,14 @@ class Option {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * Get Description
+     * @return string
+     */
+    public function getDescription(): string {
+        return $this->description;
     }
 
 }
