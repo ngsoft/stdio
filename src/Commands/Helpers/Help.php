@@ -65,48 +65,7 @@ class Help extends CommandAbstract {
         throw new RuntimeException(sprintf('Command "%s" not found.', $command));
     }
 
-    protected function renderCommandList() {
-
-        global $argv;
-        $io = STDIO::create();
-
-        $io
-                ->yellow("Usage:")
-                ->linebreak()
-                ->write(sprintf('  %s ', basename($argv[0])))
-                ->green('help [command]')
-                ->linebreak();
-
-        $io
-                ->linebreak()
-                ->yellow("Available Commands:")
-                ->linebreak();
-
-        $maxlen = 0;
-        foreach (array_keys($this->commands) as $name) {
-            if (mb_strlen($name) > $maxlen) {
-                $maxlen = mb_strlen($name);
-            }
-        }
-        $maxlen += 4;
-        /** @var Command $command */
-        foreach ($this->commands as $name => $command) {
-            $len = mb_strlen($name) + 2;
-            $repeats = $maxlen - $len;
-            $io
-                    ->green(sprintf('  %s', $name))
-                    ->space($repeats)
-                    ->write($command->getDescription())
-                    ->linebreak();
-        }
-
-        $io->out();
-    }
-
     public function renderFor(Command $command) {
-
-        //  if ($command === $this) return $this->renderCommandList();
-
 
         $io = STDIO::create();
 
@@ -114,15 +73,15 @@ class Help extends CommandAbstract {
         $description = $command->getDescription();
         $name = $command->getName();
 
-        if (!empty($description)) $io->linebreak()->writeln($description)->linebreak();
+        $io->linebreak();
+
+        if (!empty($description)) $io->writeln($description)->linebreak();
         $io
                 ->yellow("Usage:")
                 ->linebreak();
         if (!empty($name)) $io->green("  $name ");
         else $io->write('  command ');
         $io->write('[options] [arguments]')->linebreak(2);
-
-
 
         $opts = [];
         $args = [];
@@ -153,8 +112,8 @@ class Help extends CommandAbstract {
                 ];
             }
 
-            $len = mb_strlen($desc[$optName]['left']);
-            if ($len > $maxlen) $maxlen = $len + 4;
+            $len = mb_strlen($desc[$optName]['left']) + 4;
+            if ($len > $maxlen) $maxlen = $len;
         }
 
         if (count($opts) > 0) {

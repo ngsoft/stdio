@@ -10,8 +10,6 @@ class Hello extends CommandAbstract {
 
     public function command(array $args) {
 
-        var_dump($args);
-
         if ($args['help'] === true) {
             $help = new Help();
             return $help->renderFor($this);
@@ -29,7 +27,7 @@ class Hello extends CommandAbstract {
 
     public function getDescription(): string {
 
-        return "A simple hello world";
+        return "Hello World";
     }
 
     public function getName(): string {
