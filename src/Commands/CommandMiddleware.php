@@ -29,12 +29,28 @@ class CommandMiddleware implements MiddlewareInterface {
     /** @var Parser|null */
     protected $parser;
 
+    /** @var ErrorHandler|null */
+    protected $errorHandler;
+
+    /** @var bool */
+    protected $displayTraceOnError = false;
+
     /** @var array<string,string> */
     protected $commands = [
         '__default' => Help::class,
         'help' => Help::class,
         'hello' => Hello::class,
     ];
+
+    /**
+     * Tells the ErrorHandler if it can display trace on error
+     * @param bool $displayTraceOnError
+     * @return static
+     */
+    public function displayTraceOnError(bool $displayTraceOnError): self {
+        $this->displayTraceOnError = $displayTraceOnError;
+        return $this;
+    }
 
     /**
      * Set a custom Argument Parser
@@ -50,7 +66,6 @@ class CommandMiddleware implements MiddlewareInterface {
             ContainerInterface $container,
             ResponseFactoryInterface $responsefactory
     ) {
-
         $this->container = $container;
         $this->responsefactory = $responsefactory;
         $this->parser = new CommandParser();
@@ -74,49 +89,38 @@ class CommandMiddleware implements MiddlewareInterface {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
         //not in cli mode
         if (php_sapi_name() !== 'cli') return $handler->handle($request);
+        $this->errorHandler = ErrorHandler::register();
+        $this->errorHandler->setDisplayTrace($this->displayTraceOnError);
+
         global $argv;
-
-
-
         $io = STDIO::create();
-        $stderr = $io->getOutput('err');
-        $errorHandler = $io
-                ->createRect()
-                ->setBackground('red')
-                ->setColor('white');
-
-
 
         $args = $argv;
         array_shift($args); //removes scriptname
         $command = array_shift($args);
         if ($command === null) $command = '__default';
-        try {
 
-            if (!isset($this->commands[$command])) {
-                throw new RuntimeException("Command $command does not exists");
-            }
-            $classname = $this->commands[$command];
-            /** @var Command $task */
-            $task = $this->container->get($classname);
-            if ($classname == Help::class) {
-                /** @var Help $task */
-                foreach ($this->commands as $commandName => $commandClassname) {
-                    if ($commandName === '__default') continue;
-                    $task->addCommand($this->container->get($commandClassname), $commandName);
-                }
-            }
-            $arguments = $this->parser->parseArguments($args, $task->getOptions());
 
-            if (
-                    ($result = $task->command($arguments))
-                    and is_string($result)
-            ) $io->out($result); //Basic Render (for simple commands)
-        } catch (Throwable $error) {
-            //command has thrown an error
-            $errorHandler->write($error->getMessage());
-            $errorHandler->render($stderr);
+        if (!isset($this->commands[$command])) {
+            throw new RuntimeException("Command $command does not exists");
         }
+        $classname = $this->commands[$command];
+        /** @var Command $task */
+        $task = $this->container->get($classname);
+        if ($classname == Help::class) {
+            /** @var Help $task */
+            foreach ($this->commands as $commandName => $commandClassname) {
+                if ($commandName === '__default') continue;
+                $task->addCommand($this->container->get($commandClassname), $commandName);
+            }
+        }
+        $arguments = $this->parser->parseArguments($args, $task->getOptions());
+
+        if (
+                ($result = $task->command($arguments))
+                and is_string($result)
+        ) $io->out($result); //Basic Render (for simple commands)
+
 
         return $this->responsefactory->createResponse(200); //retuns empty response
     }

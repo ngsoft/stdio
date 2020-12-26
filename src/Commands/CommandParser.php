@@ -19,12 +19,12 @@ class CommandParser implements Parser {
             $params = $opt->getParams();
             $def = $params['defaultValue'];
 
-            if ($def !== null) {
-                $required[] = $opt;
-                $result[$opt->getName()] = $def;
-            } elseif ($opt->getValueType() == Option::VALUE_TYPE_BOOLEAN) {
+            if ($opt->getValueType() == Option::VALUE_TYPE_BOOLEAN) {
                 $required[] = $opt;
                 $result[$opt->getName()] = $def === true;
+            } elseif ($def !== null) {
+                $required[] = $opt;
+                $result[$opt->getName()] = $def;
             } elseif ($params['required'] === true) $required[] = $opt;
 
             if ($opt->getType() === Option::TYPE_SHORT) $parser[$params['short']] = $opt;
@@ -50,7 +50,7 @@ class CommandParser implements Parser {
                         $result[$option->getName()] = $option->transformArgument($arg);
                         continue;
                     } else throw new RuntimeException(sprintf('Invalid value "%s" for cli argument "%s"', $arg, $option->getName()));
-                } else throw new RuntimeException(sprintf('Cannot parse cli argument "%s"', $arg));
+                } else throw new RuntimeException(sprintf('Invalid argument "%s"', $arg));
             }
 
             if ($option->getValueType() === Option::VALUE_TYPE_BOOLEAN) {
