@@ -94,12 +94,16 @@ class Help extends CommandAbstract {
         foreach ($options as $option) {
 
             $optName = $option->getName();
+            $optDesc = $option->getDescription();
+            if (empty($optDesc)) $optDesc = 'No description';
 
             if ($option->getType() == Option::TYPE_ANONYMOUS) {
                 $args[] = $optName;
+
+
                 $desc[$optName] = [
                     'left' => sprintf('  [%s]', $option->getName()),
-                    'right' => $option->getDescription()
+                    'right' => $optDesc
                 ];
 
                 $argsStr .= sprintf('[%s] ', $option->getName());
@@ -109,9 +113,10 @@ class Help extends CommandAbstract {
                 $list = [];
                 if (!empty($params['short'])) $list[] = $params['short'];
                 if (!empty($params['long'])) $list[] = $params['long'];
+
                 $desc[$optName] = [
                     'left' => sprintf('  %s', implode(', ', $list)),
-                    'right' => $option->getDescription()
+                    'right' => $optDesc
                 ];
             }
 

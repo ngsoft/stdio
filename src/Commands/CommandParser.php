@@ -44,7 +44,12 @@ class CommandParser implements Parser {
                 }
             }
             if ($option === null) {
-                if (count($annon) > 0) {
+                if (
+                        preg_match(Option::VALID_SHORT_REGEX, $arg) < 1
+                        and preg_match(Option::VALID_LONG_REGEX, $arg) < 1
+                        and count($annon) > 0
+                ) {
+
                     $option = array_shift($annon);
                     if ($option->validateArgument($arg)) {
                         $result[$option->getName()] = $option->transformArgument($arg);
