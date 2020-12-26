@@ -146,7 +146,7 @@ class Help extends CommandAbstract {
                 $params = $option->getParams();
                 $list = [];
                 if (!empty($params['short'])) $list[] = $params['short'];
-                if (!empty($params['long'])) $list = $params['long'];
+                if (!empty($params['long'])) $list[] = $params['long'];
                 $desc[$optName] = [
                     'left' => sprintf('  %s', implode(', ', $list)),
                     'right' => $option->getDescription()
