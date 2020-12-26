@@ -11,8 +11,7 @@ use Psr\{
     Container\ContainerInterface, Http\Message\ResponseFactoryInterface, Http\Message\ResponseInterface,
     Http\Message\ServerRequestInterface, Http\Server\MiddlewareInterface, Http\Server\RequestHandlerInterface
 };
-use RuntimeException,
-    Throwable;
+use RuntimeException;
 
 /**
  * Command Middleware

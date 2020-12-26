@@ -3,7 +3,7 @@
 namespace NGSOFT\Commands;
 
 use NGSOFT\{
-    Commands\Interfaces\Command, Commands\Interfaces\Parser, STDIO
+    Commands\Helpers\Help, Commands\Interfaces\Command, Commands\Interfaces\Parser, STDIO
 };
 use RuntimeException;
 
@@ -60,6 +60,16 @@ class StandaloneCommand implements Command {
 
     /** {@inheritdoc} */
     public function command(array $args) {
+
+        if (
+                array_key_exists('help', $args)
+                and $args['help'] === true
+        ) {
+
+            $help = new Help();
+            return $help->renderFor($this);
+        }
+
         $io = STDIO::create();
         $retval = call_user_func_array($this->callback, [$args, $io]);
         if (is_string($retval)) {
