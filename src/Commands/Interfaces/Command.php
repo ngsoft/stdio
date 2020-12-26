@@ -23,13 +23,6 @@ interface Command {
     public function getOptions(): array;
 
     /**
-     * Parse Arguments and returns key value pair to use with command
-     * @param array $args
-     * @return array
-     */
-    public function parseArguments(array $args): array;
-
-    /**
      * Get Command Name
      * @return string
      */

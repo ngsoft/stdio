@@ -32,12 +32,12 @@ class Hello extends CommandAbstract {
     public function getOptions(): array {
 
         return [
-                    Option::create("name")
+                    Option::create("name", 'Name to display')
                     ->withDefaultValue("World"),
-                    Option::create("uppercase")
+                    Option::create("uppercase", 'Transform to uppercase.')
                     ->withIsBoolean()
                     ->withShortArgument('-u'),
-                    Option::create("lowercase")
+                    Option::create("lowercase", 'Transform to lowercase.')
                     ->withIsBoolean()
                     ->withShortArgument('-l'),
         ];
