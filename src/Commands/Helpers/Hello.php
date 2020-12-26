@@ -10,6 +10,8 @@ class Hello extends CommandAbstract {
 
     public function command(array $args) {
 
+        var_dump($args);
+
         if ($args['help'] === true) {
             $help = new Help();
             return $help->renderFor($this);

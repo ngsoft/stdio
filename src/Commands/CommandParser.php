@@ -34,6 +34,8 @@ class CommandParser implements Parser {
             } else $annon[] = $opt;
         }
 
+        var_dump($parser);
+
         for ($i = 0; $i < count($args); $i++) {
             $arg = $args[$i];
             $option = null;
