@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\STDIO\Inputs;
 
 use NGSOFT\STDIO\Interfaces\{

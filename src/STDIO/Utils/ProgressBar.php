@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\STDIO\{
