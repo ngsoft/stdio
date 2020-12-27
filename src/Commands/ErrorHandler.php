@@ -18,6 +18,12 @@ class ErrorHandler {
 
         $io = STDIO::create();
         $stderr = $io->getOutput('err');
+
+        $io
+                ->yellow("Error:")
+                ->linebreak()
+                ->err();
+
         $handler = $io->createRect()
                 ->setBackground('red')
                 ->setColor('white');

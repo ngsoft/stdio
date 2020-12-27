@@ -36,8 +36,17 @@ class StandaloneCommand implements Command {
             array_shift($args);
         }
 
-        $arguments = $this->parser->parseArguments($args, $this->getOptions());
-        $this->command($arguments);
+        try {
+            $arguments = $this->parser->parseArguments($args, $this->getOptions());
+            $this->command($arguments);
+        } catch (\Throwable $error) {
+
+            try {
+                $help = new Help();
+                $help->renderFor($this);
+            } catch (\Throwable $err) { $err->getCode(); }
+            throw $error;
+        }
     }
 
     /** @param callable $callback */

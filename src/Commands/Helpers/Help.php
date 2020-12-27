@@ -156,7 +156,10 @@ class Help extends CommandAbstract {
             }
             $io->linebreak();
         }
-        if (get_class($command) == get_class($this)) {
+        if (
+                get_class($command) == get_class($this)
+                and count($this->commands) > 0
+        ) {
             $io
                     ->yellow("Available Commands:")
                     ->linebreak();

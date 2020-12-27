@@ -17,14 +17,13 @@ class CommandParser implements Parser {
         /** @var Option $opt */
         foreach ($options as $opt) {
             $params = $opt->getParams();
-            $def = $params['defaultValue'];
+
+
+            $result[$opt->getName()] = $def = $params['defaultValue'];
 
             if ($opt->getValueType() == Option::VALUE_TYPE_BOOLEAN) {
                 $required[] = $opt;
                 $result[$opt->getName()] = $def === true;
-            } elseif ($def !== null) {
-                $required[] = $opt;
-                $result[$opt->getName()] = $def;
             } elseif ($params['required'] === true) $required[] = $opt;
 
             if ($opt->getType() === Option::TYPE_SHORT) $parser[$params['short']] = $opt;
@@ -73,7 +72,10 @@ class CommandParser implements Parser {
         }
 
         foreach ($required as $opt) {
-            if (!array_key_exists($opt->getName(), $result)) {
+            if (
+                    !array_key_exists($opt->getName(), $result)
+                    or $result[$opt->getName()] === null
+            ) {
                 throw new RuntimeException(sprintf('Required argument "%s" not defined.', $opt->getName()));
             }
         }

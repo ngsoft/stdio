@@ -11,7 +11,8 @@ use Psr\{
     Container\ContainerInterface, Http\Message\ResponseFactoryInterface, Http\Message\ResponseInterface,
     Http\Message\ServerRequestInterface, Http\Server\MiddlewareInterface, Http\Server\RequestHandlerInterface
 };
-use RuntimeException;
+use RuntimeException,
+    Throwable;
 
 /**
  * Command Middleware
@@ -113,13 +114,22 @@ class CommandMiddleware implements MiddlewareInterface {
                 $task->addCommand($this->container->get($commandClassname), $commandName);
             }
         }
-        $arguments = $this->parser->parseArguments($args, $task->getOptions());
 
-        if (
-                ($result = $task->command($arguments))
-                and is_string($result)
-        ) $io->out($result); //Basic Render (for simple commands)
+        try {
 
+            $arguments = $this->parser->parseArguments($args, $task->getOptions());
+            if (
+                    ($result = $task->command($arguments))
+                    and is_string($result)
+            ) $io->out($result); //Basic Render (for simple commands)
+        } catch (Throwable $error) {
+
+            try {
+                $help = new Help();
+                $help->renderFor($task);
+            } catch (Throwable $err) { $err->getCode(); }
+            $this->errorHandler->__invoke($error);
+        }
 
         return $this->responsefactory->createResponse(200); //retuns empty response
     }
