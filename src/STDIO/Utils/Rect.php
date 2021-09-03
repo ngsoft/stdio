@@ -97,11 +97,15 @@ class Rect implements Renderer {
 
         $margin_left = (int) floor(($this->term->width - $maxlen) / 2);
         foreach ($rectlines as $line) {
-            $message = $clear . str_repeat(" ", $margin_left);
+            $message = $clear;
+            if ($margin_left > 0) $message .= str_repeat(" ", $margin_left);
             $len = mb_strlen($line);
             $repeatsl = (int) ceil(($maxlen - $len) / 2);
             $repeatsr = $maxlen - $len - $repeatsl;
-            $message .= $prefix . str_repeat(" ", $repeatsl) . $line . str_repeat(" ", $repeatsr);
+            $message .= $prefix;
+            if ($repeatsl > 0) $message .= str_repeat(" ", $repeatsl);
+            $message .= $line;
+            if ($repeatsr > 0) $message .= str_repeat(" ", $repeatsr);
             $message .= $suffix;
             $result[] = $message;
         }

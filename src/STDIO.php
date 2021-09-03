@@ -7,9 +7,8 @@ namespace NGSOFT;
 use BadMethodCallException,
     InvalidArgumentException;
 use NGSOFT\STDIO\{
-    Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors,
-    Interfaces\Formats, Interfaces\Formatter, Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles,
-    Terminal, Utils\ProgressBar, Utils\Rect
+    Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter,
+    Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\ProgressBar, Utils\Rect
 };
 
 /**
@@ -47,7 +46,7 @@ use NGSOFT\STDIO\{
  */
 final class STDIO implements Ansi, Colors, Formats {
 
-    const VERSION = '2.0';
+    const VERSION = '2.0.1';
 
     /** @var Terminal */
     private $terminal;
@@ -224,7 +223,6 @@ final class STDIO implements Ansi, Colors, Formats {
             if (!empty($line)) $result = $line;
         } while ($result === null);
 
-
         return $result;
     }
 
@@ -243,7 +241,6 @@ final class STDIO implements Ansi, Colors, Formats {
         $no = ["no", "n"];
 
         $ynprompt = $default === true ? ' [Y/n]: ' : ' [y/N]: ';
-
 
         $result = null;
         do {
