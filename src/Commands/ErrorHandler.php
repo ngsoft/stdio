@@ -12,6 +12,21 @@ class ErrorHandler {
     /** @var bool */
     protected $displayTrace = false;
 
+    /** @var ErrorHandler */
+    protected static $instance;
+
+    /**
+     * Handles Error
+     * @param Throwable $error
+     * @param bool $displayTrace
+     */
+    public static function handle(Throwable $error, bool $displayTrace = false) {
+        self::$instance = self::$instance ?? new static();
+        $handler = self::$instance;
+        $handler->setDisplayTrace($displayTrace);
+        $handler($error);
+    }
+
     /**
      * Respond to an exception
      * @param Throwable $error
