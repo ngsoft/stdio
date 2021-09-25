@@ -83,7 +83,7 @@ class StandaloneCommand extends CommandAbstract implements Command {
             return $help->renderFor($this);
         }
 
-        $io = STDIO::create();
+        $io = $this->getSTDIO();
         $retval = call_user_func_array($this->callback, [$args, $io]);
         if (is_string($retval)) {
             $io($retval);
