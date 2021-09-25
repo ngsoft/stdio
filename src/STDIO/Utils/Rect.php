@@ -110,7 +110,7 @@ class Rect implements Renderer {
             $message .= $suffix;
             $result[] = $message;
         }
-        return implode("\n", $result);
+        return implode("\n", $result) . "\n";
     }
 
     /** {@inheritdoc} */
