@@ -27,4 +27,9 @@ abstract class CommandAbstract implements Command {
         $help->renderFor($command);
     }
 
+    /** @return STDIO */
+    public function getSTDIO(): STDIO {
+        return $this->io;
+    }
+
 }

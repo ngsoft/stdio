@@ -9,7 +9,7 @@ use NGSOFT\{
 };
 use RuntimeException;
 
-class StandaloneCommand implements Command {
+class StandaloneCommand extends CommandAbstract implements Command {
 
     /** @var string */
     protected $name = '';
@@ -55,10 +55,11 @@ class StandaloneCommand implements Command {
     public function __construct(callable $callback) {
         $this->options = [
                     BooleanOption::create('help', '-h', '--help')
-                    ->description('Display this help message')
+                    ->setDescription('Display this help message')
         ];
         $this->setCallback($callback);
         $this->parser = new CommandParser();
+        parent::__construct();
     }
 
     /**

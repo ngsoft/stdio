@@ -78,8 +78,8 @@ class Option {
             $this->name = $name;
         } else throw new InvalidArgumentException(sprintf('Invalid argument name="%s"', $name));
 
-        if (is_string($short)) $this->short($short);
-        if (is_string($long)) $this->long($long);
+        if (is_string($short)) $this->setShort($short);
+        if (is_string($long)) $this->setLong($long);
     }
 
     /**
@@ -120,7 +120,7 @@ class Option {
         ) $type = self::TYPE_NAMED;
         elseif (!empty($this->short)) $type = self::TYPE_SHORT;
         elseif (!empty($this->long)) $type = self::TYPE_VERBOSE;
-        return $this->type($type);
+        return $this->setType($type);
     }
 
     /**
@@ -129,7 +129,7 @@ class Option {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function short(string $short): self {
+    public function setShort(string $short): self {
         if (preg_match(self::VALID_SHORT_REGEX, $short) > 0) {
             $this->short = $short;
         } else throw new InvalidArgumentException(sprintf('Invalid argument short="%s".', $short));
@@ -142,7 +142,7 @@ class Option {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function long(string $long): self {
+    public function setLong(string $long): self {
         if (preg_match(self::VALID_LONG_REGEX, $long) > 0) {
             $this->long = $long;
         } else throw new InvalidArgumentException(sprintf('Invalid argument long="%s".', $long));
@@ -156,7 +156,7 @@ class Option {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function type(int $type): self {
+    public function setType(int $type): self {
         $valid = [self::TYPE_SHORT, self::TYPE_VERBOSE, self::TYPE_NAMED, self::TYPE_ANONYMOUS];
         if (!in_array($type, $valid)) {
             throw new InvalidArgumentException('Invalid argument type');
@@ -172,7 +172,7 @@ class Option {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function valueType(string $valueType): self {
+    public function setValueType(string $valueType): self {
         $valid = [self::VALUE_TYPE_STRING, self::VALUE_TYPE_INT, self::VALUE_TYPE_FLOAT, self::VALUE_TYPE_BOOLEAN];
         if (!in_array($valueType, $valid)) {
             throw new InvalidArgumentException(sprintf('Invalid argument valueType="%s" specified(valid: %s)', $valueType, implode(', ', $valid)));
@@ -186,7 +186,7 @@ class Option {
      * @param string $description
      * @return static
      */
-    public function description(string $description): self {
+    public function setDescription(string $description): self {
         $this->description = $description;
         return $this;
     }
@@ -196,7 +196,7 @@ class Option {
      * @param mixed $defaultValue
      * @return static
      */
-    public function defaultValue($defaultValue): self {
+    public function setDefaultValue($defaultValue): self {
         $this->defaultValue = $defaultValue;
         return $this;
     }
@@ -206,7 +206,7 @@ class Option {
      * @param bool $required
      * @return static
      */
-    public function isRequired(bool $required = true): self {
+    public function setRequired(bool $required = true): self {
         $this->required = $required;
         return $this;
     }
@@ -237,24 +237,24 @@ class Option {
      * Set Option Value as Boolean
      * @return static
      */
-    public function isBoolean(): self {
-        return $this->valueType(self::VALUE_TYPE_BOOLEAN);
+    public function setBoolean(): self {
+        return $this->setValueType(self::VALUE_TYPE_BOOLEAN);
     }
 
     /**
      * Set Option Value as integer
      * @return static
      */
-    public function isInt(): self {
-        return $this->valueType(self::VALUE_TYPE_INT);
+    public function setInt(): self {
+        return $this->setValueType(self::VALUE_TYPE_INT);
     }
 
     /**
      * Set Option Value as Float
      * @return static
      */
-    public function isFloat(): self {
-        return $this->valueType(self::VALUE_TYPE_FLOAT);
+    public function setFloat(): self {
+        return $this->setValueType(self::VALUE_TYPE_FLOAT);
     }
 
     ////////////////////////////   ToolBox   ////////////////////////////

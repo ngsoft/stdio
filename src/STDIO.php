@@ -46,7 +46,7 @@ use NGSOFT\STDIO\{
  */
 final class STDIO implements Ansi, Colors, Formats {
 
-    const VERSION = '2.0.1';
+    const VERSION = '2.1';
 
     /** @var Terminal */
     private $terminal;
