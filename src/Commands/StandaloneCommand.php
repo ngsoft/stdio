@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\Commands;
 
-use NGSOFT\{
-    Commands\Helpers\Help, Commands\Interfaces\Command, Commands\Interfaces\Parser, STDIO
+use NGSOFT\Commands\{
+    Helpers\Help, Interfaces\Command, Interfaces\Parser
 };
-use RuntimeException;
+use RuntimeException,
+    Throwable;
 
 class StandaloneCommand extends CommandAbstract implements Command {
 
@@ -41,12 +42,12 @@ class StandaloneCommand extends CommandAbstract implements Command {
         try {
             $arguments = $this->parser->parseArguments($args, $this->getOptions());
             $this->command($arguments);
-        } catch (\Throwable $error) {
+        } catch (Throwable $error) {
 
             try {
                 $help = new Help();
                 $help->renderFor($this);
-            } catch (\Throwable $err) { $err->getCode(); }
+            } catch (Throwable $err) { $err->getCode(); }
             throw $error;
         }
     }

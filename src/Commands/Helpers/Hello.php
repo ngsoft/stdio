@@ -42,18 +42,18 @@ class Hello extends CommandAbstract {
 
         return [
                     Option::create("name")
-                    ->description('Name to display')
-                    ->defaultValue("World"),
+                    ->setDescription('Name to display')
+                    ->setDefaultValue("World"),
                     BooleanOption::create('help', '-h', '--help')
-                    ->description('Display this help message'),
+                    ->setDescription('Display this help message'),
                     BooleanOption::create("uppercase", '-u', '--upper')
-                    ->description('Transform to uppercase.'),
+                    ->setDescription('Transform to uppercase.'),
                     BooleanOption::create("lowercase", '-l', '--lower')
-                    ->description('Transform to lowercase.'),
+                    ->setDescription('Transform to lowercase.'),
                     Option::create('repeat', '-r', '--repeat')
-                    ->isInt()
-                    ->description('Number of repeats')
-                    ->defaultValue(1)
+                    ->setInt()
+                    ->setDescription('Number of repeats')
+                    ->setDefaultValue(1)
         ];
     }
 

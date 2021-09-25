@@ -16,25 +16,13 @@ class ErrorHandler {
     protected static $instance;
 
     /**
-     * Handles Error
-     * @param Throwable $error
-     * @param bool $displayTrace
-     */
-    public static function handle(Throwable $error, bool $displayTrace = false) {
-        self::$instance = self::$instance ?? new static();
-        $handler = self::$instance;
-        $handler->setDisplayTrace($displayTrace);
-        $handler($error);
-    }
-
-    /**
      * Respond to an exception
      * @param Throwable $error
      */
     public function __invoke(Throwable $error) {
 
         $io = STDIO::create();
-        $stderr = $io->getOutput('err');
+        $stderr = $io->getSTDERR();
 
         $io
                 ->yellow("Error:")
@@ -63,17 +51,29 @@ class ErrorHandler {
     }
 
     /**
+     * Handles Error
+     * @param Throwable $error
+     * @param bool $displayTrace
+     */
+    public static function handle(Throwable $error, bool $displayTrace = false) {
+        self::$instance = self::$instance ?? new static();
+        $handler = self::$instance;
+        $handler->setDisplayTrace($displayTrace);
+        $handler($error);
+    }
+
+    /**
      * Register to the exception handler
      * @staticvar type $instance
      * @return static
      */
     public static function register(): self {
-        static $instance;
-        if (!($instance instanceof self)) {
-            $instance = new static();
-            set_exception_handler($instance);
+
+        if (!(static::$instance instanceof self)) {
+            static::$instance = new static();
+            set_exception_handler([static::$instance, '__invoke']);
         }
-        return $instance;
+        return static::$instance;
     }
 
     /**

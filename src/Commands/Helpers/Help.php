@@ -37,8 +37,8 @@ class Help extends CommandAbstract {
 
         return [
                     Option::create('command')
-                    ->description('Command to get help screen for.')
-                    ->defaultValue('help')
+                    ->setDescription('Command to get help screen for.')
+                    ->setDefaultValue('help')
                     ->validateWith(fn($val) => preg_match(Command::VALID_COMMAND_NAME_REGEX, $val) > 0),
         ];
     }
@@ -101,7 +101,6 @@ class Help extends CommandAbstract {
 
             if ($option->getType() == Option::TYPE_ANONYMOUS) {
                 $args[] = $optName;
-
 
                 $desc[$optName] = [
                     'left' => sprintf('  [%s]', $option->getName()),

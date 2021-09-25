@@ -118,8 +118,8 @@ class Option {
                 !empty($this->short)
                 and!empty($this->long)
         ) $type = self::TYPE_NAMED;
-        elseif (!empty($this->short)) $type = self::TYPE_SHORT;
-        elseif (!empty($this->long)) $type = self::TYPE_VERBOSE;
+        elseif (is_null($this->short)) $type = self::TYPE_SHORT;
+        elseif (is_null($this->long)) $type = self::TYPE_VERBOSE;
         return $this->setType($type);
     }
 

@@ -204,6 +204,22 @@ final class STDIO implements Ansi, Colors, Formats {
         return $this->outputs[$index] ?? null;
     }
 
+    /**
+     * Get STDERR
+     * @return StreamOutput
+     */
+    public function getSTDERR(): StreamOutput {
+        return $this->outputs['err'];
+    }
+
+    /**
+     * Get STDOUT
+     * @return StreamOutput
+     */
+    public function getSTDOUT(): StreamOutput {
+        return $this->outputs['out'];
+    }
+
     ////////////////////////////   Read and Write   ////////////////////////////
 
     /**
@@ -292,7 +308,7 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->writeln($message);
         }
         if ($this->supportsColors) $this->buffer->write($this->styles->reset->getSuffix());
-        $this->buffer->flush($this->getOutput('out'));
+        $this->buffer->flush($this->getSTDOUT());
         return $this;
     }
 
@@ -307,7 +323,7 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->writeln($message);
         }
         if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
-        $this->buffer->flush($this->getOutput('err'));
+        $this->buffer->flush($this->getSTDERR());
         return $this;
     }
 
