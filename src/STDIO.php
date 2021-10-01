@@ -330,14 +330,27 @@ final class STDIO implements Ansi, Colors, Formats {
     ////////////////////////////   Utils  ////////////////////////////
 
     /**
+     * Draw a Rectangle
+     *
+     * @param string $message
+     * @param string $backgroundColor
+     * @param int $color
+     */
+    public function drawRect(string $message, string $backgroundColor = 'green', string $color = 'white'): self {
+
+        $rect = $this->createRect();
+        $rect->setBackground($backgroundColor);
+        $rect->setColor($color);
+        $rect->out($message);
+        return $this;
+    }
+
+    /**
      * Creates Rectangle Object
      * @return Rect
      */
     public function createRect(): Rect {
-
-        $rect = new Rect($this);
-        $rect->setStyles($this->styles);
-        return $rect;
+        return new Rect($this);
     }
 
     /**

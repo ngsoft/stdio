@@ -37,6 +37,9 @@ class Rect implements Renderer {
     /** @var int */
     protected $maxLength;
 
+    /** @var int */
+    protected $marginLeft;
+
     public function __construct(
             STDIO $stdio = null
     ) {
@@ -45,6 +48,7 @@ class Rect implements Renderer {
         $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
         $this->setMaxLength(64);
+        $this->setMarginLeft(2);
     }
 
     /**
@@ -99,6 +103,16 @@ class Rect implements Renderer {
     }
 
     /**
+     * Set left margin
+     * @param int $marginLeft
+     * @return $this
+     */
+    public function setMarginLeft(int $marginLeft) {
+        $this->marginLeft = $marginLeft;
+        return $this;
+    }
+
+    /**
      * Set Line Max Length
      *
      * @param int $maxLength
@@ -132,64 +146,44 @@ class Rect implements Renderer {
             }
         }
 
+        $max = 0;
 
-
-
-
-
-
-
-
-
-
-
-
-        return implode("\n", $result) . "\n";
-    }
-
-    protected function old_build(): string {
-        $result = [""];
-        $lines = $this->buffer->getBuffer();
-
-        $prefix = $suffix = $clear = '';
-        if ($this->term->hasColorSupport()) {
-            $clear = $this->styles->reset->getSuffix();
-            if ($this->color instanceof Style) {
-                $prefix .= $this->color->getPrefix();
-                $suffix .= $this->color->getSuffix();
-            }
-
-            if ($this->background instanceof Style) {
-                $prefix .= $this->background->getPrefix();
-                $suffix .= $this->background->getSuffix();
-            }
-        }
-
-        $maxlen = 64;
-
-        $rectlines = [""];
-        foreach ($lines as $line) {
-            if (mb_strlen($line) > $maxlen) $maxlen = mb_strlen($line) + 8;
-            $rectlines[] = $line;
-        }
-
-        $rectlines[] = "";
-
-        $margin_left = (int) floor(($this->term->width - $maxlen) / 2);
-
-        foreach ($rectlines as $line) {
-            $message = $clear;
-            $message .= $margin_left > 0 ? str_repeat(" ", $margin_left) : '';
+        $rect = [''];
+        foreach ($this->buffer as $line) {
             $len = mb_strlen($line);
-            $repeatsl = (int) ceil(($maxlen - $len) / 2);
-            $repeatsr = $maxlen - $len - $repeatsl;
+            $max = $len > $max ? $len : $max;
+            $rect[] = $line;
+        }
+        $rect[] = '';
+        $maxlen = min($this->maxLength, $max);
+        $available = $this->term->width - $maxlen;
+        //padding
+        $padding = 0;
+        if ($available > ($this->padding * 2)) {
+            $padding = $this->padding;
+            $available -= $padding * 2;
+        }
+        //margin
+        $marginLeft = 0;
+        if ($available > $this->marginLeft) $marginLeft = $this->marginLeft;
+
+        foreach ($rect as $line) {
+            $message = $clear;
+            if ($marginLeft > 0) $message .= str_repeat(' ', $marginLeft);
+            $len = mb_strlen($line);
+            $repeatLeft = (int) ceil(($maxlen - $len) / 2);
+            $repeatRight = $maxlen - $len - $repeatLeft;
             $message .= $prefix;
-            $message .= $repeatsl > 0 ? str_repeat(" ", $repeatsl) : '';
+            if ($padding > 0) $message .= str_repeat(' ', $padding);
+            if ($repeatLeft > 0) $message .= str_repeat(' ', $repeatLeft);
             $message .= $line;
-            $message .= $repeatsr > 0 ? str_repeat(" ", $repeatsr) : '';
+            if ($repeatRight > 0) $message .= str_repeat(' ', $repeatLeft);
+            if ($padding > 0) $message .= str_repeat(' ', $padding);
             $message .= $suffix;
             $result[] = $message;
         }
+
+
         return implode("\n", $result) . "\n";
     }
 
@@ -215,7 +209,7 @@ class Rect implements Renderer {
     /**
      * Render Rect into StdOUT
      *
-     * @param string $message
+     * @param ?string $message
      * @return static
      */
     public function out(string $message = null): self {
@@ -227,7 +221,7 @@ class Rect implements Renderer {
     /**
      * Render Rect into StdERR
      *
-     * @param string $message
+     * @param ?string $message
      * @return static
      */
     public function err(string $message = null) {
