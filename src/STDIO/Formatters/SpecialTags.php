@@ -22,7 +22,7 @@ class SpecialTags implements Formatter {
      */
     public function format(string $message): string {
 
-        $message = preg_replace_callback('/([<](?:\\\)*(?P<tag>\w+)(?:\s+(?P<extra>.*?))?[>])/', function($matches) {
+        $message = preg_replace_callback('/([<](?:\\\)*(?P<tag>\w+)(?:\s+(?P<extra>.*?))?[>])/', function ($matches) {
 
             $params = [];
 
@@ -50,7 +50,6 @@ class SpecialTags implements Formatter {
             }
             return $matches[0];
         }, $message);
-
 
         return $message;
     }
