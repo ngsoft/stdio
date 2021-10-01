@@ -129,8 +129,10 @@ class Rect implements Renderer {
      * @return string
      */
     protected function build(): string {
+
+        if (count($this->buffer) == 0) return '';
+
         $result = [''];
-        $lines = $this->buffer->getBuffer();
 
         $prefix = $suffix = $clear = '';
         if ($this->term->hasColorSupport()) {
@@ -182,8 +184,6 @@ class Rect implements Renderer {
             $message .= $suffix;
             $result[] = $message;
         }
-
-
         return implode("\n", $result) . "\n";
     }
 
