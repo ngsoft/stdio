@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Interfaces;
 
-interface Buffer {
+use Countable;
+
+interface Buffer extends Countable {
 
     /**
      * Adds Message to the buffer

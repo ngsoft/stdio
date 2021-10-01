@@ -46,7 +46,7 @@ use NGSOFT\STDIO\{
  */
 final class STDIO implements Ansi, Colors, Formats {
 
-    const VERSION = '2.1';
+    const VERSION = '2.2';
 
     /** @var Terminal */
     private $terminal;
@@ -335,7 +335,7 @@ final class STDIO implements Ansi, Colors, Formats {
      */
     public function createRect(): Rect {
 
-        $rect = new Rect();
+        $rect = new Rect($this);
         $rect->setStyles($this->styles);
         return $rect;
     }

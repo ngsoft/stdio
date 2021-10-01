@@ -4,32 +4,47 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use NGSOFT\STDIO\{
-    Interfaces\Buffer, Interfaces\Output, Interfaces\Renderer, Outputs\OutputBuffer, Styles, Styles\Style, Terminal
+use NGSOFT\{
+    STDIO, STDIO\Interfaces\Buffer, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Styles, STDIO\Styles\Style, STDIO\Terminal
 };
 use function mb_strlen;
 
 class Rect implements Renderer {
 
+    const DEFAULT_OUTPUT = 'out';
+
     /** @var Terminal */
-    private $term;
+    protected $term;
 
     /** @var Styles */
-    private $styles;
+    protected $styles;
 
     /** @var Buffer */
-    private $buffer;
+    protected $buffer;
 
     /** @var Style */
-    private $color;
+    protected $color;
 
     /** @var Style */
-    private $background;
+    protected $background;
 
-    public function __construct() {
-        $this->term = new Terminal();
+    /** @var int */
+    protected $padding = 2;
+
+    /** @var STDIO */
+    protected $stdio;
+
+    /** @var int */
+    protected $maxLength;
+
+    public function __construct(
+            STDIO $stdio = null
+    ) {
+        $this->stdio = $stdio ?? new STDIO();
+        $this->term = $stdio->getTerminal();
+        $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
-        $this->styles = new Styles();
+        $this->setMaxLength(64);
     }
 
     /**
@@ -37,7 +52,7 @@ class Rect implements Renderer {
      * @param string $color
      * @return static
      */
-    public function setColor(string $color) {
+    public function setColor(string $color): self {
         if (isset($this->styles[$color])) $this->color = $this->styles[$color];
         return $this;
     }
@@ -47,7 +62,7 @@ class Rect implements Renderer {
      * @param string $color
      * @return static
      */
-    public function setBackground(string $color) {
+    public function setBackground(string $color): self {
         if (isset($this->styles["bg$color"])) $this->background = $this->styles["bg$color"];
         return $this;
     }
@@ -55,19 +70,81 @@ class Rect implements Renderer {
     /**
      * Adds a line to the Rectangle
      * @param string $line
-     * @return $this
+     * @return static
      */
-    public function write(string $line) {
+    public function write(string $line): self {
         $this->buffer->write(trim($line));
         return $this;
     }
 
-    /** {@inheritdoc} */
-    public function setStyles(Styles $styles) {
+    /**
+     * Set Styles
+     * @param Styles $styles
+     * @return static
+     */
+    public function setStyles(Styles $styles): self {
         $this->styles = $styles;
+        return $this;
     }
 
-    private function build(): string {
+    /**
+     * Set Line Padding
+     *
+     * @param int $padding
+     * @return static
+     */
+    public function setPadding(int $padding): self {
+        $this->padding = $padding;
+        return $this;
+    }
+
+    /**
+     * Set Line Max Length
+     *
+     * @param int $maxLength
+     * @return self
+     */
+    public function setMaxLength(int $maxLength): self {
+        $this->maxLength = min($maxLength, $this->term->width);
+        return $this;
+    }
+
+    /**
+     * Create the string to be rendered
+     *
+     * @return string
+     */
+    protected function build(): string {
+        $result = [''];
+        $lines = $this->buffer->getBuffer();
+
+        $prefix = $suffix = $clear = '';
+        if ($this->term->hasColorSupport()) {
+            $clear = $this->styles->reset->getSuffix();
+            if ($this->color instanceof Style) {
+                $prefix .= $this->color->getPrefix();
+                $suffix .= $this->color->getSuffix();
+            }
+
+            if ($this->background instanceof Style) {
+                $prefix .= $this->background->getPrefix();
+                $suffix .= $this->background->getSuffix();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        return implode("\n", $result) . "\n";
+    }
+
+    protected function old_build(): string {
         $result = [""];
         $lines = $this->buffer->getBuffer();
 
@@ -115,11 +192,34 @@ class Rect implements Renderer {
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-
         $text = $this->build();
         $output->write($text);
         $output->write("\n");
         $this->buffer->clear();
+    }
+
+    /**
+     * @param string $message
+     * @return static
+     */
+    protected function bufferMessage(string $message): self {
+
+        $message = explode("\n", $message);
+        foreach ($message as $line) {
+            $this->write($line);
+        }
+    }
+
+    public function out(string $message = null): self {
+        if (is_string($message)) $this->bufferMessage($message);
+        $this->render($this->stdio->getSTDOUT());
+        return $this;
+    }
+
+    public function err(string $message = null) {
+        if (is_string($message)) $this->bufferMessage($message);
+        $this->render($this->stdio->getSTDERR());
+        return $this;
     }
 
 }
