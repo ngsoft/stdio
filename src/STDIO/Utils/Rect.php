@@ -38,6 +38,9 @@ class Rect implements Renderer {
     protected $maxLength;
 
     /** @var int */
+    protected $minLength;
+
+    /** @var int */
     protected $marginLeft;
 
     public function __construct(
@@ -47,6 +50,7 @@ class Rect implements Renderer {
         $this->term = $stdio->getTerminal();
         $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
+        $this->setMinLength(0);
         $this->setMaxLength(64);
         $this->setMarginLeft(2);
     }
@@ -124,6 +128,17 @@ class Rect implements Renderer {
     }
 
     /**
+     * Set Line Min Length
+     *
+     * @param int $minLength
+     * @return $this
+     */
+    public function setMinLength(int $minLength) {
+        $this->minLength = min($minLength, $this->term->width);
+        return $this;
+    }
+
+    /**
      * Create the string to be rendered
      *
      * @return string
@@ -157,7 +172,10 @@ class Rect implements Renderer {
             $rect[] = $line;
         }
         $rect[] = '';
+
         $maxlen = min($this->maxLength, $max);
+        if ($this->minLength > 0) $maxlen = max($maxlen, $this->minLength);
+
         $available = $this->term->width - $maxlen;
         //padding
         $padding = 0;
