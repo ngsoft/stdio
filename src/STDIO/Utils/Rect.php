@@ -141,6 +141,9 @@ class Rect implements Renderer {
 
 
 
+
+
+
         return implode("\n", $result) . "\n";
     }
 
@@ -200,9 +203,8 @@ class Rect implements Renderer {
 
     /**
      * @param string $message
-     * @return static
      */
-    protected function bufferMessage(string $message): self {
+    protected function bufferMessage(string $message) {
 
         $message = explode("\n", $message);
         foreach ($message as $line) {
@@ -210,15 +212,27 @@ class Rect implements Renderer {
         }
     }
 
+    /**
+     * Render Rect into StdOUT
+     *
+     * @param string $message
+     * @return static
+     */
     public function out(string $message = null): self {
         if (is_string($message)) $this->bufferMessage($message);
-        $this->render($this->stdio->getSTDOUT());
+        if (count($this->buffer) > 0) $this->render($this->stdio->getSTDOUT());
         return $this;
     }
 
+    /**
+     * Render Rect into StdERR
+     *
+     * @param string $message
+     * @return static
+     */
     public function err(string $message = null) {
         if (is_string($message)) $this->bufferMessage($message);
-        $this->render($this->stdio->getSTDERR());
+        if (count($this->buffer) > 0) $this->render($this->stdio->getSTDERR());
         return $this;
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
+use Generator;
 use NGSOFT\STDIO\Interfaces\{
     Buffer, Output
 };
@@ -32,6 +33,18 @@ class OutputBuffer implements Buffer {
     /** {@inheritdoc} */
     public function getBuffer(): array {
         return $this->buffer;
+    }
+
+    /** {@inheritdoc} */
+    public function count() {
+        return count($this->buffer);
+    }
+
+    /**
+     * @return Generator
+     */
+    public function getIterator() {
+        foreach ($this->buffer as $line) yield $line;
     }
 
 }

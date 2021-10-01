@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Interfaces;
 
-use Countable;
+use Countable,
+    IteratorAggregate;
 
-interface Buffer extends Countable {
+interface Buffer extends Countable, IteratorAggregate {
 
     /**
      * Adds Message to the buffer
