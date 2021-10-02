@@ -128,7 +128,8 @@ abstract class ProgressElement implements Countable, Stringable {
      * @return static
      */
     public function setTotal(int $total) {
-        $this->total = $total;
+        $this->total = max(1, $total);
+        $this->setCurrent(0);
         return $this;
     }
 

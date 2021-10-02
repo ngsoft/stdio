@@ -4,36 +4,234 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
+use Generator,
+    IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\ProgressElement
+    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage,
+    STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
 };
 
-class Progress implements Renderer {
+class Progress implements Renderer, IteratorAggregate {
 
     /** @var STDIO */
     protected $stdio;
 
     /** @var ProgressElement[] */
-    protected $elements = [];
+    protected $elements;
 
     /** @var int */
     protected $total;
 
+    /** @var int */
+    protected $current = 0;
+
+    /** @var bool */
+    protected $alignRight = false;
+
+    /** @var callable[] */
+    protected $onComplete = [];
+
+    ////////////////////////////   Getter/Setter   ////////////////////////////
+
+    /**
+     * @param int $total
+     * @param ?STDIO $stdio
+     */
     public function __construct(
             int $total = 100,
             STDIO $stdio = null
     ) {
+        $stdio = $stdio ?? new STDIO();
         $this->total = $total;
-        $this->stdio = $stdio ?? new STDIO();
+        $this->stdio = $stdio;
+
+        $this->elements = [
+            (new Status($total, $stdio))->setColor('yellow'),
+            (new Bar($total, $stdio))->setColor('cyan'),
+            (new Percentage($total, $stdio))->setColor('white'),
+        ];
+    }
+
+    /**
+     * @return Generator<ProgressElement>
+     */
+    public function getElements(): Generator {
+        foreach ($this->elements as $element) yield $element;
+    }
+
+    /** @return int */
+    public function getTotal(): int {
+        return $this->total;
+    }
+
+    /** @return int */
+    public function getCurrent(): int {
+        return $this->current;
+    }
+
+    /**
+     *
+     * @param bool $alignRight
+     * @return static
+     */
+    public function setAlignRight(bool $alignRight = true): self {
+        $this->alignRight = $alignRight;
+        return $this;
+    }
+
+    /**
+     * @param int $total
+     * @return static
+     */
+    public function setTotal(int $total): self {
+        $this->current = 0;
+        $total = max(1, $total);
+        $this->total = $total;
+        /** @var ProgressElement $element */
+        foreach ($this->getElements() as $element) {
+            $element->setCurrent(0);
+            $element->setTotal($total);
+        }
+        return $this;
+    }
+
+    /**
+     * @param int $current
+     * @return static
+     */
+    public function setCurrent(int $current): self {
+        $current = max(0, min($current, $this->total));
+        $this->current = $current;
+        /** @var ProgressElement $element */
+        foreach ($this->getElements() as $element) {
+            $element->setCurrent($current);
+        }
+        return $this;
+    }
+
+    /**
+     * Checks if complete
+     *
+     * @return bool
+     */
+    public function getComplete(): bool {
+        return $this->current == $this->total;
+    }
+
+    /**
+     * Get Percentage Done
+     * @return int
+     */
+    public function getPercent(): int {
+        $percent = (int) floor(($this->current / $this->total) * 100);
+        if ($percent > 100) $percent = 100;
+        return $percent;
+    }
+
+    ////////////////////////////   Utils   ////////////////////////////
+
+    /**
+     * Increments the counter
+     * @param int $value value to add
+     * @return static
+     */
+    public function increment(int $value = 1) {
+        $current = $this->current;
+        $current += $value;
+        $this->setCurrent($current);
+        return $this;
+    }
+
+    /**
+     * Decrements the Counter
+     * @param int $value
+     * @return $this
+     */
+    public function decrement(int $value = 1) {
+        $current = $this->current;
+        $current -= $value;
+        $this->setCurrent($current);
+        return $this;
     }
 
     protected function build(): string {
+        $str = $block = '';
+        $len = 0;
+        /** @var ProgressElement $element */
+        foreach ($this->getElements() as $element) {
+            $len += count($element);
+            $block .= (string) $element;
+        }
 
-        return '';
+        $str .= sprintf("\r%s", Ansi::CLEAR_END_LINE);
+        if ($this->alignRight) {
+            $padding = $this->stdio->getTerminal()->width - 1;
+            $padding -= $len;
+            if ($padding > 0) $str .= str_repeat(' ', $padding);
+        }
+
+        $str .= $block;
+
+        if ($this->getComplete()) {
+            $str .= "\n";
+        }
+
+        return $str;
     }
 
+    /**
+     * Adds a callback to be called on completion
+     * @param callable $callback
+     * @return self
+     */
+    public function onComplete(callable $callback): self {
+        $this->onComplete[] = $callback;
+        return $this;
+    }
+
+    /**
+     * Render into StdOUT
+     *
+     * @return static
+     */
+    public function out(): self {
+        $this->render($this->stdio->getSTDOUT());
+        return $this;
+    }
+
+    /**
+     * Render Rect into StdERR
+     *
+     * @return static
+     */
+    public function err() {
+        $this->render($this->stdio->getSTDERR());
+        return $this;
+    }
+
+    ////////////////////////////   Interfaces   ////////////////////////////
+
+    /** {@inheritdoc} */
     public function render(Output $output) {
         $output->write($this->build());
+
+        if ($this->getComplete()) {
+            foreach ($this->onComplete as $call) {
+                $call($this);
+            }
+        }
+    }
+
+    /**
+     * @return Generator<int,int>
+     */
+    public function getIterator() {
+        $this->setTotal($this->total);
+        for ($i = 0; $i <= $this->total; $i++) {
+            $this->setCurrent($i);
+            $this->out();
+            yield $this->total => $this->current;
+        }
     }
 
 }
