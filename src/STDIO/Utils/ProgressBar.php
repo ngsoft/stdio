@@ -18,31 +18,31 @@ class ProgressBar implements Renderer {
     const ICON_BORDER = "|";
 
     /** @var Terminal */
-    private $term;
+    protected $term;
 
     /** @var int */
-    private $total = 100;
+    protected $total = 100;
 
     /** @var int */
-    private $current = 0;
+    protected $current = 0;
 
     /** @var int */
-    private $percent = 0;
+    protected $percent = 0;
 
     /** @var string */
-    private $label = '';
+    protected $label = '';
 
     /** @var bool */
-    private $complete = false;
+    protected $complete = false;
 
     /** @var callable[] */
-    private $onComplete = [];
+    protected $onComplete = [];
 
     /** @var Output */
-    private $output;
+    protected $output;
 
     /** @var ProgressBarStyles */
-    private $progressBarStyles;
+    protected $progressBarStyles;
 
     public function __construct() {
         $this->term = new Terminal();
@@ -62,7 +62,7 @@ class ProgressBar implements Renderer {
      * Build the string to display into the terminal
      * @return string
      */
-    private function build(): string {
+    protected function build(): string {
 
         $result = [
             sprintf("\r%s", Ansi::CLEAR_END_LINE)
@@ -126,7 +126,7 @@ class ProgressBar implements Renderer {
      * Build the Label
      * @return array
      */
-    private function buildLabel(): array {
+    protected function buildLabel(): array {
         $result = $this->label;
 
         $strlen = mb_strlen($result);
@@ -147,7 +147,7 @@ class ProgressBar implements Renderer {
      * Build the Status Text
      * @return array
      */
-    private function buildStatus(): array {
+    protected function buildStatus(): array {
 
         $tot = $this->total;
         $cur = $this->current;
@@ -173,7 +173,7 @@ class ProgressBar implements Renderer {
      * Build the Percentage Display
      * @return array
      */
-    private function buildPercent(): array {
+    protected function buildPercent(): array {
 
         $percent = $this->getPercent();
         $result = '';
@@ -201,7 +201,7 @@ class ProgressBar implements Renderer {
      * Build the progress Bar
      * @return array
      */
-    private function buildBar(): array {
+    protected function buildBar(): array {
         $percent = $this->getPercent();
         $len_done = (int) floor($percent / 2);
         $len = 50 - $len_done;

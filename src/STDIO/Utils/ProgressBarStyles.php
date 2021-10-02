@@ -36,7 +36,7 @@ class ProgressBarStyles {
     private $statusColor;
 
     /** @var string */
-    private $labelPosition = self::LABEL_POSITION_CENTER;
+    private $labelPosition = self::LABEL_POSITION_LEFT;
 
     /** @var bool */
     private $displayBar = true;
@@ -64,8 +64,8 @@ class ProgressBarStyles {
     public function resetStyles() {
         $this->statusColor = $this->labelColor = $this->barColor = $this->percentColor = null;
         $this->displayOrder = [
-            self::DISPLAY_LABEL,
             self::DISPLAY_STATUS,
+            self::DISPLAY_LABEL,
             self::DISPLAY_BAR,
             self::DISPLAY_PERCENT,
         ];
