@@ -353,14 +353,18 @@ final class STDIO implements Ansi, Colors, Formats {
     }
 
     /**
-     * Creates a Progress Bar
+     * Creates a Formated Progress Bar
      * @param int $total
+     * @param string|null $label
      * @param callable|null $onComplete
      * @return Progress
      */
-    public function createProgressBar(int $total = 100, ?callable $onComplete = null): Progress {
+    public function createProgressBar(int $total = 100, string $label = null, ?callable $onComplete = null): Progress {
         $progress = new Progress($total, $this);
-        $progress->setTotal($total);
+        $progress
+                ->setTotal($total)
+                ->setLabel($label ?? '', 'green');
+
         if (is_callable($onComplete)) $progress->onComplete($onComplete);
 
         return $progress

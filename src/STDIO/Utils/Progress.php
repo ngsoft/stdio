@@ -7,8 +7,8 @@ namespace NGSOFT\STDIO\Utils;
 use Generator,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage,
-    STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
+    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\Element, STDIO\Utils\Progress\Elements\Bar,
+    STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
 };
 
 class Progress implements Renderer, IteratorAggregate {
@@ -24,6 +24,9 @@ class Progress implements Renderer, IteratorAggregate {
 
     /** @var Percentage */
     protected $percentage;
+
+    /** @var Element */
+    protected $label;
 
     /** @var ProgressElement[] */
     protected $elements;
@@ -57,6 +60,7 @@ class Progress implements Renderer, IteratorAggregate {
             $this->bar = new Bar($total, $stdio),
             $this->percentage = new Percentage($total, $stdio),
         ];
+        $this->setLabel('');
         $this->setTotal($total);
     }
 
@@ -136,8 +140,6 @@ class Progress implements Renderer, IteratorAggregate {
         return $percent;
     }
 
-    ////////////////////////////   Styles   ////////////////////////////
-
     /**
      * Set Status color
      * @param string $color
@@ -169,6 +171,27 @@ class Progress implements Renderer, IteratorAggregate {
     }
 
     /**
+     * Set Label
+     * @param string $label
+     * @param ?string $color
+     * @return static
+     */
+    public function setLabel(string $label, string $color = null): self {
+        $element = new Element($this->stdio);
+        if (
+                is_string($color) and
+                ( $style = $this->stdio->getStyles()[$color] ?? null)
+        ) {
+            $element->setStyle($style);
+        }
+        $element->setValue($label);
+        $this->label = $element;
+        return $this;
+    }
+
+    ////////////////////////////   Utils   ////////////////////////////
+
+    /**
      * Hide Status
      * @return self
      */
@@ -194,8 +217,6 @@ class Progress implements Renderer, IteratorAggregate {
         $this->percentage->setVisible(false);
         return $this;
     }
-
-    ////////////////////////////   Utils   ////////////////////////////
 
     /**
      * Increments the counter
@@ -224,6 +245,12 @@ class Progress implements Renderer, IteratorAggregate {
     protected function build(): string {
         $str = $block = '';
         $len = 0;
+
+        if (count($this->label) > 0) {
+            $block .= (string) $this->label . ' ';
+            $len += count($this->label) + 1;
+        }
+
         /** @var ProgressElement $element */
         foreach ($this->getElements() as $element) {
             $len += count($element);
@@ -231,6 +258,7 @@ class Progress implements Renderer, IteratorAggregate {
         }
 
         $str .= sprintf("\r%s", Ansi::CLEAR_END_LINE);
+
         if ($this->alignRight) {
             $padding = $this->stdio->getTerminal()->width - 1;
             $padding -= $len;
