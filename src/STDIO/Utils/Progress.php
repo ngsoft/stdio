@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\ProgressElement
+    STDIO, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\ProgressElement
 };
 
 class Progress implements Renderer {
@@ -17,13 +17,23 @@ class Progress implements Renderer {
     protected $elements = [];
 
     /** @var int */
-    protected $total = 100;
+    protected $total;
 
     public function __construct(
-            STDIO $stdio,
-            int $total
+            int $total = 100,
+            STDIO $stdio = null
     ) {
+        $this->total = $total;
+        $this->stdio = $stdio ?? new STDIO();
+    }
 
+    protected function build(): string {
+
+        return '';
+    }
+
+    public function render(Output $output) {
+        $output->write($this->build());
     }
 
 }
