@@ -164,7 +164,7 @@ abstract class ProgressElement implements Countable, Stringable {
     public function decrement(int $value = 1) {
         $current = $this->current;
         $current -= $value;
-        $this->setCurrent($value);
+        $this->setCurrent($current);
         return $this;
     }
 

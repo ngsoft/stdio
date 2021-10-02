@@ -206,7 +206,7 @@ class ProgressBar implements Renderer {
         $percent = $this->getPercent();
         $len_done = (int) floor($percent / 2);
         $len = 50 - $len_done;
-        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, $len_done > 0 ? str_repeat(self::ICON_DONE, $len_done) : '', $len > 0 ? str_repeat(self::ICON_LEFT, $len) : '', self::ICON_BORDER);
+        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, $len_done > 0 ? str_repeat(self::ICON_DONE, $len_done) : '', $len > 0 ? str_repeat(self::ICON_PROGRESS, $len) : '', self::ICON_BORDER);
         $strlen = mb_strlen($progress);
         if (
                 $this->term->hasColorSupport()
