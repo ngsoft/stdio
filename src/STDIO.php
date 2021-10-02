@@ -8,7 +8,7 @@ use BadMethodCallException,
     InvalidArgumentException;
 use NGSOFT\STDIO\{
     Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter,
-    Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Progress, Utils\ProgressBar, Utils\Rect
+    Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Progress, Utils\Rect
 };
 
 /**
@@ -356,7 +356,7 @@ final class STDIO implements Ansi, Colors, Formats {
      * Creates a Progress Bar
      * @param int $total
      * @param callable|null $onComplete
-     * @return ProgressBar
+     * @return Progress
      */
     public function createProgressBar(int $total = 100, ?callable $onComplete = null): Progress {
         $progress = new Progress($total, $this);

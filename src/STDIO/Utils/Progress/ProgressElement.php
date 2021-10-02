@@ -173,12 +173,12 @@ abstract class ProgressElement implements Countable, Stringable {
 
     /** {@inheritdoc} */
     public function count() {
-        return count($this->element);
+        return $this->visible ? count($this->element) : 0;
     }
 
     /** {@inheritdoc} */
     public function __toString() {
-        return (string) $this->element;
+        return $this->visible ? (string) $this->element : '';
     }
 
 }

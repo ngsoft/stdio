@@ -168,6 +168,33 @@ class Progress implements Renderer, IteratorAggregate {
         return $this;
     }
 
+    /**
+     * Hide Status
+     * @return self
+     */
+    public function hideStatus(): self {
+        $this->status->setVisible(false);
+        return $this;
+    }
+
+    /**
+     * Hide Progress Bar
+     * @return self
+     */
+    public function hideBar(): self {
+        $this->bar->setVisible(false);
+        return $this;
+    }
+
+    /**
+     * Hide Percentage
+     * @return self
+     */
+    public function hidePercentage(): self {
+        $this->percentage->setVisible(false);
+        return $this;
+    }
+
     ////////////////////////////   Utils   ////////////////////////////
 
     /**
