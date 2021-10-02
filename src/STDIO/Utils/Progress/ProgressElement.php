@@ -21,33 +21,35 @@ abstract class ProgressElement implements Countable, Stringable {
     /** @var bool */
     protected $visible = true;
 
-    /** @var ?Style */
-    protected $style;
-
     /** @var STDIO */
     protected $stdio;
+
+    /** @var Element */
+    protected $element;
 
     ////////////////////////////   Abstract   ////////////////////////////
 
     /**
      * Build the element
+     *
+     * @param Element $element
+     * @return array return an array with the length and the valur
      */
-    abstract protected function build(): string;
+    abstract protected function build(Element $element): Element;
 
     ////////////////////////////   Getters/Setters   ////////////////////////////
 
     /**
-     * @param STDIO $stdio
      * @param int $total
-     * @param Style $style
+     * @param STDIO $stdio
      */
     public function __construct(
-            STDIO $stdio,
-            int $total
+            int $total,
+            STDIO $stdio
     ) {
         $this->stdio = $stdio;
         $this->total = $total;
-        $this->style = $style;
+        $this->element = new Element();
     }
 
     /**
@@ -93,7 +95,9 @@ abstract class ProgressElement implements Countable, Stringable {
      */
     public function setColor(string $color) {
         $styles = $this->stdio->getStyles();
-        $this->style = $styles[$color] ?? null;
+        if ($style = $styles[$color] ?? null) {
+            $this->element->setStyle($style);
+        }
         return $this;
     }
 
@@ -114,6 +118,8 @@ abstract class ProgressElement implements Countable, Stringable {
      */
     public function setCurrent(int $current) {
         $this->current = max(0, min($current, $this->total));
+
+        $this->element = $this->build($this->element);
         return $this;
     }
 
@@ -163,16 +169,24 @@ abstract class ProgressElement implements Countable, Stringable {
         return $this;
     }
 
+    /**
+     * Get Element Value
+     * @return string
+     */
+    public function getElement(): string {
+        return $this->str = $this->build();
+    }
+
     ////////////////////////////   Interfaces   ////////////////////////////
 
     /** {@inheritdoc} */
     public function count() {
-        return $this->current;
+        return count($this->element);
     }
 
     /** {@inheritdoc} */
     public function __toString() {
-        return $this->build();
+        return (string) $this->element;
     }
 
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\STDIO\Utils\Progress;
+namespace NGSOFT\STDIO\Utils\Progress\Elements;
 
 class Bar {
 
