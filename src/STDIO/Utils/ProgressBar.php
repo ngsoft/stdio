@@ -98,6 +98,7 @@ class ProgressBar implements Renderer {
                     //centers the label
                     $repeats = $available - 1;
                     $repeats -= $data['len'];
+                    if ($data['len'] == 0) $repeats = 0;
 
                     switch ($this->progressBarStyles->getLabelPosition()) {
                         case ProgressBarStyles::LABEL_POSITION_LEFT:
