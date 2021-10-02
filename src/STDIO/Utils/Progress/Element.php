@@ -21,13 +21,12 @@ class Element implements Countable, Stringable {
 
     /**
      * Change Element Value
-     * @param string $value Formated value
-     * @param int $length Length without format
-     * @return $this
+     * @param string $value
+     * @return static
      */
-    public function update(string $value, int $length) {
+    public function setValue(string $value) {
         $this->value = $value;
-        $this->length = $length;
+        $this->length = mb_strlen($value);
         return $this;
     }
 
@@ -53,7 +52,9 @@ class Element implements Countable, Stringable {
 
     /** {@inheritdoc} */
     public function __toString() {
-        return $this->value;
+        $value = $this->value;
+        if ($this->style) $value = $this->style->format($value);
+        return $value;
     }
 
 }

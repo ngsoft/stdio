@@ -33,7 +33,7 @@ abstract class ProgressElement implements Countable, Stringable {
      * Build the element
      *
      * @param Element $element
-     * @return array return an array with the length and the valur
+     * @return Element
      */
     abstract protected function build(Element $element): Element;
 
@@ -118,7 +118,6 @@ abstract class ProgressElement implements Countable, Stringable {
      */
     public function setCurrent(int $current) {
         $this->current = max(0, min($current, $this->total));
-
         $this->element = $this->build($this->element);
         return $this;
     }
@@ -139,7 +138,7 @@ abstract class ProgressElement implements Countable, Stringable {
      * @return static
      */
     public function setStyle(Style $style) {
-        $this->style = $style;
+        $this->element->setStyle($style);
         return $this;
     }
 
@@ -163,18 +162,10 @@ abstract class ProgressElement implements Countable, Stringable {
      * @return $this
      */
     public function decrement(int $value = 1) {
-        $current = $$this->current;
+        $current = $this->current;
         $current -= $value;
         $this->setCurrent($value);
         return $this;
-    }
-
-    /**
-     * Get Element Value
-     * @return string
-     */
-    public function getElement(): string {
-        return $this->str = $this->build();
     }
 
     ////////////////////////////   Interfaces   ////////////////////////////
