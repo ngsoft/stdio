@@ -49,7 +49,7 @@ abstract class ProgressElement implements Countable, Stringable {
     ) {
         $this->stdio = $stdio;
         $this->total = $total;
-        $this->element = new Element();
+        $this->element = new Element($stdio);
     }
 
     /**

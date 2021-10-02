@@ -16,6 +16,15 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var STDIO */
     protected $stdio;
 
+    /** @var Status */
+    protected $status;
+
+    /** @var Bar */
+    protected $bar;
+
+    /** @var Percentage */
+    protected $percentage;
+
     /** @var ProgressElement[] */
     protected $elements;
 
@@ -42,14 +51,13 @@ class Progress implements Renderer, IteratorAggregate {
             STDIO $stdio = null
     ) {
         $stdio = $stdio ?? new STDIO();
-        $this->total = $total;
         $this->stdio = $stdio;
-
         $this->elements = [
-            (new Status($total, $stdio))->setColor('yellow'),
-            (new Bar($total, $stdio))->setColor('cyan'),
-            (new Percentage($total, $stdio))->setColor('white'),
+            $this->status = new Status($total, $stdio),
+            $this->bar = new Bar($total, $stdio),
+            $this->percentage = new Percentage($total, $stdio),
         ];
+        $this->setTotal($total);
     }
 
     /**
@@ -126,6 +134,38 @@ class Progress implements Renderer, IteratorAggregate {
         $percent = (int) floor(($this->current / $this->total) * 100);
         if ($percent > 100) $percent = 100;
         return $percent;
+    }
+
+    ////////////////////////////   Styles   ////////////////////////////
+
+    /**
+     * Set Status color
+     * @param string $color
+     * @return static
+     */
+    public function setStatusColor(string $color): self {
+        $this->status->setColor($color);
+        return $this;
+    }
+
+    /**
+     * Set Progress Bar Color
+     * @param string $color
+     * @return self
+     */
+    public function setBarColor(string $color): self {
+        $this->bar->setColor($color);
+        return $this;
+    }
+
+    /**
+     * Set Percentage Color
+     * @param string $color
+     * @return self
+     */
+    public function setPercentageColor(string $color): self {
+        $this->percentage->setColor($color);
+        return $this;
     }
 
     ////////////////////////////   Utils   ////////////////////////////
