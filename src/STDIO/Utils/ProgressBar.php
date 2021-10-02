@@ -101,15 +101,15 @@ class ProgressBar implements Renderer {
 
                     switch ($this->progressBarStyles->getLabelPosition()) {
                         case ProgressBarStyles::LABEL_POSITION_LEFT:
-                            $result[] = sprintf("%s%s ", $data['text'], str_repeat(' ', $repeats));
+                            $result[] = sprintf("%s%s ", $data['text'], $repeats > 0 ? str_repeat(' ', $repeats) : '');
                             break;
                         case ProgressBarStyles::LABEL_POSITION_RIGHT:
-                            $result[] = sprintf("%s%s ", str_repeat(' ', $repeats), $data['text']);
+                            $result[] = sprintf("%s%s ", $repeats > 0 ? str_repeat(' ', $repeats) : '', $data['text']);
                             break;
                         case ProgressBarStyles::LABEL_POSITION_CENTER:
                             $padding_left = (int) ceil($repeats / 2);
                             $padding_right = $repeats - $padding_left;
-                            $result[] = sprintf("%s%s%s ", str_repeat(' ', $padding_left), $data['text'], str_repeat(' ', $padding_right));
+                            $result[] = sprintf("%s%s%s ", $padding_left > 0 ? str_repeat(' ', $padding_left) : '', $data['text'], $padding_right > 0 ? str_repeat(' ', $padding_right) : '');
                             break;
                         default :
                             //no padding
@@ -205,7 +205,7 @@ class ProgressBar implements Renderer {
         $percent = $this->getPercent();
         $len_done = (int) floor($percent / 2);
         $len = 50 - $len_done;
-        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, str_repeat(self::ICON_DONE, $len_done), str_repeat(self::ICON_LEFT, $len), self::ICON_BORDER);
+        $progress = sprintf("%s%s%s%s", self::ICON_BORDER, $len_done > 0 ? str_repeat(self::ICON_DONE, $len_done) : '', $len > 0 ? str_repeat(self::ICON_LEFT, $len) : '', self::ICON_BORDER);
         $strlen = mb_strlen($progress);
         if (
                 $this->term->hasColorSupport()
