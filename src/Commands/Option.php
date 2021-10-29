@@ -89,7 +89,7 @@ class Option {
      * @param string|null $long Long Argument
      * @return static
      */
-    public static function create(string $name, ?string $short = null, ?string $long = null): self {
+    public static function create(string $name, ?string $short = null, ?string $long = null) {
         return new static($name, $short, $long);
     }
 
