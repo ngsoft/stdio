@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace NGSOFT\Commands;
 
 use NGSOFT\Commands\{
-    Helpers\Help, Interfaces\Command, Interfaces\Parser
+    Helpers\Help, Interfaces\Parser
 };
 use RuntimeException,
     Throwable;
 
-class StandaloneCommand extends CommandAbstract implements Command {
+class StandaloneCommand extends CommandAbstract {
 
     /** @var string */
     protected $name = '';
@@ -36,35 +36,30 @@ class StandaloneCommand extends CommandAbstract implements Command {
      * @return mixed
      */
     public function run(array $args = null) {
-        //ErrorHandler::register();
-        global $argv, $help;
+        global $argv;
+        static $help;
+        /** @var Help $help */
         $help = $help ?? new Help();
-
         if (!is_array($args)) {
             $args = $argv;
             array_shift($args);
         }
-
+        $displayHelp = false;
         try {
             $arguments = $this->parser->parseArguments($args, $this->getOptions());
-
-            $displayHelp = $arguments['help'] ?? false;
-            if ($displayHelp) {
-
-
+            if ($displayHelp = $arguments['help'] ?? $displayHelp) {
+                $help->renderFor($this);
                 return true;
             }
             $retval = $this->command($arguments);
         } catch (Throwable $error) {
-            $retval = null;
-            if ($this->displayHelpOnError) {
+            ErrorHandler::handle($error);
+            if (!$displayHelp and $this->displayHelpOnError) {
                 try {
-                    $help = new Help();
                     $help->renderFor($this);
                 } catch (Throwable $err) { $err->getCode(); }
             }
-
-            ErrorHandler::handle($error);
+            return false;
         }
 
         return $retval;
@@ -84,30 +79,19 @@ class StandaloneCommand extends CommandAbstract implements Command {
 
     /**
      * Creates a new instance
-     * @param callable $callback Callable to use when using run()
+     *
+     * @param callable $callback
+     * @param bool $displayHelpOnError
      * @return static
      */
-    public static function create(callable $callback): self {
-        return new static($callback);
+    public static function create(callable $callback, bool $displayHelpOnError = false) {
+        return new static($callback, $displayHelpOnError);
     }
 
     /** {@inheritdoc} */
     public function command(array $args) {
-
-        if (
-                array_key_exists('help', $args)
-                and $args['help'] === true
-        ) {
-
-            $help = new Help();
-            return $help->renderFor($this);
-        }
-
         $io = $this->getSTDIO();
-        $retval = call_user_func_array($this->callback, [$args, $io]);
-        if (is_string($retval)) {
-            $io($retval);
-        }
+        return call_user_func_array($this->callback, [$args, $io]);
     }
 
     /** {@inheritdoc} */
