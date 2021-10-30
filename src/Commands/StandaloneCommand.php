@@ -21,6 +21,9 @@ class StandaloneCommand extends CommandAbstract implements Command {
     /** @var Option[] */
     protected $options = [];
 
+    /** @var bool */
+    protected $displayHelpOnError;
+
     /** @var callable|null */
     protected $callback;
 
@@ -30,10 +33,13 @@ class StandaloneCommand extends CommandAbstract implements Command {
     /**
      * Run the command
      * @param array|null $args if not set will use $argv
+     * @return mixed
      */
-    public function run(?array $args = null) {
-        ErrorHandler::register();
-        global $argv;
+    public function run(array $args = null) {
+        //ErrorHandler::register();
+        global $argv, $help;
+        $help = $help ?? new Help();
+
         if (!is_array($args)) {
             $args = $argv;
             array_shift($args);
@@ -41,19 +47,32 @@ class StandaloneCommand extends CommandAbstract implements Command {
 
         try {
             $arguments = $this->parser->parseArguments($args, $this->getOptions());
-            $this->command($arguments);
-        } catch (Throwable $error) {
 
-            try {
-                $help = new Help();
-                $help->renderFor($this);
-            } catch (Throwable $err) { $err->getCode(); }
-            throw $error;
+            $displayHelp = $arguments['help'] ?? false;
+            if ($displayHelp) {
+
+
+                return true;
+            }
+            $retval = $this->command($arguments);
+        } catch (Throwable $error) {
+            $retval = null;
+            if ($this->displayHelpOnError) {
+                try {
+                    $help = new Help();
+                    $help->renderFor($this);
+                } catch (Throwable $err) { $err->getCode(); }
+            }
+
+            ErrorHandler::handle($error);
         }
+
+        return $retval;
     }
 
     /** @param callable $callback */
-    public function __construct(callable $callback) {
+    public function __construct(callable $callback, bool $displayHelpOnError = false) {
+        $this->displayHelpOnError = $displayHelpOnError;
         $this->options = [
                     BooleanOption::create('help', '-h', '--help')
                     ->setDescription('Display this help message')
@@ -170,6 +189,17 @@ class StandaloneCommand extends CommandAbstract implements Command {
      */
     public function setParser(Parser $parser): self {
         $this->parser = $parser;
+        return $this;
+    }
+
+    /**
+     * Displays help on error
+     *
+     * @param bool $displayHelpOnError
+     * @return static
+     */
+    public function setDisplayHelpOnError(bool $displayHelpOnError = true) {
+        $this->displayHelpOnError = $displayHelpOnError;
         return $this;
     }
 

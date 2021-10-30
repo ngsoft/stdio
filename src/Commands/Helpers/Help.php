@@ -69,7 +69,7 @@ class Help extends CommandAbstract {
 
     public function renderFor(Command $command) {
 
-        $io = STDIO::create();
+        $io = $this->getSTDIO();
 
         $options = $command->getOptions();
         $description = $command->getDescription();

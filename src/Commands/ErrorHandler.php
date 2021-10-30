@@ -22,21 +22,16 @@ class ErrorHandler {
     public function __invoke(Throwable $error) {
 
         $io = STDIO::create();
-        $stderr = $io->getSTDERR();
-
-        $io
-                ->yellow("Error:")
-                ->linebreak()
-                ->err();
-
+        $io->err(sprintf("<yellow>%s:</yellow>", get_class($error)));
         $handler = $io->createRect()
                 ->setBackground('red')
-                ->setColor('white');
-        $handler->write($error->getMessage());
-        $handler->render($stderr);
+                ->setColor('white')
+                ->err($error->getMessage());
+
         if ($this->displayTrace) {
-            $io->yellow("\nTrace:\n")->err();
-            $io->err($error->getTraceAsString());
+            $io
+                    ->err('<yellow>Trace:</yellow>')
+                    ->err($error->getTraceAsString());
         }
     }
 
@@ -56,8 +51,8 @@ class ErrorHandler {
      * @param bool $displayTrace
      */
     public static function handle(Throwable $error, bool $displayTrace = false) {
-        self::$instance = self::$instance ?? new static();
-        $handler = self::$instance;
+        static::$instance = static::$instance ?? new static();
+        $handler = static::$instance;
         $handler->setDisplayTrace($displayTrace);
         $handler($error);
     }
