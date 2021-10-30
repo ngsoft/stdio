@@ -46,7 +46,8 @@ class Rect implements Renderer {
     public function __construct(
             STDIO $stdio = null
     ) {
-        $this->stdio = $stdio ?? new STDIO();
+        $stdio = $stdio ?? STDIO::create();
+        $this->stdio = $stdio;
         $this->term = $stdio->getTerminal();
         $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
