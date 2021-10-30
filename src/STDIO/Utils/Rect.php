@@ -198,7 +198,7 @@ class Rect implements Renderer {
             if ($padding > 0) $message .= str_repeat(' ', $padding);
             if ($repeatLeft > 0) $message .= str_repeat(' ', $repeatLeft);
             $message .= $line;
-            if ($repeatRight > 0) $message .= str_repeat(' ', $repeatLeft);
+            if ($repeatRight > 0) $message .= str_repeat(' ', $repeatRight);
             if ($padding > 0) $message .= str_repeat(' ', $padding);
             $message .= $suffix;
             $result[] = $message;
