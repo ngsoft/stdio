@@ -46,7 +46,7 @@ use NGSOFT\STDIO\{
  */
 final class STDIO implements Ansi, Colors, Formats {
 
-    const VERSION = '2.3';
+    const VERSION = '3.0';
 
     /** @var Terminal */
     private $terminal;
@@ -115,16 +115,16 @@ final class STDIO implements Ansi, Colors, Formats {
     public function __call($method, $arguments) {
 
         if ($this->styles->offsetExists($method)) {
-            $message = null;
-            if (array_key_exists(0, $arguments)) {
-                $message = $arguments[0];
-                if (
-                        !is_string($message)
-                        and $message !== null
-                ) {
-                    throw new InvalidArgumentException(sprintf('%s::%s($message) Invalid argument $message, string|null requested but %s given.', get_class($this), $method, gettype($message)));
-                }
+
+            $message = $arguments[0] ?? null;
+
+            if (
+                    !is_string($message)
+                    and $message !== null
+            ) {
+                throw new InvalidArgumentException(sprintf('%s::%s($message) Invalid argument $message, string|null requested but %s given.', get_class($this), $method, gettype($message)));
             }
+
             if ($this->supportsColors) {
                 if (is_string($message)) $message = $this->styles[$method]->format($message);
                 else $message = $this->styles[$method]->getPrefix();
