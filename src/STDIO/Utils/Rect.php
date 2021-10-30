@@ -11,8 +11,6 @@ use function mb_strlen;
 
 class Rect implements Renderer {
 
-    const DEFAULT_OUTPUT = 'out';
-
     /** @var Terminal */
     protected $term;
 
