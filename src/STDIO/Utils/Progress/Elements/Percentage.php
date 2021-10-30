@@ -13,7 +13,7 @@ class Percentage extends ProgressElement {
     protected function build(Element $element): Element {
         $percent = (string) $this->getPercent();
         while (strlen($percent) < 3) {
-            $percent .= ' ';
+            $percent = ' ' . $percent;
         }
         $percent .= "%";
         return $element->setValue($percent);
