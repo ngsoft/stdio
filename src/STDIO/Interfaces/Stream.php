@@ -11,11 +11,4 @@ interface Stream {
      * @return resource
      */
     public function getStream();
-
-    /**
-     * Gets a new instance with defined stream
-     * @param resource $stream
-     * @return static
-     */
-    public function withStream($stream);
 }

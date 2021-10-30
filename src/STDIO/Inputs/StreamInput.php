@@ -33,12 +33,4 @@ class StreamInput implements Stream, Input {
         return $this->stream;
     }
 
-    /** {@inheritdoc} */
-    public function withStream($stream) {
-        assert(is_resource($stream));
-        $i = clone $this;
-        $i->stream = $stream;
-        return $i;
-    }
-
 }

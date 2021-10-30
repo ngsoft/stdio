@@ -290,7 +290,7 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function out(): self {
-        $this->render($this->stdio->getSTDOUT());
+        $this->render($this->stdio->getOutput());
         return $this;
     }
 
@@ -300,7 +300,7 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function err() {
-        $this->render($this->stdio->getSTDERR());
+        $this->render($this->stdio->getErrorOutput());
         return $this;
     }
 

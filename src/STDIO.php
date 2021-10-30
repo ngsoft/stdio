@@ -8,7 +8,7 @@ use BadMethodCallException,
     InvalidArgumentException;
 use NGSOFT\STDIO\{
     Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter,
-    Interfaces\Input, Interfaces\Output, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Progress, Utils\Rect
+    Interfaces\Input, Interfaces\Output, Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Progress, Utils\Rect
 };
 
 /**
@@ -54,11 +54,14 @@ final class STDIO implements Ansi, Colors, Formats {
     /** @var bool */
     private $supportsColors;
 
-    /** @var array<string,STDIO\Interfaces\Input> */
-    private $inputs = [];
+    /** @var Output */
+    private $output;
 
-    /** @var array<string,STDIO\Interfaces\Output> */
-    private $outputs = [];
+    /** @var Output */
+    private $errorOutput;
+
+    /** @var Input */
+    private $input;
 
     /** @var Buffer */
     private $buffer;
@@ -82,10 +85,9 @@ final class STDIO implements Ansi, Colors, Formats {
     public function __construct() {
         $this->terminal = new Terminal();
         $this->supportsColors = $this->terminal->hasColorSupport();
-        $this->inputs['in'] = new StreamInput();
-        $stdout = new StreamOutput();
-        $this->outputs['out'] = $stdout;
-        $this->outputs['err'] = $stdout->withStream(fopen('php://stderr', 'w'));
+        $this->input = new StreamInput();
+        $this->output = new StreamOutput();
+        $this->errorOutput = new ErrorStreamOutput();
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
 
@@ -132,8 +134,6 @@ final class STDIO implements Ansi, Colors, Formats {
             } elseif (is_string($message)) return $this->write($message);
             else return $this; //no text to render and no color support, so do nothing
         }
-
-
         throw new BadMethodCallException(sprintf('%s::%s() does not exists.', get_class($this), $method));
     }
 
@@ -145,22 +145,6 @@ final class STDIO implements Ansi, Colors, Formats {
      */
     public function getTerminal(): Terminal {
         return $this->terminal;
-    }
-
-    /**
-     * Get Inputs
-     * @return array<string,STDIO\Interfaces\Input>
-     */
-    public function getInputs() {
-        return $this->inputs;
-    }
-
-    /**
-     * Get Outputs
-     * @return array<string,STDIO\Interfaces\Output>
-     */
-    public function getOutputs() {
-        return $this->outputs;
     }
 
     /**
@@ -188,36 +172,27 @@ final class STDIO implements Ansi, Colors, Formats {
     }
 
     /**
-     * Get Input by name
-     * @return Input|null
+     * Get Input
+     * @return Input
      */
-    public function getInput(string $index = 'in'): ?Input {
-        return $this->inputs[$index] ?? null;
+    public function getInput(): Input {
+        return $this->input;
     }
 
     /**
-     * Get Output by name
-     * @param string $index
-     * @return Output|null
+     * Get Output
+     * @return Output
      */
-    public function getOutput(string $index = 'out'): ?Output {
-        return $this->outputs[$index] ?? null;
+    public function getOutput(): Output {
+        return $this->output;
     }
 
     /**
      * Get STDERR
-     * @return StreamOutput
+     * @return Output
      */
-    public function getSTDERR(): StreamOutput {
-        return $this->outputs['err'];
-    }
-
-    /**
-     * Get STDOUT
-     * @return StreamOutput
-     */
-    public function getSTDOUT(): StreamOutput {
-        return $this->outputs['out'];
+    public function getErrorOutput(): Output {
+        return $this->errorOutput;
     }
 
     ////////////////////////////   Read and Write   ////////////////////////////
@@ -308,7 +283,7 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->writeln($message);
         }
         if ($this->supportsColors) $this->buffer->write($this->styles->reset->getSuffix());
-        $this->buffer->flush($this->getSTDOUT());
+        $this->buffer->flush($this->getOutput());
         return $this;
     }
 
@@ -323,7 +298,7 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->writeln($message);
         }
         if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
-        $this->buffer->flush($this->getSTDERR());
+        $this->buffer->flush($this->getErrorOutput());
         return $this;
     }
 

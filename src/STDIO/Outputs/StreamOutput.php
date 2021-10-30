@@ -34,12 +34,4 @@ class StreamOutput implements Stream, Output {
         return $this->stream;
     }
 
-    /** {@inheritdoc} */
-    public function withStream($stream) {
-        assert(is_resource($stream));
-        $i = clone $this;
-        $i->stream = $stream;
-        return $i;
-    }
-
 }

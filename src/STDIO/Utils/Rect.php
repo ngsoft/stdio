@@ -233,7 +233,7 @@ class Rect implements Renderer {
      */
     public function out(string $message = null): self {
         if (is_string($message)) $this->bufferMessage($message);
-        if (count($this->buffer) > 0) $this->render($this->stdio->getSTDOUT());
+        if (count($this->buffer) > 0) $this->render($this->stdio->getOutput());
         return $this;
     }
 
@@ -245,7 +245,7 @@ class Rect implements Renderer {
      */
     public function err(string $message = null) {
         if (is_string($message)) $this->bufferMessage($message);
-        if (count($this->buffer) > 0) $this->render($this->stdio->getSTDERR());
+        if (count($this->buffer) > 0) $this->render($this->stdio->getErrorOutput());
         return $this;
     }
 
