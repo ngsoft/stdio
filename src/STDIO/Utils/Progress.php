@@ -311,11 +311,12 @@ class Progress implements Renderer, IteratorAggregate {
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-        if (!$this->complete) $output->write($this->build());
-
-        if ($this->complete) {
-            foreach ($this->onComplete as $call) {
-                $call($this);
+        if (!$this->complete) {
+            $output->write($this->build());
+            if ($this->complete) {
+                foreach ($this->onComplete as $call) {
+                    $call($this);
+                }
             }
         }
     }
