@@ -8,7 +8,7 @@ use BadMethodCallException,
     InvalidArgumentException;
 use NGSOFT\STDIO\{
     Formatters\PlainText, Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter,
-    Interfaces\Input, Interfaces\Output, Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Progress, Utils\Rect
+    Interfaces\Input, Interfaces\Output, Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Cursor, Utils\Progress, Utils\Rect
 };
 
 /**
@@ -71,6 +71,9 @@ final class STDIO implements Ansi, Colors, Formats {
 
     /** @var Formatter */
     private $formatter;
+
+    /** @var Cursor */
+    private $cursor;
 
     ////////////////////////////   Initialisation   ////////////////////////////
 
@@ -349,6 +352,16 @@ final class STDIO implements Ansi, Colors, Formats {
     }
 
     ////////////////////////////   Special Features   ////////////////////////////
+
+    /**
+     * Get the cursor utility
+     *
+     * @return Cursor
+     */
+    public function getCursor(): Cursor {
+        if (!$this->cursor) $this->cursor = new Cursor($this->getOutput());
+        return $this->cursor;
+    }
 
     /**
      * Insert tabulations into buffer
