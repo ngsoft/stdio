@@ -249,8 +249,6 @@ class Progress implements Renderer, IteratorAggregate {
         $str = $block = '';
         $len = 0;
 
-        if ($this->complete) return $str;
-
         if (count($this->label) > 0) {
             $block .= (string) $this->label . ' ';
             $len += count($this->label) + 1;
@@ -313,7 +311,7 @@ class Progress implements Renderer, IteratorAggregate {
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-        $output->write($this->build());
+        if (!$this->complete) $output->write($this->build());
 
         if ($this->complete) {
             foreach ($this->onComplete as $call) {
