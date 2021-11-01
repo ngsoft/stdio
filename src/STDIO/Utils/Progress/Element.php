@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils\Progress;
 
-use Countable;
-use NGSOFT\{
-    STDIO, STDIO\Styles\Style
-};
-use Stringable;
+use Countable,
+    NGSOFT\STDIO\Styles\Style,
+    Stringable;
 use function mb_strlen;
 
 class Element implements Countable, Stringable {

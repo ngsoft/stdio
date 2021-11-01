@@ -167,6 +167,15 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
     private $styles = [];
 
     /**
+     * Creates a new instance
+     * 
+     * @return static
+     */
+    public static function create(): self {
+        return new static();
+    }
+
+    /**
      * @staticvar array $build
      */
     public function __construct() {

@@ -7,7 +7,7 @@ namespace NGSOFT\STDIO\Utils;
 use Generator,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Styles,
+    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Styles, STDIO\Terminal,
     STDIO\Utils\Progress\Element, STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status,
     STDIO\Utils\Progress\ProgressElement
 };
@@ -50,7 +50,21 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var Output */
     protected $output;
 
+    /** @var Styles */
+    protected $styles;
+
     ////////////////////////////   Getter/Setter   ////////////////////////////
+
+    /**
+     * Creates a new instance
+     *
+     * @param int $total
+     * @param ?STDIO $stdio
+     * @return static
+     */
+    public static function create(int $total = 100, STDIO $stdio = null): self {
+        return new static($total, $stdio);
+    }
 
     /**
      * @param int $total
@@ -60,7 +74,7 @@ class Progress implements Renderer, IteratorAggregate {
         $stdio = $stdio ?? STDIO::create();
         $this->output = new StreamOutput();
         $this->buffer = new OutputBuffer();
-        $styles = $stdio->getStyles();
+        $styles = $this->styles = $stdio->getStyles();
         $this->elements = [
             $this->status = new Status($total, $styles),
             $this->bar = new Bar($total, $styles),
@@ -183,14 +197,13 @@ class Progress implements Renderer, IteratorAggregate {
     /**
      * Set Label
      * @param string $label
-     * @param ?string $color
+     * @param string|int|null $color
      * @return static
      */
-    public function setLabel(string $label, string $color = null): self {
-        $element = new Element($this->stdio);
+    public function setLabel(string $label, $color = null): self {
+        $element = new Element();
         if (
-                is_string($color) and
-                ( $style = $this->stdio->getStyles()[$color] ?? null)
+                is_string($color) and ($style = $this->styles[$color] ?? null)
         ) {
             $element->setStyle($style);
         }
@@ -201,7 +214,9 @@ class Progress implements Renderer, IteratorAggregate {
 
     ////////////////////////////   Utils   ////////////////////////////
 
-
+    /**
+     * Run the callbacks once
+     */
     protected function triggerComplete() {
         if ($this->complete) {
             $total = $this->total;
@@ -264,7 +279,10 @@ class Progress implements Renderer, IteratorAggregate {
         return $this;
     }
 
-    protected function build(): string {
+    protected function build() {
+
+        static $term;
+        $term = $term ?? Terminal::create();
 
         if (count($this->buffer) == 0) {
             $str = $block = '';
@@ -281,10 +299,10 @@ class Progress implements Renderer, IteratorAggregate {
                 $block .= (string) $element;
             }
 
-            $str .= sprintf("\r%s", Ansi::CLEAR_END_LINE);
+            $str .= sprintf("\r%s", Ansi::CLEAR_LINE);
 
             if ($this->alignRight) {
-                $padding = $this->stdio->getTerminal()->width - 1;
+                $padding = $term->width - 1;
                 $padding -= $len;
                 if ($padding > 0) $str .= str_repeat(' ', $padding);
             }
@@ -311,6 +329,16 @@ class Progress implements Renderer, IteratorAggregate {
      */
     public function out(): self {
         $this->render($this->output);
+        return $this;
+    }
+
+    /**
+     * Reset progress to 0
+     * @return self
+     */
+    public function reset(): self {
+        $this->setCurrent(0);
+        $this->buffer->write("\r" . Ansi::CLEAR_LINE);
         return $this;
     }
 

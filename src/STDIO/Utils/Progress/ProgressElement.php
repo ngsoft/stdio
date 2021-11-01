@@ -52,7 +52,7 @@ abstract class ProgressElement implements Countable, Stringable {
     ) {
         $this->styles = $styles;
         $this->total = $total;
-        $this->element = new Element($stdio);
+        $this->element = new Element();
     }
 
     /**
@@ -62,16 +62,6 @@ abstract class ProgressElement implements Countable, Stringable {
      */
     public function getComplete(): bool {
         return $this->current == $this->total;
-    }
-
-    /**
-     * Get Percentage Done
-     * @return int
-     */
-    public function getPercent(): int {
-        $percent = (int) floor(($this->current / $this->total) * 100);
-        if ($percent > 100) $percent = 100;
-        return $percent;
     }
 
     /**
@@ -91,13 +81,23 @@ abstract class ProgressElement implements Countable, Stringable {
     }
 
     /**
+     * Get Percentage Done
+     * @return int
+     */
+    public function getPercent(): int {
+        $percent = (int) floor(($this->current / $this->total) * 100);
+        if ($percent > 100) $percent = 100;
+        return $percent;
+    }
+
+    /**
      * Set Element Color
      *
-     * @param string $color
+     * @param string|int $color
      * @return $this
      */
-    public function setColor(string $color) {
-        $styles = $this->stdio->getStyles();
+    public function setColor($color) {
+        $styles = &$this->styles;
         if ($style = $styles[$color] ?? null) {
             $this->element->setStyle($style);
         }
@@ -120,7 +120,7 @@ abstract class ProgressElement implements Countable, Stringable {
      * @return static
      */
     public function setCurrent(int $current) {
-        $this->current = max(0, min($current, $this->total));
+        $this->current = $current;
         $this->element = $this->build($this->element);
         return $this;
     }
@@ -131,7 +131,7 @@ abstract class ProgressElement implements Countable, Stringable {
      * @return static
      */
     public function setTotal(int $total) {
-        $this->total = max(1, $total);
+        $this->total = $total;
         $this->setCurrent(0);
         return $this;
     }
@@ -143,32 +143,6 @@ abstract class ProgressElement implements Countable, Stringable {
      */
     public function setStyle(Style $style) {
         $this->element->setStyle($style);
-        return $this;
-    }
-
-    ////////////////////////////   Utils   ////////////////////////////
-
-    /**
-     * Increments the counter
-     * @param int $value value to add
-     * @return static
-     */
-    public function increment(int $value = 1) {
-        $current = $this->current;
-        $current += $value;
-        $this->setCurrent($current);
-        return $this;
-    }
-
-    /**
-     * Decrements the Counter
-     * @param int $value
-     * @return $this
-     */
-    public function decrement(int $value = 1) {
-        $current = $this->current;
-        $current -= $value;
-        $this->setCurrent($current);
         return $this;
     }
 
