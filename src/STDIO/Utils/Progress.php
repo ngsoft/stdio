@@ -7,14 +7,11 @@ namespace NGSOFT\STDIO\Utils;
 use Generator,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Utils\Progress\Element, STDIO\Utils\Progress\Elements\Bar,
-    STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
+    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Utils\Progress\Element,
+    STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
 };
 
 class Progress implements Renderer, IteratorAggregate {
-
-    /** @var STDIO */
-    protected $stdio;
 
     /** @var Status */
     protected $status;
@@ -46,18 +43,31 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var bool */
     protected $complete = false;
 
+    /** @var OutputBuffer */
+    protected $buffer;
+
+    /** @var Output */
+    protected $output;
+
+    /** @var Styles */
+    protected $styles;
+
     ////////////////////////////   Getter/Setter   ////////////////////////////
 
     /**
      * @param int $total
      * @param ?STDIO $stdio
      */
-    public function __construct(
-            int $total = 100,
-            STDIO $stdio = null
-    ) {
-        $stdio = $stdio ?? new STDIO();
-        $this->stdio = $stdio;
+    public function __construct(int $total = 100, STDIO $stdio = null) {
+
+        $stdio = $stdio ?? STDIO::create();
+
+        $this->output = new StreamOutput();
+
+        $this->buffer = new OutputBuffer();
+
+        $this->styles = $stdio->getStyles();
+
         $this->elements = [
             $this->status = new Status($total, $stdio),
             $this->bar = new Bar($total, $stdio),
@@ -246,35 +256,38 @@ class Progress implements Renderer, IteratorAggregate {
     }
 
     protected function build(): string {
-        $str = $block = '';
-        $len = 0;
 
-        if (count($this->label) > 0) {
-            $block .= (string) $this->label . ' ';
-            $len += count($this->label) + 1;
+        if (count($this->buffer) == 0) {
+            $str = $block = '';
+            $len = 0;
+
+            if (count($this->label) > 0) {
+                $block .= (string) $this->label . ' ';
+                $len += count($this->label) + 1;
+            }
+
+            /** @var ProgressElement $element */
+            foreach ($this->getElements() as $element) {
+                $len += count($element);
+                $block .= (string) $element;
+            }
+
+            $str .= sprintf("\r%s", Ansi::CLEAR_END_LINE);
+
+            if ($this->alignRight) {
+                $padding = $this->stdio->getTerminal()->width - 1;
+                $padding -= $len;
+                if ($padding > 0) $str .= str_repeat(' ', $padding);
+            }
+
+            $str .= $block;
+
+            if ($this->getComplete()) {
+                $str .= "\n";
+            }
+
+            $this->buffer->write($str);
         }
-
-        /** @var ProgressElement $element */
-        foreach ($this->getElements() as $element) {
-            $len += count($element);
-            $block .= (string) $element;
-        }
-
-        $str .= sprintf("\r%s", Ansi::CLEAR_END_LINE);
-
-        if ($this->alignRight) {
-            $padding = $this->stdio->getTerminal()->width - 1;
-            $padding -= $len;
-            if ($padding > 0) $str .= str_repeat(' ', $padding);
-        }
-
-        $str .= $block;
-
-        if ($this->getComplete()) {
-            $str .= "\n";
-        }
-
-        return $str;
     }
 
     /**
@@ -293,17 +306,9 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function out(): self {
-        $this->render($this->stdio->getOutput());
-        return $this;
-    }
 
-    /**
-     * Render Rect into StdERR
-     *
-     * @return static
-     */
-    public function err() {
-        $this->render($this->stdio->getErrorOutput());
+
+        $this->render($this->stdio->getOutput());
         return $this;
     }
 

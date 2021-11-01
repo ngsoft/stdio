@@ -16,11 +16,11 @@ interface Ansi {
     const CLEAR_SCREEN = self::ESCAPE . '2J';
     const SCROLL_UP = self::ESCAPE . 'S';
     const SCROLL_DOWN = self::ESCAPE . 'T';
-    const CURSOR_SUFFIX_UP = 'A';
-    const CURSOR_SUFFIX_DOWN = 'B';
-    const CURSOR_SUFFIX_RIGHT = 'C';
-    const CURSOR_SUFFIX_LEFT = 'D';
     const CURSOR_SUFFIX_TO = 'H';
+    const CURSOR_UP = self::ESCAPE . 'A';
+    const CURSOR_DOWN = self::ESCAPE . 'B';
+    const CURSOR_RIGHT = self::ESCAPE . 'C';
+    const CURSOR_LEFT = self::ESCAPE . 'D';
     const CURSOR_NEXT_LINE = self::ESCAPE . 'E';
     const CURSOR_PREV_LINE = self::ESCAPE . 'F';
     const CURSOR_SAVE_POS = self::ESCAPE . 's';

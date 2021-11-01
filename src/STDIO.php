@@ -369,7 +369,8 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function tab(int $count = 1) {
-        if ($count > 0) $this->write(str_repeat("\t", $count));
+        $count = max(1, $count);
+        $this->write(str_repeat('    ', $count));
         return $this;
     }
 
@@ -379,7 +380,8 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function space(int $count = 1) {
-        if ($count > 0) $this->write(str_repeat(" ", $count));
+        $count = max(1, $count);
+        $this->write(str_repeat(" ", $count));
         return $this;
     }
 
@@ -389,7 +391,8 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function linebreak(int $count = 1) {
-        if ($count > 0) $this->write(str_repeat("\n", $count));
+        $count = max(1, $count);
+        $this->write(str_repeat("\n", $count));
         return $this;
     }
 
@@ -416,7 +419,7 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function clearLine() {
-        if ($this->supportsColors) $this->write("\033[2K");
+        $this->write(self::CLEAR_LINE);
         return $this;
     }
 
@@ -425,7 +428,7 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function clearStartOfLine() {
-        if ($this->supportsColors) $this->write("\033[1K");
+        $this->write(self::CLEAR_START_LINE);
         return $this;
     }
 
@@ -434,7 +437,7 @@ final class STDIO implements Ansi, Colors, Formats {
      * @return static
      */
     public function clearEndOfLine() {
-        if ($this->supportsColors) $this->write("\033[K");
+        $this->write(self::CLEAR_END_LINE);
         return $this;
     }
 

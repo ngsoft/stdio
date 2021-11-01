@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Utils\Progress;
 
 use Countable;
 use NGSOFT\{
-    STDIO, STDIO\Styles\Style
+    STDIO, STDIO\Styles, STDIO\Styles\Style
 };
 use Stringable;
 
@@ -27,6 +27,9 @@ abstract class ProgressElement implements Countable, Stringable {
     /** @var Element */
     protected $element;
 
+    /** @var Styles */
+    protected $styles;
+
     ////////////////////////////   Abstract   ////////////////////////////
 
     /**
@@ -41,13 +44,13 @@ abstract class ProgressElement implements Countable, Stringable {
 
     /**
      * @param int $total
-     * @param STDIO $stdio
+     * @param Styles $styles
      */
     public function __construct(
             int $total,
-            STDIO $stdio
+            Styles $styles
     ) {
-        $this->stdio = $stdio;
+        $this->styles = $styles;
         $this->total = $total;
         $this->element = new Element($stdio);
     }

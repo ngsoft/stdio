@@ -24,10 +24,7 @@ class Cursor implements Ansi {
      */
     protected function render(string $char, int $count): self {
         $count = max(1, $count);
-        for ($i = 0; $i < $count; $i++) {
-            $this->output->write(self::ESCAPE . $char);
-        }
-
+        $this->output->write(str_repeat($char, $count));
         return $this;
     }
 
@@ -35,40 +32,40 @@ class Cursor implements Ansi {
      * Move Cursor UP
      *
      * @param int $count
-     * @return self
+     * @return static
      */
     public function up(int $count = 1): self {
-        return $this->render(self::CURSOR_SUFFIX_UP, $count);
+        return $this->render(self::CURSOR_UP, $count);
     }
 
     /**
      * Move Cursor DOWN
      *
      * @param int $count
-     * @return self
+     * @return static
      */
     public function down(int $count = 1): self {
-        return $this->render(self::CURSOR_SUFFIX_DOWN, $count);
+        return $this->render(self::CURSOR_DOWN, $count);
     }
 
     /**
      * Move Cursor LEFT
      *
      * @param int $count
-     * @return type
+     * @return static
      */
-    public function left(int $count = 1) {
-        return $this->render(self::CURSOR_SUFFIX_LEFT, $count);
+    public function left(int $count = 1): self {
+        return $this->render(self::CURSOR_LEFT, $count);
     }
 
     /**
      * Move Cursor RIGHT
      *
      * @param int $count
-     * @return type
+     * @return static
      */
-    public function right(int $count = 1) {
-        return $this->render(self::CURSOR_SUFFIX_RIGHT, $count);
+    public function right(int $count = 1): self {
+        return $this->render(self::CURSOR_RIGHT, $count);
     }
 
     /**
