@@ -22,13 +22,6 @@ class Element implements Countable, Stringable {
     /** @var Style|null */
     private $style;
 
-    /** @var STDIO */
-    private $stdio;
-
-    public function __construct(STDIO $stdio) {
-        $this->stdio = $stdio;
-    }
-
     /**
      * Change Element Value
      * @param string $value
@@ -62,13 +55,7 @@ class Element implements Countable, Stringable {
 
     /** {@inheritdoc} */
     public function __toString() {
-        $value = $this->value;
-
-        if (
-                $this->style and
-                mb_strlen($value) > 0 and
-                $this->stdio->getTerminal()->hasColorSupport()
-        ) $value = $this->style->format($value);
+        $value = is_null($this->style) ? $this->value : $this->style->format($this->value);
         return $value;
     }
 

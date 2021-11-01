@@ -7,8 +7,9 @@ namespace NGSOFT\STDIO\Utils;
 use Generator,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Utils\Progress\Element,
-    STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status, STDIO\Utils\Progress\ProgressElement
+    STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Styles,
+    STDIO\Utils\Progress\Element, STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status,
+    STDIO\Utils\Progress\ProgressElement
 };
 
 class Progress implements Renderer, IteratorAggregate {
@@ -38,7 +39,7 @@ class Progress implements Renderer, IteratorAggregate {
     protected $alignRight = false;
 
     /** @var callable[] */
-    protected $onComplete = [];
+    protected $callbacks = [];
 
     /** @var bool */
     protected $complete = false;
@@ -49,9 +50,6 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var Output */
     protected $output;
 
-    /** @var Styles */
-    protected $styles;
-
     ////////////////////////////   Getter/Setter   ////////////////////////////
 
     /**
@@ -59,19 +57,14 @@ class Progress implements Renderer, IteratorAggregate {
      * @param ?STDIO $stdio
      */
     public function __construct(int $total = 100, STDIO $stdio = null) {
-
         $stdio = $stdio ?? STDIO::create();
-
         $this->output = new StreamOutput();
-
         $this->buffer = new OutputBuffer();
-
-        $this->styles = $stdio->getStyles();
-
+        $styles = $stdio->getStyles();
         $this->elements = [
-            $this->status = new Status($total, $stdio),
-            $this->bar = new Bar($total, $stdio),
-            $this->percentage = new Percentage($total, $stdio),
+            $this->status = new Status($total, $styles),
+            $this->bar = new Bar($total, $styles),
+            $this->percentage = new Percentage($total, $styles),
         ];
         $this->setLabel('');
         $this->setTotal($total);
@@ -131,6 +124,10 @@ class Progress implements Renderer, IteratorAggregate {
         foreach ($this->getElements() as $element) {
             $element->setCurrent($current);
         }
+        if ($this->getComplete() === true) {
+            $this->triggerComplete();
+        }
+
         return $this;
     }
 
@@ -204,6 +201,16 @@ class Progress implements Renderer, IteratorAggregate {
 
     ////////////////////////////   Utils   ////////////////////////////
 
+
+    protected function triggerComplete() {
+        if ($this->complete) {
+            $total = $this->total;
+            while (null !== ($callable = array_shift($this->callbacks))) {
+                call_user_func_array($callable, [$total]);
+            }
+        }
+    }
+
     /**
      * Hide Status
      * @return self
@@ -237,7 +244,8 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function increment(int $value = 1) {
-        $current = $this->current;
+        $value = max(1, $value);
+        $current = min($this->current, $this->total - $value);
         $current += $value;
         $this->setCurrent($current);
         return $this;
@@ -249,7 +257,8 @@ class Progress implements Renderer, IteratorAggregate {
      * @return $this
      */
     public function decrement(int $value = 1) {
-        $current = $this->current;
+        $value = max(1, $value);
+        $current = min($this->current, $this->total);
         $current -= $value;
         $this->setCurrent($current);
         return $this;
@@ -279,13 +288,7 @@ class Progress implements Renderer, IteratorAggregate {
                 $padding -= $len;
                 if ($padding > 0) $str .= str_repeat(' ', $padding);
             }
-
             $str .= $block;
-
-            if ($this->getComplete()) {
-                $str .= "\n";
-            }
-
             $this->buffer->write($str);
         }
     }
@@ -296,19 +299,18 @@ class Progress implements Renderer, IteratorAggregate {
      * @return self
      */
     public function onComplete(callable $callback): self {
-        $this->onComplete[] = $callback;
+        if ($this->complete) $callback($this->total);
+        else $this->callbacks[] = $callback;
         return $this;
     }
 
     /**
-     * Render into StdOUT
+     * Render into STDOUT
      *
      * @return static
      */
     public function out(): self {
-
-
-        $this->render($this->stdio->getOutput());
+        $this->render($this->output);
         return $this;
     }
 
@@ -316,14 +318,8 @@ class Progress implements Renderer, IteratorAggregate {
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-        if (!$this->complete) {
-            $output->write($this->build());
-            if ($this->complete) {
-                foreach ($this->onComplete as $call) {
-                    $call($this);
-                }
-            }
-        }
+        $this->build();
+        $this->buffer->flush($output);
     }
 
     /**
