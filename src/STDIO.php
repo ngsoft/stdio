@@ -11,39 +11,6 @@ use NGSOFT\STDIO\{
     Interfaces\Input, Interfaces\Output, Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Cursor, Utils\Progress, Utils\Rect
 };
 
-/**
- * @method STDIO black(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO red(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO green(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO yellow(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO blue(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO purple(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO cyan(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO white(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO gray(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightred(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightgreen(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightyellow(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightblue(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightpurple(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightcyan(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO brightwhite(?string $message) Adds the corresponding Style to the buffer
- *
- * @method STDIO info(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO comment(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO whisper(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO shout(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO error(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO notice(?string $message) Adds the corresponding Style to the buffer
- *
- * @method STDIO bold(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO dim(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO italic(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO underline(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO inverse(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO hidden(?string $message) Adds the corresponding Style to the buffer
- * @method STDIO striketrough(?string $message) Adds the corresponding Style to the buffer
- */
 final class STDIO implements Ansi, Colors, Formats {
 
     public const VERSION = '3.0';
@@ -110,34 +77,6 @@ final class STDIO implements Ansi, Colors, Formats {
      */
     public function __invoke(string $message) {
         return $this->out($message);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @throws InvalidArgumentException
-     * @throws BadMethodCallException
-     */
-    public function __call($method, $arguments) {
-
-        if ($this->styles->offsetExists($method)) {
-
-            $message = $arguments[0] ?? null;
-
-            if (
-                    !is_string($message)
-                    and $message !== null
-            ) {
-                throw new InvalidArgumentException(sprintf('%s::%s($message) Invalid argument $message, string|null requested but %s given.', get_class($this), $method, gettype($message)));
-            }
-
-            if ($this->supportsColors) {
-                if (is_string($message)) $message = $this->styles[$method]->format($message);
-                else $message = $this->styles[$method]->getPrefix();
-                return $this->write($message);
-            } elseif (is_string($message)) return $this->write($message);
-            else return $this; //no text to render and no color support, so do nothing
-        }
-        throw new BadMethodCallException(sprintf('%s::%s() does not exists.', get_class($this), $method));
     }
 
     ////////////////////////////   GETTERS   ////////////////////////////
