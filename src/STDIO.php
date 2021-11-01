@@ -341,7 +341,8 @@ final class STDIO implements Ansi, Colors, Formats {
         $progress = new Progress($total, $this);
         $progress
                 ->setTotal($total)
-                ->setLabel($label ?? '', 'green');
+                ->setLabel($label ?? '')
+                ->setLabelColor('green');
 
         if (is_callable($onComplete)) $progress->onComplete($onComplete);
 

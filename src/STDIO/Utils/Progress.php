@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use ErrorException,
-    Generator,
+use Generator,
     IteratorAggregate;
 use NGSOFT\{
     STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Styles, STDIO\Terminal,
     STDIO\Utils\Progress\Element, STDIO\Utils\Progress\Elements\Bar, STDIO\Utils\Progress\Elements\Percentage, STDIO\Utils\Progress\Elements\Status,
     STDIO\Utils\Progress\ProgressElement
 };
+use function mb_strlen;
 
 class Progress implements Renderer, IteratorAggregate {
 
@@ -389,18 +389,20 @@ class Progress implements Renderer, IteratorAggregate {
 
     /**
      * Increments the progress as steps and render
+     *  Useful to show progress on multiple operations
+     *  Operations are completed during yield
+     *  eg: ORM: get a list of ids, and during yield loading these ids foreach($progress->setTotal(count($ids)) as $index) {$id = $ids[$index]; ...}
      *
-     * @return Generator<int,int>
+     * @return Generator<int,int> $next => $current
      */
     public function getIterator() {
         // reset progress
         $this->setTotal($this->total);
-        // 0 is already done step
-        $i = 1;
-        while ($i <= $this->total) {
-            yield $this->total => $i;
+        $i = 0;
+        while ($i < $this->total) {
+            yield $i + 1 => $i;
             //after yield so $progress->setLabel('My changing label') is rendered
-            $this->setCurrent($i)->out();
+            $this->setCurrent($i + 1)->out();
             // if during yield done $progress->end() or $progress->setCurrent($total)
             if ($this->complete) break;
             $i++;
