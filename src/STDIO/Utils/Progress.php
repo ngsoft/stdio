@@ -53,6 +53,9 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var Styles */
     protected $styles;
 
+    /** @var bool */
+    protected $rendered = false;
+
     ////////////////////////////   Getter/Setter   ////////////////////////////
 
     /**
@@ -330,16 +333,27 @@ class Progress implements Renderer, IteratorAggregate {
 
     /**
      * Reset progress to 0 and set to erase the line
-     * @return self
+     * @return static
      */
     public function reset(): self {
         $this->setCurrent(0);
-        $this->buffer->write("\r" . Ansi::CLEAR_LINE);
+        if ($this->rendered) $this->buffer->write("\r" . Ansi::CLEAR_LINE);
+        $this->buffer->flush($this->output);
+        $this->rendered = false;
         return $this;
     }
 
+    /**
+     * Set the progress to complete and end the line
+     *
+     * @return static
+     */
     public function end(): self {
         $this->setCurrent($this->total);
+        if ($this->rendered) $this->buffer->write('\n');
+        $this->buffer->flush($this->output);
+        $this->rendered = false;
+        return $this;
     }
 
     ////////////////////////////   Interfaces   ////////////////////////////
@@ -348,9 +362,11 @@ class Progress implements Renderer, IteratorAggregate {
     public function render(Output $output) {
         $this->build();
         $this->buffer->flush($output);
+        $this->rendered = true;
     }
 
     /**
+     * Increments the progress as steps
      * @return Generator<int,int>
      */
     public function getIterator() {
