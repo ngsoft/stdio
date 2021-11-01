@@ -163,7 +163,7 @@ class Rect implements Renderer {
      */
     protected function build(): string {
         if (count($this->buffer) == 0) return '';
-        $lines = [''];
+        $lines = [];
 
         $clear = $this->styles->reset->getSuffix();
         $length = $this->length;
@@ -192,6 +192,8 @@ class Rect implements Renderer {
             $message .= $this->color->format($this->background->format($line));
             $lines[] = $message;
         }
+
+        if (!empty($lines)) $lines[] = '';
 
         return implode("\n", $lines) . "\n";
     }
