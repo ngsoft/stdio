@@ -393,11 +393,15 @@ class Progress implements Renderer, IteratorAggregate {
      * @return Generator<int,int>
      */
     public function getIterator() {
+        // reset progress
         $this->setTotal($this->total);
+        // 0 is already done step
         $i = 1;
         while ($i <= $this->total) {
             yield $this->total => $i;
+            //after yield so $progress->setLabel('My changing label') is rendered
             $this->setCurrent($i)->out();
+            // if during yield done $progress->end() or $progress->setCurrent($total)
             if ($this->complete) break;
             $i++;
         }
