@@ -53,8 +53,7 @@ class Element implements Countable, Stringable {
 
     /** {@inheritdoc} */
     public function __toString() {
-        $value = is_null($this->style) ? $this->value : $this->style->format($this->value);
-        return $value;
+        return is_null($this->style) ? $this->value : $this->style->format($this->value);
     }
 
 }
