@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use Generator,
+use ErrorException,
+    Generator,
     IteratorAggregate;
 use NGSOFT\{
     STDIO, STDIO\Interfaces\Ansi, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Outputs\StreamOutput, STDIO\Styles, STDIO\Terminal,
@@ -53,9 +54,6 @@ class Progress implements Renderer, IteratorAggregate {
     /** @var Styles */
     protected $styles;
 
-    /** @var bool */
-    protected $rendered = false;
-
     ////////////////////////////   Getter/Setter   ////////////////////////////
 
     /**
@@ -83,7 +81,7 @@ class Progress implements Renderer, IteratorAggregate {
             $this->bar = new Bar($total, $styles),
             $this->percentage = new Percentage($total, $styles),
         ];
-        $this->setLabel('');
+        $this->label = new Element();
         $this->setTotal($total);
     }
 
@@ -105,6 +103,7 @@ class Progress implements Renderer, IteratorAggregate {
     }
 
     /**
+     * Displays bar to the right
      *
      * @param bool $alignRight
      * @return static
@@ -121,6 +120,7 @@ class Progress implements Renderer, IteratorAggregate {
     public function setTotal(int $total): self {
         $total = max(1, $total);
         $this->total = $total;
+        $this->complete = false;
         /** @var ProgressElement $element */
         foreach ($this->getElements() as $element) {
             $element->setTotal($total);
@@ -140,6 +140,8 @@ class Progress implements Renderer, IteratorAggregate {
         foreach ($this->getElements() as $element) {
             $element->setCurrent($current);
         }
+        $this->buffer->clear();
+        $this->build();
         if ($this->getComplete()) $this->triggerComplete();
         return $this;
     }
@@ -150,7 +152,7 @@ class Progress implements Renderer, IteratorAggregate {
      * @return bool
      */
     public function getComplete(): bool {
-        return $this->complete = $this->current == $this->total;
+        return $this->current == $this->total;
     }
 
     /**
@@ -165,49 +167,61 @@ class Progress implements Renderer, IteratorAggregate {
 
     /**
      * Set Status color
-     * @param string $color
+     * @param string|int $color
      * @return static
      */
-    public function setStatusColor(string $color): self {
+    public function setStatusColor($color): self {
         $this->status->setColor($color);
         return $this;
     }
 
     /**
      * Set Progress Bar Color
-     * @param string $color
-     * @return self
+     * @param string|int $color
+     * @return static
      */
-    public function setBarColor(string $color): self {
+    public function setBarColor($color): self {
         $this->bar->setColor($color);
         return $this;
     }
 
     /**
      * Set Percentage Color
-     * @param string $color
-     * @return self
+     * @param string|int $color
+     * @return static
      */
-    public function setPercentageColor(string $color): self {
+    public function setPercentageColor($color): self {
         $this->percentage->setColor($color);
+        return $this;
+    }
+
+    /**
+     * Set Percentage Color
+     * @param string|int $color
+     * @return static
+     */
+    public function setLabelColor($color): self {
+        if ($style = $this->styles[$color]) {
+            $this->label->setStyle($style);
+        }
         return $this;
     }
 
     /**
      * Set Label
      * @param string $label
-     * @param string|int|null $color
+     * @param ?int $length Length to reserve to prevent padding
      * @return static
      */
-    public function setLabel(string $label, $color = null): self {
-        $element = new Element();
-        if (
-                is_string($color) and ($style = $this->styles[$color] ?? null)
-        ) {
-            $element->setStyle($style);
+    public function setLabel(string $label, int $length = null): self {
+        $length = $length ?? mb_strlen($label);
+        // to prevent bar padding when changing label
+        if (!empty($label) and mb_strlen($label) < $length) {
+            while (mb_strlen($label) < $length) {
+                $label .= ' ';
+            }
         }
-        $element->setValue($label);
-        $this->label = $element;
+        $this->label->setValue($label);
         return $this;
     }
 
@@ -217,8 +231,11 @@ class Progress implements Renderer, IteratorAggregate {
      * Run the callbacks once
      */
     protected function triggerComplete() {
-        if ($this->complete) {
+        if (!$this->complete && $this->getComplete()) {
+            $this->complete = true;
             $total = $this->total;
+            $this->current = 0;
+            $this->buffer->write("\n");
             while (null !== ($callable = array_shift($this->callbacks))) {
                 call_user_func_array($callable, [$total]);
             }
@@ -283,7 +300,7 @@ class Progress implements Renderer, IteratorAggregate {
         static $term;
         $term = $term ?? Terminal::create();
 
-        if (count($this->buffer) == 0) {
+        if (count($this->buffer) == 0 && !$this->complete) {
             $str = $block = '';
             $len = 0;
 
@@ -336,10 +353,14 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function reset(): self {
-        $this->setCurrent(0);
-        if ($this->rendered) $this->buffer->write("\r" . Ansi::CLEAR_LINE);
+        // sets current to 0, complete to false
+        $this->setTotal($this->total);
+        // unbuild
+        $this->buffer->clear();
+        // removes current line
+        $this->buffer->write("\r" . Ansi::CLEAR_LINE);
+        //renders
         $this->buffer->flush($this->output);
-        $this->rendered = false;
         return $this;
     }
 
@@ -349,10 +370,13 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function end(): self {
-        $this->setCurrent($this->total);
-        if ($this->rendered) $this->buffer->write('\n');
-        $this->buffer->flush($this->output);
-        $this->rendered = false;
+        // don't do anything if already complete
+        if (!$this->complete) {
+            // build and triggers complete
+            $this->setCurrent($this->total);
+            //Render
+            $this->out();
+        }
         return $this;
     }
 
@@ -360,21 +384,22 @@ class Progress implements Renderer, IteratorAggregate {
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-        $this->build();
         $this->buffer->flush($output);
-        $this->rendered = true;
     }
 
     /**
-     * Increments the progress as steps
+     * Increments the progress as steps and render
+     *
      * @return Generator<int,int>
      */
     public function getIterator() {
         $this->setTotal($this->total);
-        for ($i = 0; $i <= $this->total; $i++) {
-            $this->setCurrent($i);
-            $this->out();
-            yield $this->total => $this->current;
+        $i = 1;
+        while ($i <= $this->total) {
+            yield $this->total => $i;
+            $this->setCurrent($i)->out();
+            if ($this->complete) break;
+            $i++;
         }
     }
 

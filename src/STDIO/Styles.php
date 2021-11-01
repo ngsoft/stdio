@@ -168,7 +168,7 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
     /**
      * Creates a new instance
-     * 
+     *
      * @return static
      */
     public static function create(): self {
@@ -231,21 +231,25 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
     /** {@inheritdoc} */
     public function offsetExists($offset) {
-
+        // find style using Color::COLOR
+        if (is_int($offset)) {
+            $color = array_search($offset, self::DEFAULT_COLORS);
+            $offset = $color === false ? null : $color;
+        }
         return
-                is_string($offset) ?
+                !is_string($offset) ?
                 false :
                 isset($this->styles[$offset]);
     }
 
     /** {@inheritdoc} */
     public function &offsetGet($offset) {
+
         // find style using Color::COLOR
         if (is_int($offset)) {
             $color = array_search($offset, self::DEFAULT_COLORS);
             $offset = $color === false ? null : $color;
         }
-
         if (is_null($offset)) $result = null;
         else $result = $this->styles[$offset] ?? null;
         return $result;
