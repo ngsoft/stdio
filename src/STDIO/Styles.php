@@ -123,7 +123,7 @@ use NGSOFT\STDIO\{
  * @method string inverse(string $message) Format message
  * @method string hidden(string $message) Format message
  * @method string striketrough(string $message) Format message
- * 
+ *
  */
 final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
@@ -311,7 +311,7 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
     /** {@inheritdoc} */
     public function __debugInfo() {
-        return [];
+        return array_map(fn($s) => $s->format($s->getName()), $this->styles);
     }
 
 }
