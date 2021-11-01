@@ -36,6 +36,30 @@ use NGSOFT\STDIO\{
  * @property Style $shout
  * @property Style $error
  * @property Style $notice
+ *
+ * @property Style $bgblack
+ * @property Style $bgred
+ * @property Style $bggreen
+ * @property Style $bgyellow
+ * @property Style $bgblue
+ * @property Style $bgpurple
+ * @property Style $bgcyan
+ * @property Style $bgwhite
+ * @property Style $bggray
+ * @property Style $bgbrightred
+ * @property Style $bgbrightgreen
+ * @property Style $bgbrightyellow
+ * @property Style $bgbrightblue
+ * @property Style $bgbrightpurple
+ * @property Style $bgbrightcyan
+ * @property Style $bgbrightwhite
+ * @property Style $bginfo
+ * @property Style $bgcomment
+ * @property Style $bgwhisper
+ * @property Style $bgshout
+ * @property Style $bgerror
+ * @property Style $bgnotice
+ *
  * @property Style $reset
  * @property Style $bold
  * @property Style $dim
@@ -44,6 +68,62 @@ use NGSOFT\STDIO\{
  * @property Style $inverse
  * @property Style $hidden
  * @property Style $striketrough
+ *
+ * @method string black(string $message) Format message
+ * @method string red(string $message) Format message
+ * @method string green(string $message) Format message
+ * @method string yellow(string $message) Format message
+ * @method string blue(string $message) Format message
+ * @method string purple(string $message) Format message
+ * @method string cyan(string $message) Format message
+ * @method string white(string $message) Format message
+ * @method string gray(string $message) Format message
+ * @method string brightred(string $message) Format message
+ * @method string brightgreen(string $message) Format message
+ * @method string brightyellow(string $message) Format message
+ * @method string brightblue(string $message) Format message
+ * @method string brightpurple(string $message) Format message
+ * @method string brightcyan(string $message) Format message
+ * @method string brightwhite(string $message) Format message
+ * @method string info(string $message) Format message
+ * @method string comment(string $message) Format message
+ * @method string whisper(string $message) Format message
+ * @method string shout(string $message) Format message
+ * @method string error(string $message) Format message
+ * @method string notice(string $message) Format message
+ *
+ * @method string bgblack(string $message) Format message
+ * @method string bgred(string $message) Format message
+ * @method string bggreen(string $message) Format message
+ * @method string bgyellow(string $message) Format message
+ * @method string bgblue(string $message) Format message
+ * @method string bgpurple(string $message) Format message
+ * @method string bgcyan(string $message) Format message
+ * @method string bgwhite(string $message) Format message
+ * @method string bggray(string $message) Format message
+ * @method string bgbrightred(string $message) Format message
+ * @method string bgbrightgreen(string $message) Format message
+ * @method string bgbrightyellow(string $message) Format message
+ * @method string bgbrightblue(string $message) Format message
+ * @method string bgbrightpurple(string $message) Format message
+ * @method string bgbrightcyan(string $message) Format message
+ * @method string bgbrightwhite(string $message) Format message
+ * @method string bginfo(string $message) Format message
+ * @method string bgcomment(string $message) Format message
+ * @method string bgwhisper(string $message) Format message
+ * @method string bgshout(string $message) Format message
+ * @method string bgerror(string $message) Format message
+ * @method string bgnotice(string $message) Format message
+ *
+ * @method string reset(string $message) Format message
+ * @method string bold(string $message) Format message
+ * @method string dim(string $message) Format message
+ * @method string italic(string $message) Format message
+ * @method string underline(string $message) Format message
+ * @method string inverse(string $message) Format message
+ * @method string hidden(string $message) Format message
+ * @method string striketrough(string $message) Format message
+ * 
  */
 final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
