@@ -250,7 +250,7 @@ final class Style {
      */
     public function getPrefix(): string {
         //compile prefix
-        if ($this->prefix === null) {
+        if ($this->prefix === null && $this->supported) {
             $prefix = '';
             $params = [];
             if (count($this->formats)) $params = $this->formats;
@@ -261,7 +261,7 @@ final class Style {
             }
             $this->prefix = $prefix;
         }
-        return $this->prefix;
+        return $this->prefix ?? '';
     }
 
     /**
@@ -269,7 +269,7 @@ final class Style {
      * @return string
      */
     public function getSuffix(): string {
-        if ($this->suffix === null) {
+        if ($this->suffix === null && $this->supported) {
             $suffix = '';
             $params = [];
             if (count($this->formats)) {
@@ -286,7 +286,7 @@ final class Style {
 
             $this->suffix = $suffix;
         }
-        return $this->suffix;
+        return $this->suffix ?? '';
     }
 
     /**
@@ -295,7 +295,7 @@ final class Style {
      * @return string
      */
     public function format(string $message): string {
-        return !$this->supported ? $message : sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
+        return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
     }
 
 }

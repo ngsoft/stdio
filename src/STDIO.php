@@ -305,7 +305,7 @@ final class STDIO implements Ansi, Colors, Formats {
         return $this;
     }
 
-    ////////////////////////////   Utils  ////////////////////////////
+    ////////////////////////////   Extra Features  ////////////////////////////
 
     /**
      * Draw a Rectangle
