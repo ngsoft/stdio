@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Utils;
 
 use NGSOFT\{
-    STDIO, STDIO\Interfaces\Buffer, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Styles, STDIO\Styles\Style, STDIO\Terminal
+    STDIO, STDIO\Interfaces\Output, STDIO\Interfaces\Renderer, STDIO\Outputs\OutputBuffer, STDIO\Styles, STDIO\Styles\Style, STDIO\Terminal
 };
 use function mb_strlen;
 
@@ -17,7 +17,7 @@ class Rect implements Renderer {
     /** @var Styles */
     protected $styles;
 
-    /** @var Buffer */
+    /** @var OutputBuffer */
     protected $buffer;
 
     /** @var Style */
@@ -26,51 +26,51 @@ class Rect implements Renderer {
     /** @var Style */
     protected $background;
 
-    /** @var int */
-    protected $padding = 2;
+    /** @var Style */
+    protected $emptyStyle;
 
     /** @var STDIO */
     protected $stdio;
 
     /** @var int */
-    protected $maxLength;
+    protected $length;
 
     /** @var int */
-    protected $minLength;
-
-    /** @var int */
-    protected $marginLeft;
+    protected $marginLeft = 2;
 
     public function __construct(
             STDIO $stdio = null
     ) {
+
         $stdio = $stdio ?? STDIO::create();
+        $this->emptyStyle = $this->background = $this->color = new Style(false);
         $this->stdio = $stdio;
         $this->term = $stdio->getTerminal();
         $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
-        $this->setMinLength(0);
-        $this->setMaxLength(64);
-        $this->setMarginLeft(2);
+
+        $this->setLength(56);
     }
 
     /**
      * Set Text Color
-     * @param string $color
+     * @param string|int $color
      * @return static
      */
-    public function setColor(string $color): self {
-        if (isset($this->styles[$color])) $this->color = $this->styles[$color];
+    public function setColor($color): self {
+        $this->color = $this->styles[$color] ?? $this->emptyStyle;
         return $this;
     }
 
     /**
      * Set Background Color
-     * @param string $color
+     * @param string|int $color
      * @return static
      */
-    public function setBackground(string $color): self {
-        if (isset($this->styles["bg$color"])) $this->background = $this->styles["bg$color"];
+    public function setBackground($color): self {
+        if (is_int($color) && $style = $this->styles[$color]) $color = $style->getName();
+        if (is_string($color) && strpos($color, 'bg') !== 0) $color = "bg$color";
+        $this->background = $this->styles[$color] ?? $this->emptyStyle;
         return $this;
     }
 
@@ -85,27 +85,6 @@ class Rect implements Renderer {
     }
 
     /**
-     * Set Styles
-     * @param Styles $styles
-     * @return static
-     */
-    public function setStyles(Styles $styles): self {
-        $this->styles = $styles;
-        return $this;
-    }
-
-    /**
-     * Set Line Padding
-     *
-     * @param int $padding
-     * @return static
-     */
-    public function setPadding(int $padding): self {
-        $this->padding = $padding;
-        return $this;
-    }
-
-    /**
      * Set left margin
      * @param int $marginLeft
      * @return $this
@@ -116,25 +95,65 @@ class Rect implements Renderer {
     }
 
     /**
-     * Set Line Max Length
+     * Set Rectange line length (with padding)
      *
      * @param int $maxLength
      * @return self
      */
-    public function setMaxLength(int $maxLength): self {
-        $this->maxLength = min($maxLength, $this->term->width);
+    public function setLength(int $maxLength): self {
+        $this->length = min($maxLength, $this->term->width);
         return $this;
     }
 
     /**
-     * Set Line Min Length
+     * Cut string at length, also add spaces to get the right length
      *
-     * @param int $minLength
-     * @return $this
+     * @param string $string
+     * @param int $lineLength
+     * @return array
      */
-    public function setMinLength(int $minLength) {
-        $this->minLength = min($minLength, $this->term->width);
-        return $this;
+    protected function cutString(string $string, int $lineLength): array {
+        $result = [];
+
+        // -2 to get a padding before and after the line
+        $length = $lineLength - 2;
+
+        if (mb_strlen($string) > $length) {
+            //cut words at tab, spaces ...
+            $words = preg_split('/\h+/', $string);
+
+            $line = '';
+            foreach ($words as $index => $word) {
+                if (mb_strlen($line . " $word") > $length) {
+                    $result[] = $line;
+                    $line = '';
+                }
+                $line .= !empty($line) ? " $word" : $word;
+                if (!array_key_exists($index + 1, $words)) {
+                    $result[] = $line;
+                }
+            }
+        } else $result[] = $string;
+
+        // center the lines
+        foreach ($result as $index => $line) {
+            $len = mb_strlen($line);
+            if ($len < $lineLength) {
+                $repeatLeft = max(0, (int) ceil(($lineLength - $len) / 2));
+                $repeatRight = max(0, $lineLength - $len - $repeatLeft);
+                for ($i = 0; $i < $repeatLeft; $i++) {
+                    $line = " $line";
+                }
+                for ($i = 0; $i < $repeatRight; $i++) {
+                    $line = "$line ";
+                }
+            }
+
+            $result[$index] = $line;
+        }
+
+
+        return $result;
     }
 
     /**
@@ -143,80 +162,53 @@ class Rect implements Renderer {
      * @return string
      */
     protected function build(): string {
-
         if (count($this->buffer) == 0) return '';
+        $lines = [''];
 
-        $result = [''];
+        $clear = $this->styles->reset->getSuffix();
+        $length = $this->length;
 
-        $prefix = $suffix = $clear = '';
-        if ($this->term->hasColorSupport()) {
-            $clear = $this->styles->reset->getSuffix();
-            if ($this->color instanceof Style) {
-                $prefix .= $this->color->getPrefix();
-                $suffix .= $this->color->getSuffix();
-            }
+        $header = $this->cutString('', $length)[0];
 
-            if ($this->background instanceof Style) {
-                $prefix .= $this->background->getPrefix();
-                $suffix .= $this->background->getSuffix();
+        $rect = [$header];
+        foreach ($this->buffer as $bufferLine) {
+            foreach ($this->cutString($bufferLine, $length) as $l) {
+                $rect[] = $l;
             }
         }
-
-        $max = 0;
-
-        $rect = [''];
-        foreach ($this->buffer as $line) {
-            $len = mb_strlen($line);
-            $max = $len > $max ? $len : $max;
-            $rect[] = $line;
-        }
-        $rect[] = '';
-
-        $maxlen = min($this->maxLength, $max);
-        if ($this->minLength > 0) $maxlen = max($maxlen, $this->minLength);
-
-        $available = $this->term->width - $maxlen;
-        //padding
-        $padding = 0;
-        if ($available > ($this->padding * 2)) {
-            $padding = $this->padding;
-            $available -= $padding * 2;
-        }
-        //margin
-        $marginLeft = 0;
-        if ($available > $this->marginLeft) $marginLeft = $this->marginLeft;
+        $rect[] = $header;
+        $available = $this->term->width - $length;
+        if ($this->marginLeft > 0) $margin = $available > $this->marginLeft ? $this->marginLeft : max(0, $available - 2);
+        else $margin = 0;
 
         foreach ($rect as $line) {
+            // removes all styles
             $message = $clear;
-            if ($marginLeft > 0) $message .= str_repeat(' ', $marginLeft);
-            $len = mb_strlen($line);
-            $repeatLeft = (int) ceil(($maxlen - $len) / 2);
-            $repeatRight = $maxlen - $len - $repeatLeft;
-            $message .= $prefix;
-            if ($padding > 0) $message .= str_repeat(' ', $padding);
-            if ($repeatLeft > 0) $message .= str_repeat(' ', $repeatLeft);
-            $message .= $line;
-            if ($repeatRight > 0) $message .= str_repeat(' ', $repeatRight);
-            if ($padding > 0) $message .= str_repeat(' ', $padding);
-            $message .= $suffix;
-            $result[] = $message;
+            //margin
+            for ($i = 0; $i < $margin; $i++) {
+                $message .= ' ';
+            }
+            // add styles to line
+            $message .= $this->color->format($this->background->format($line));
+            $lines[] = $message;
         }
-        return implode("\n", $result) . "\n";
+
+        return implode("\n", $lines) . "\n";
     }
 
     /** {@inheritdoc} */
     public function render(Output $output) {
-        $text = $this->build();
-        $output->write($text);
-        $output->write("\n");
-        $this->buffer->clear();
+        if (count($this->buffer) > 0) {
+            $text = $this->build();
+            $output->write($text);
+            $this->buffer->clear();
+        }
     }
 
     /**
      * @param string $message
      */
     protected function bufferMessage(string $message) {
-
         $message = explode("\n", $message);
         foreach ($message as $line) {
             $this->write($line);
@@ -230,7 +222,10 @@ class Rect implements Renderer {
      * @return static
      */
     public function out(string $message = null): self {
-        if (is_string($message)) $this->bufferMessage($message);
+        if (is_string($message)) {
+            $this->buffer->clear();
+            $this->bufferMessage($message);
+        }
         if (count($this->buffer) > 0) $this->render($this->stdio->getOutput());
         return $this;
     }
@@ -242,7 +237,10 @@ class Rect implements Renderer {
      * @return static
      */
     public function err(string $message = null) {
-        if (is_string($message)) $this->bufferMessage($message);
+        if (is_string($message)) {
+            $this->buffer->clear();
+            $this->bufferMessage($message);
+        }
         if (count($this->buffer) > 0) $this->render($this->stdio->getErrorOutput());
         return $this;
     }
