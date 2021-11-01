@@ -10,7 +10,18 @@ use RuntimeException;
  * @property-read int $width Terminal Width
  * @property-read int $height Terminal Height
  */
-class Terminal {
+final class Terminal {
+
+    /**
+     * Get unique instance
+     * @staticvar Terminal $instance
+     * @return static
+     */
+    public static function create(): self {
+        static $instance;
+        $instance = $instance ?? new static();
+        return $instance;
+    }
 
     public function __construct() {
         if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
@@ -78,19 +89,25 @@ class Terminal {
      * @return bool true if the stream supports colorization, false otherwise
      */
     public function hasColorSupport() {
-        $stream = fopen("php://stdout", "w");
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return
-                    (function_exists('sapi_windows_vt100_support') and @ sapi_windows_vt100_support($stream))
-                    or false !== getenv('ANSICON')
-                    or 'ON' === getenv('ConEmuANSI')
-                    or preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false;
+
+        static $result;
+
+        if (is_null($result)) {
+            $stream = fopen("php://stdout", "w");
+            if (DIRECTORY_SEPARATOR === '\\') {
+                return $result = (function_exists('sapi_windows_vt100_support') and @ sapi_windows_vt100_support($stream))
+                        or false !== getenv('ANSICON')
+                        or 'ON' === getenv('ConEmuANSI')
+                        or preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false;
+            }
+            if (function_exists('stream_isatty')) return $result = @stream_isatty($stream);
+            if (function_exists('posix_isatty')) return $result = @posix_isatty($stream);
+            $stat = @fstat($stream);
+            // Check if formatted mode is S_IFCHR
+            return $result = $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
         }
-        if (function_exists('stream_isatty')) return @stream_isatty($stream);
-        if (function_exists('posix_isatty')) return @posix_isatty($stream);
-        $stat = @fstat($stream);
-        // Check if formatted mode is S_IFCHR
-        return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+
+        return $result;
     }
 
     public function __get($name) {

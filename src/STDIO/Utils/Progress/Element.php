@@ -63,6 +63,7 @@ class Element implements Countable, Stringable {
     /** {@inheritdoc} */
     public function __toString() {
         $value = $this->value;
+
         if (
                 $this->style and
                 mb_strlen($value) > 0 and

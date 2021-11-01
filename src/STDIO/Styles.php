@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO;
 
+use ArrayAccess,
+    BadMethodCallException,
+    Countable,
+    InvalidArgumentException,
+    IteratorAggregate;
 use NGSOFT\STDIO\{
-    Interfaces\Colors, Interfaces\Formats, Styles\Style, Utils\ArrayObject
+    Interfaces\Colors, Interfaces\Formats, Styles\Style
 };
 
 /**
@@ -40,9 +45,9 @@ use NGSOFT\STDIO\{
  * @property Style $hidden
  * @property Style $striketrough
  */
-class Styles extends ArrayObject {
+final class Styles implements IteratorAggregate, Countable, ArrayAccess {
 
-    const DEFAULT_COLORS = [
+    protected const DEFAULT_COLORS = [
         'black' => Colors::BLACK,
         'red' => Colors::RED,
         'green' => Colors::GREEN,
@@ -67,7 +72,7 @@ class Styles extends ArrayObject {
         'error' => Colors::BRIGHTRED,
         'notice' => Colors::CYAN,
     ];
-    const DEFAULT_FORMATS = [
+    protected const DEFAULT_FORMATS = [
         'reset' => Formats::RESET,
         'bold' => Formats::BOLD,
         'dim' => Formats::DIM,
@@ -78,8 +83,16 @@ class Styles extends ArrayObject {
         'striketrough' => Formats::STRIKETROUGH,
     ];
 
+    /** @var array<string,Style> */
+    private $styles = [];
+
+    /**
+     * @staticvar array $build
+     */
     public function __construct() {
-        parent::__construct($this->build());
+        static $build;
+        $build = $build ?? $this->build(Terminal::create()->hasColorSupport());
+        $this->styles = $build;
     }
 
     /**
@@ -98,9 +111,9 @@ class Styles extends ArrayObject {
      * @suppress PhanAccessMethodInternal
      * @return array
      */
-    private function build(): array {
+    private function build(bool $supportsColors): array {
         $result = [];
-        $style = new Style();
+        $style = new Style($supportsColors);
 
         foreach (self::DEFAULT_COLORS as $name => $code) {
             //color
@@ -123,6 +136,102 @@ class Styles extends ArrayObject {
                     ->compile();
         }
         return $result;
+    }
+
+    ////////////////////////////   Interfaces   ////////////////////////////
+
+    /** {@inheritdoc} */
+    public function offsetExists($offset) {
+
+        return
+                is_string($offset) ?
+                false :
+                isset($this->styles[$offset]);
+    }
+
+    /** {@inheritdoc} */
+    public function &offsetGet($offset) {
+        // find style using Color::COLOR
+        if (is_int($offset)) {
+            $color = array_search($offset, self::DEFAULT_COLORS);
+            $offset = $color === false ? null : $color;
+        }
+
+        if (is_null($offset)) $result = null;
+        else $result = $this->styles[$offset] ?? null;
+        return $result;
+    }
+
+    /** {@inheritdoc} */
+    public function offsetSet($offset, $value) {
+        if ($value instanceof Style and is_string($offset)) {
+            $this->styles[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->styles[$offset]);
+    }
+
+    public function count() {
+        return count($this->styles);
+    }
+
+    /**
+     * @return \Generator<string,Style>
+     */
+    public function getIterator() {
+        foreach ($this->styles as $name => $style) yield $name => $style;
+    }
+
+    ////////////////////////////   Magic Methods   ////////////////////////////
+
+    /**
+     * Access Format directly
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return string
+     * @throws InvalidArgumentException
+     * @throws BadMethodCallException
+     */
+    public function __call($method, $arguments) {
+        if (!isset($arguments[0]) or!is_string($arguments[0])) throw new InvalidArgumentException('No argument given for ' . get_class($this) . '::' . $method . '()');
+        elseif (!isset($this->styles[$method])) throw new BadMethodCallException("Method " . get_class($this) . "$method() does not exists");
+        return $this->styles[$method]->format($arguments[0]);
+    }
+
+    /** {@inheritdoc} */
+    public function __clone() {
+        foreach ($this->styles as $name => $style) {
+            $this->styles[$name] = clone $style;
+        }
+    }
+
+    /** {@inheritdoc} */
+    public function &__get($name) {
+        $value = $this->offsetGet($name);
+        return $value;
+    }
+
+    /** {@inheritdoc} */
+    public function __isset($name) {
+        return $this->offsetExists($name);
+    }
+
+    /** {@inheritdoc} */
+    public function __set($name, $value) {
+        $this->offsetSet($name, $value);
+    }
+
+    /** {@inheritdoc} */
+    public function __unset($name) {
+        $this->offsetUnset($name);
+    }
+
+    /** {@inheritdoc} */
+    public function __debugInfo() {
+        return [];
     }
 
 }

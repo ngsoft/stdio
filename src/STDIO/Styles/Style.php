@@ -29,6 +29,13 @@ final class Style {
     /** @var string|null */
     private $suffix;
 
+    /** @var bool */
+    private $supported;
+
+    public function __construct(bool $supported) {
+        $this->supported = $supported;
+    }
+
     ////////////////////////////   Configurators   ////////////////////////////
 
     /**
@@ -266,7 +273,7 @@ final class Style {
             $suffix = '';
             $params = [];
             if (count($this->formats)) {
-                $params = array_map(function($val) {
+                $params = array_map(function ($val) {
                     return Formats::FORMAT_UNSET[$val];
                 }, $this->formats);
             }
@@ -288,7 +295,7 @@ final class Style {
      * @return string
      */
     public function format(string $message): string {
-        return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
+        return !$this->supported ? $message : sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
     }
 
 }

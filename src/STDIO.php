@@ -86,8 +86,8 @@ final class STDIO implements Ansi, Colors, Formats {
     }
 
     public function __construct() {
-        $this->terminal = new Terminal();
-        $this->supportsColors = $this->terminal->hasColorSupport();
+        $terminal = $this->terminal = Terminal::create();
+        $this->supportsColors = $terminal->hasColorSupport();
         $this->input = new StreamInput();
         $this->output = new StreamOutput();
         $this->errorOutput = new ErrorStreamOutput();
