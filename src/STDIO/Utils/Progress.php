@@ -116,14 +116,13 @@ class Progress implements Renderer, IteratorAggregate {
      * @return static
      */
     public function setTotal(int $total): self {
-        $this->current = 0;
         $total = max(1, $total);
         $this->total = $total;
         /** @var ProgressElement $element */
         foreach ($this->getElements() as $element) {
-            $element->setCurrent(0);
             $element->setTotal($total);
         }
+        $this->setCurrent(0);
         return $this;
     }
 
@@ -138,10 +137,7 @@ class Progress implements Renderer, IteratorAggregate {
         foreach ($this->getElements() as $element) {
             $element->setCurrent($current);
         }
-        if ($this->getComplete() === true) {
-            $this->triggerComplete();
-        }
-
+        if ($this->getComplete()) $this->triggerComplete();
         return $this;
     }
 
@@ -333,13 +329,17 @@ class Progress implements Renderer, IteratorAggregate {
     }
 
     /**
-     * Reset progress to 0
+     * Reset progress to 0 and set to erase the line
      * @return self
      */
     public function reset(): self {
         $this->setCurrent(0);
         $this->buffer->write("\r" . Ansi::CLEAR_LINE);
         return $this;
+    }
+
+    public function end(): self {
+        $this->setCurrent($this->total);
     }
 
     ////////////////////////////   Interfaces   ////////////////////////////

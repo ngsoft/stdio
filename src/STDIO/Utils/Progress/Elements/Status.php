@@ -14,7 +14,7 @@ class Status extends ProgressElement {
         $total = (string) $this->total;
         $current = (string) $this->current;
         while (strlen($current) < strlen($total)) {
-            $current = "0$current";
+            $current = " $current";
         }
         $str = sprintf('[%s/%s]', $current, $total);
         return $element->setValue($str);
