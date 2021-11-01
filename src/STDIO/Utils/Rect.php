@@ -48,7 +48,7 @@ class Rect implements Renderer {
         $this->term = $stdio->getTerminal();
         $this->styles = $stdio->getStyles();
         $this->buffer = new OutputBuffer();
-
+        //now fixed length to prevent staircase effect
         $this->setLength(56);
     }
 
@@ -168,6 +168,7 @@ class Rect implements Renderer {
         $clear = $this->styles->reset->getSuffix();
         $length = $this->length;
 
+        //add formatted line before and after to get a y padding(just spaces)
         $header = $this->cutString('', $length)[0];
 
         $rect = [$header];
