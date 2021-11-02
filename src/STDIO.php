@@ -79,6 +79,11 @@ final class STDIO implements Ansi, Colors, Formats {
         return $this->out($message);
     }
 
+    /** {@inheritdoc} */
+    public function __debugInfo() {
+        return [];
+    }
+
     ////////////////////////////   GETTERS   ////////////////////////////
 
     /**
@@ -224,7 +229,6 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->buffer->clear();
             $this->writeln($message);
         }
-        if ($this->supportsColors) $this->buffer->write($this->styles->reset->getSuffix());
         $this->buffer->flush($this->getOutput());
         return $this;
     }
@@ -239,7 +243,6 @@ final class STDIO implements Ansi, Colors, Formats {
             $this->buffer->clear();
             $this->writeln($message);
         }
-        if ($this->supportsColors) $this->buffer->write($this->styles['reset']->getSuffix());
         $this->buffer->flush($this->getErrorOutput());
         return $this;
     }
