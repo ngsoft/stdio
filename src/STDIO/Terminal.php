@@ -23,7 +23,7 @@ final class Terminal {
         return $instance;
     }
 
-    protected static function readFromProcess(string $command): ?string {
+    private static function readFromProcess(string $command): ?string {
 
         if (!function_exists('proc_open')) {
             return null;
@@ -53,7 +53,7 @@ final class Terminal {
         return $result;
     }
 
-    protected static function getSize(): ?string {
+    private static function getSize(): ?string {
         if (DIRECTORY_SEPARATOR === '\\') {
             if ($out = self::readFromProcess('mode con /status')) {
                 $out = explode("\n", $out);
@@ -112,9 +112,7 @@ final class Terminal {
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    public function hasColorSupport() {
-
-        var_dump(getenv('TERM'));
+    public function hasColorSupport(): bool {
 
         static $result;
 
@@ -139,7 +137,7 @@ final class Terminal {
     }
 
     public function __get($name) {
-        if (!in_array($name, ['width', 'height'])) throw new RuntimeException("Invalid index $name.");
+        if (!in_array($name, ['width', 'height'])) throw new RuntimeException("Invalid property $name.");
         $method = sprintf('get%s', ucfirst($name));
         return $this->{$method}();
     }
