@@ -194,7 +194,7 @@ class Rect implements Renderer {
             $lines[] = $message;
         }
 
-        if (!empty($lines)) $lines[] = '';
+        $lines[] = '';
 
         return implode("\n", $lines) . "\n";
     }

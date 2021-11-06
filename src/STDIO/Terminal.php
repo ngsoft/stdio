@@ -121,7 +121,8 @@ final class Terminal {
 
             $stream = fopen("php://stdout", "w");
             if (DIRECTORY_SEPARATOR === '\\') {
-                return $result = (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream))
+                return
+                        $result = (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream))
                         or false !== getenv('ANSICON')
                         or 'ON' === getenv('ConEmuANSI')
                         or preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false;
@@ -137,9 +138,21 @@ final class Terminal {
     }
 
     public function __get($name) {
-        if (!in_array($name, ['width', 'height'])) throw new RuntimeException("Invalid property $name.");
         $method = sprintf('get%s', ucfirst($name));
+        if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
         return $this->{$method}();
+    }
+
+    public function __set($name, $value) {
+
+    }
+
+    public function __isset($name) {
+        return method_exists($this, sprintf('get%s', ucfirst($name)));
+    }
+
+    public function __unset($name) {
+
     }
 
 }

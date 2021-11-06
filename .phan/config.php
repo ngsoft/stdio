@@ -63,6 +63,7 @@ return [
         'PhanPluginDescriptionlessCommentOnPrivateMethod',
         // TODO: Fix edge cases in --automatic-fix for PhanPluginRedundantClosureComment
         'PhanPluginRedundantClosureComment',
-        'PhanTypeInstantiateTraitStaticOrSelf'
+        'PhanTypeInstantiateTraitStaticOrSelf',
+        'PhanUnusedPublicFinalMethodParameter'
     ]
 ];
