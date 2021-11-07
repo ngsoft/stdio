@@ -122,7 +122,7 @@ final class Terminal {
             $stream = fopen("php://stdout", "w");
             if (DIRECTORY_SEPARATOR === '\\') {
                 return
-                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false or
+                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') > 0 or
                         false !== getenv('ANSICON') or
                         'ON' === getenv('ConEmuANSI') or
                         (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream));

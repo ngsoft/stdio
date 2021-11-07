@@ -53,6 +53,7 @@ class Tags implements Formatter {
 
     private function build(Styles $styles) {
         $this->tags = [];
+        if (!$this->term->hasColorSupport()) return;
         $tags = &$this->tags;
 
         foreach ($styles as $name => $style) {
@@ -62,8 +63,10 @@ class Tags implements Formatter {
         }
     }
 
-    public function __construct() {
+    public function __construct(Styles $styles = null) {
         $this->specials = new SpecialTags();
+        $this->setTerminal(Terminal::create());
+        $styles && $this->setStyles($styles);
     }
 
 }
