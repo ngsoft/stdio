@@ -122,10 +122,10 @@ final class Terminal {
             $stream = fopen("php://stdout", "w");
             if (DIRECTORY_SEPARATOR === '\\') {
                 return
-                        $result = (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream))
-                        or false !== getenv('ANSICON')
-                        or 'ON' === getenv('ConEmuANSI')
-                        or preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false;
+                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') !== false or
+                        false !== getenv('ANSICON') or
+                        'ON' === getenv('ConEmuANSI') or
+                        (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream));
             }
             if (function_exists('stream_isatty')) return $result = @stream_isatty($stream);
             if (function_exists('posix_isatty')) return $result = @posix_isatty($stream);
@@ -137,18 +137,18 @@ final class Terminal {
         return $result;
     }
 
+    public function __isset($name) {
+        return method_exists($this, sprintf('get%s', ucfirst($name)));
+    }
+
     public function __get($name) {
         $method = sprintf('get%s', ucfirst($name));
         if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
-        return $this->{$method}();
+        return call_user_func([$this, $method]);
     }
 
     public function __set($name, $value) {
 
-    }
-
-    public function __isset($name) {
-        return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
     public function __unset($name) {

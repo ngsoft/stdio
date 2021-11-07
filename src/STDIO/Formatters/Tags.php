@@ -32,7 +32,6 @@ class Tags implements Formatter {
 
     /** {@inheritdoc} */
     public function format(string $message): string {
-
         $message = $this->specials->format($message);
         $message = str_replace(array_keys($this->tags), array_values($this->tags), $message);
         $message = strip_tags($message); //removes not managed tags

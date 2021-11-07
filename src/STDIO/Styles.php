@@ -30,12 +30,17 @@ use NGSOFT\STDIO\{
  * @property Style $brightpurple
  * @property Style $brightcyan
  * @property Style $brightwhite
+ * @property Style $emergency
+ * @property Style $alert
+ * @property Style $critical
+ * @property Style $error
+ * @property Style $warning
+ * @property Style $notice
  * @property Style $info
+ * @property Style $debug
  * @property Style $comment
  * @property Style $whisper
  * @property Style $shout
- * @property Style $error
- * @property Style $notice
  *
  * @property Style $bgblack
  * @property Style $bgred
@@ -53,12 +58,6 @@ use NGSOFT\STDIO\{
  * @property Style $bgbrightpurple
  * @property Style $bgbrightcyan
  * @property Style $bgbrightwhite
- * @property Style $bginfo
- * @property Style $bgcomment
- * @property Style $bgwhisper
- * @property Style $bgshout
- * @property Style $bgerror
- * @property Style $bgnotice
  *
  * @property Style $reset
  * @property Style $bold
@@ -85,12 +84,17 @@ use NGSOFT\STDIO\{
  * @method string brightpurple(string $message) Format message
  * @method string brightcyan(string $message) Format message
  * @method string brightwhite(string $message) Format message
+ * @method string emergency(string $message) Format message
+ * @method string alert(string $message) Format message
+ * @method string critical(string $message) Format message
+ * @method string error(string $message) Format message
+ * @method string warning(string $message) Format message
+ * @method string notice(string $message) Format message
  * @method string info(string $message) Format message
+ * @method string debug(string $message) Format message
  * @method string comment(string $message) Format message
  * @method string whisper(string $message) Format message
  * @method string shout(string $message) Format message
- * @method string error(string $message) Format message
- * @method string notice(string $message) Format message
  *
  * @method string bgblack(string $message) Format message
  * @method string bgred(string $message) Format message
@@ -108,12 +112,6 @@ use NGSOFT\STDIO\{
  * @method string bgbrightpurple(string $message) Format message
  * @method string bgbrightcyan(string $message) Format message
  * @method string bgbrightwhite(string $message) Format message
- * @method string bginfo(string $message) Format message
- * @method string bgcomment(string $message) Format message
- * @method string bgwhisper(string $message) Format message
- * @method string bgshout(string $message) Format message
- * @method string bgerror(string $message) Format message
- * @method string bgnotice(string $message) Format message
  *
  * @method string reset(string $message) Format message
  * @method string bold(string $message) Format message
@@ -144,13 +142,19 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
         'brightpurple' => Colors::BRIGHTPURPLE,
         'brightcyan' => Colors::BRIGHTCYAN,
         'brightwhite' => Colors::BRIGHTWHITE,
-        //custom
-        'info' => Colors::GREEN,
-        'comment' => Colors::YELLOW,
-        'whisper' => Colors::WHITE,
-        'shout' => Colors::RED,
-        'error' => Colors::BRIGHTRED,
-        'notice' => Colors::CYAN,
+    ];
+    protected const CUSTOM_COLORS = [
+        'emergency' => [Colors::YELLOW, Colors::RED, Formats::BOLD],
+        'alert' => [Colors::RED, null, Formats::BOLD],
+        'critical' => [Colors::RED, null, Formats::BOLD],
+        'error' => [Colors::RED, null, null],
+        'warning' => [Colors::YELLOW, null, null],
+        'notice' => [Colors::CYAN, null, null],
+        'info' => [Colors::CYAN, null, null],
+        'debug' => [Colors::PURPLE, null, null],
+        'comment' => [Colors::YELLOW, null, null],
+        'whisper' => [Colors::WHITE, null, Formats::DIM],
+        'shout' => [Colors::RED, null, Formats::BOLD],
     ];
     protected const DEFAULT_FORMATS = [
         'reset' => Formats::RESET,
@@ -216,6 +220,16 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
                     ->withName("bg$name")
                     ->withBackground($code)
                     ->compile();
+        }
+
+
+        foreach (self::CUSTOM_COLORS as $name => $codes) {
+            list($color, $bg, $format) = $codes;
+            $custom = $style->withName($name);
+            if (is_int($color)) $custom = $custom->withColor($color);
+            if (is_int($bg)) $custom = $custom->withBackground($bg);
+            if (is_int($format)) $custom = $custom->withFormats([$format]);
+            $result[$name] = $custom->compile();
         }
 
         foreach (self::DEFAULT_FORMATS as $name => $code) {
