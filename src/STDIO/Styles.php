@@ -159,8 +159,10 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
     protected const DEFAULT_FORMATS = [
         'reset' => Formats::RESET,
         'bold' => Formats::BOLD,
+        'b' => Formats::BOLD,
         'dim' => Formats::DIM,
         'italic' => Formats::ITALIC,
+        'i' => Formats::ITALIC,
         'underline' => Formats::UNDERLINE,
         'inverse' => Formats::INVERSE,
         'hidden' => Formats::HIDDEN,
@@ -223,6 +225,14 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
         }
 
 
+
+        foreach (self::DEFAULT_FORMATS as $name => $code) {
+            $result[$name] = $style
+                    ->withName($name)
+                    ->withFormats([$code])
+                    ->compile();
+        }
+
         foreach (self::CUSTOM_COLORS as $name => $codes) {
             list($color, $bg, $format) = $codes;
             $custom = $style->withName($name);
@@ -232,12 +242,6 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
             $result[$name] = $custom->compile();
         }
 
-        foreach (self::DEFAULT_FORMATS as $name => $code) {
-            $result[$name] = $style
-                    ->withName($name)
-                    ->withFormats([$code])
-                    ->compile();
-        }
         return $result;
     }
 
