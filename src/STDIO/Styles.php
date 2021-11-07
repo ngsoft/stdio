@@ -144,17 +144,17 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
         'brightwhite' => Colors::BRIGHTWHITE,
     ];
     protected const CUSTOM_COLORS = [
-        'emergency' => [Colors::YELLOW, Colors::RED, Formats::BOLD],
-        'alert' => [Colors::RED, null, Formats::BOLD],
-        'critical' => [Colors::RED, null, Formats::BOLD],
+        'emergency' => [Colors::YELLOW, Colors::RED, [Formats::BOLD]],
+        'alert' => [Colors::RED, null, [Formats::BOLD]],
+        'critical' => [Colors::RED, null, [Formats::BOLD]],
         'error' => [Colors::RED, null, null],
         'warning' => [Colors::YELLOW, null, null],
         'notice' => [Colors::CYAN, null, null],
         'info' => [Colors::CYAN, null, null],
         'debug' => [Colors::PURPLE, null, null],
         'comment' => [Colors::YELLOW, null, null],
-        'whisper' => [Colors::WHITE, null, Formats::DIM],
-        'shout' => [Colors::RED, null, Formats::BOLD],
+        'whisper' => [Colors::WHITE, null, [Formats::DIM]],
+        'shout' => [Colors::RED, null, [Formats::BOLD]],
     ];
     protected const DEFAULT_FORMATS = [
         'reset' => Formats::RESET,
@@ -238,7 +238,7 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
             $custom = $style->withName($name);
             if (is_int($color)) $custom = $custom->withColor($color);
             if (is_int($bg)) $custom = $custom->withBackground($bg);
-            if (is_int($format)) $custom = $custom->withFormats([$format]);
+            if (is_array($format)) $custom = $custom->withFormats($format);
             $result[$name] = $custom->compile();
         }
 
