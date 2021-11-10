@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Interfaces;
 
-use NGSOFT\STDIO\{
-    Styles, Terminal
-};
-
 interface Formatter {
 
     /**

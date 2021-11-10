@@ -17,6 +17,8 @@ interface Tag {
     public function getName(): string;
 
     /**
+     * Replaces the tag by the formated output
+     * 
      * @param array<string,mixed> $params
      * @return string Formatted output
      */

@@ -5,21 +5,25 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Interfaces\Formatter, Styles, Terminal
+    Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Space, Formatters\Tags\Tab, Interfaces\Formatter, Interfaces\Tag, Styles
 };
 
 class TagFormatter implements Formatter {
 
+    protected const BUILTIN_TAGS = [
+        Space::class,
+        Tab::class,
+        BR::class,
+        HR::class,
+    ];
+
     /** @var Styles */
     protected $styles;
-
-    /** @var Terminal */
-    protected $term;
 
     /** @var array<string,string> */
     protected $tags = [];
 
-    /** @var Tag[] */
+    /** @var array<string,Tag> */
     protected $formatTags = [];
 
     /** @var array<string,string> */
@@ -33,7 +37,9 @@ class TagFormatter implements Formatter {
     /** @param ?Styles $styles */
     public function __construct(Styles $styles = null) {
         $this->styles = $styles ?? new Styles();
-        $this->term = Terminal::create();
+        foreach (self::BUILTIN_TAGS as $className) {
+            $this->addTag(new $className());
+        }
     }
 
     /** {@inheritdoc} */
@@ -46,47 +52,19 @@ class TagFormatter implements Formatter {
         return $message;
     }
 
+    ////////////////////////////   Tags   ////////////////////////////
+
+    /**
+     * Adds a Format Tag
+     * @param Tag $tag
+     * @return static
+     */
+    public function addTag(Tag $tag) {
+        $this->formatTags[$tag->getName()] = $tag;
+        return $this;
+    }
+
     ////////////////////////////   Utils   ////////////////////////////
-
-    /**
-     * Add Spaces
-     * @param int $repeat
-     * @return string
-     */
-    public function space(int $repeat = 1): string {
-        $repeat = max(1, $repeat);
-        return str_repeat(" ", $repeat);
-    }
-
-    /**
-     * Adds Separator
-     * @param string $char
-     * @return string
-     */
-    public function hr(string $char = "-"): string {
-        $width = $this->term->width;
-        return sprintf("\n  %s  \n", str_repeat($char, $width - 4));
-    }
-
-    /**
-     * Adds Line Break
-     * @param int $repeat
-     * @return string
-     */
-    public function br(int $repeat = 1): string {
-        $repeat = max(1, $repeat);
-        return str_repeat("\n", $repeat);
-    }
-
-    /**
-     * Adds Tabs
-     * @param int $repeat
-     * @return string
-     */
-    public function tab(int $repeat = 1): string {
-        $repeat = max(1, $repeat);
-        return str_repeat("\t", $repeat);
-    }
 
     /**
      * Build the tags
@@ -104,7 +82,7 @@ class TagFormatter implements Formatter {
     }
 
     /**
-     *
+     * Format using Tag
      */
     private function formatExtraTags(string $message): string {
 
@@ -119,7 +97,7 @@ class TagFormatter implements Formatter {
             $params = [];
 
             $extra = $matches['extra'] ?? null;
-            $tag = $matches['tag'];
+            $tag = strtolower($matches['tag']);
 
             if (is_string($extra)) {
                 if (preg_match_all('/(\w+)\=[\'\"]*([\w\-]+)[\'\"]*/', $extra, $out) !== false) {
@@ -127,22 +105,9 @@ class TagFormatter implements Formatter {
                     $params = array_combine($keys, $values);
                 }
             }
+            $params['closing'] = $closing;
 
-            var_dump($params);
-
-            $repeat = isset($params['repeat']) && is_numeric($params['repeat']) ? intval($params['repeat']) : 1;
-            $char = isset($params['char']) ? $params['char'] : '-';
-
-            switch ($tag) {
-                case "space":
-                    return $this->space($repeat);
-                case "tab":
-                    return $this->tab($repeat);
-                case "br":
-                    return $this->br($repeat);
-                case "hr":
-                    return $this->hr($char);
-            }
+            if (isset($this->formatTags[$tag])) return $this->formatTags[$tag]->format($params);
             return $input;
         }, $message);
 
