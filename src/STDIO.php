@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Formatters\Tags, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter, Interfaces\Input, Interfaces\Output,
-    Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Cursor, Utils\Progress, Utils\Rect
+    Formatters\TagFormatter, Inputs\StreamInput, Interfaces\Ansi, Interfaces\Buffer, Interfaces\Colors, Interfaces\Formats, Interfaces\Formatter, Interfaces\Input,
+    Interfaces\Output, Outputs\ErrorStreamOutput, Outputs\OutputBuffer, Outputs\StreamOutput, Styles, Terminal, Utils\Cursor, Utils\Progress, Utils\Rect
 };
 
 final class STDIO implements Ansi, Colors, Formats {
@@ -59,7 +59,7 @@ final class STDIO implements Ansi, Colors, Formats {
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
 
-        $this->formatter = new Tags($this->styles);
+        $this->formatter = new TagFormatter($this->styles);
     }
 
     ////////////////////////////   Magics   ////////////////////////////
