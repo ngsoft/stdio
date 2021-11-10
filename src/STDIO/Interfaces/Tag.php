@@ -10,7 +10,15 @@ namespace NGSOFT\STDIO\Interfaces;
 interface Tag {
 
     /**
-     * @param array $params
+     * A lowercased Tag name
+     *
+     * @return string
      */
-    public function format(array $params);
+    public function getName(): string;
+
+    /**
+     * @param array<string,mixed> $params
+     * @return string Formatted output
+     */
+    public function format(array $params): string;
 }
