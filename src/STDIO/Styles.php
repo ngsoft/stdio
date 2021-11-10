@@ -138,6 +138,7 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
         'cyan' => Colors::CYAN,
         'white' => Colors::WHITE,
         'gray' => Colors::GRAY,
+        'unset' => Colors::UNSET,
         'brightred' => Colors::BRIGHTRED,
         'brightgreen' => Colors::BRIGHTGREEN,
         'brightyellow' => Colors::BRIGHTYELLOW,
@@ -219,7 +220,7 @@ final class Styles implements IteratorAggregate, Countable, ArrayAccess {
                     ->withName($name)
                     ->withColor($code)
                     ->compile();
-
+            if ($code == Colors::UNSET) continue;
             //bgcolor
             $result["bg$name"] = $style
                     ->withName("bg$name")
