@@ -14,6 +14,7 @@ interface Colors {
     const PURPLE = 35;
     const CYAN = 36;
     const WHITE = 37;
+    const UNSET = 39;
     const GRAY = 90;
     const BRIGHTBLACK = 90;
     const BRIGHTRED = 91;
@@ -26,9 +27,10 @@ interface Colors {
     const COLOR_UNSET = [
         30 => 39, 31 => 39, 32 => 39, 33 => 39, 34 => 39, 35 => 39, 36 => 39, 37 => 39,
         90 => 39, 91 => 39, 92 => 39, 93 => 39, 94 => 39, 95 => 39, 96 => 39, 97 => 39,
+        39 => 39
     ];
     const COLOR_VALID = [
-        30, 31, 32, 33, 34, 35, 36, 37,
+        30, 31, 32, 33, 34, 35, 36, 37, 39,
         90, 91, 92, 93, 94, 95, 96, 97,
     ];
     const BACKGROUND_COLOR_MODIFIER = 10;

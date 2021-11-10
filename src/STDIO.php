@@ -58,6 +58,7 @@ final class STDIO implements Ansi, Colors, Formats {
         $this->errorOutput = new ErrorStreamOutput();
         $this->buffer = new OutputBuffer();
         $this->styles = Styles::create();
+
         $this->formatter = new Tags($this->styles);
     }
 
@@ -104,7 +105,7 @@ final class STDIO implements Ansi, Colors, Formats {
     }
 
     /**
-     * Ger Current Formatter
+     * Get Current Formatter
      * @return Formatter
      */
     public function getFormatter(): Formatter {

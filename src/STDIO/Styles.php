@@ -41,6 +41,7 @@ use NGSOFT\STDIO\{
  * @property Style $comment
  * @property Style $whisper
  * @property Style $shout
+ * @property Style $unset
  *
  * @property Style $bgblack
  * @property Style $bgred
@@ -58,6 +59,7 @@ use NGSOFT\STDIO\{
  * @property Style $bgbrightpurple
  * @property Style $bgbrightcyan
  * @property Style $bgbrightwhite
+ *
  *
  * @property Style $reset
  * @property Style $bold
@@ -95,6 +97,7 @@ use NGSOFT\STDIO\{
  * @method string comment(string $message) Format message
  * @method string whisper(string $message) Format message
  * @method string shout(string $message) Format message
+ * @method string unset(string $message) Format message
  *
  * @method string bgblack(string $message) Format message
  * @method string bgred(string $message) Format message
