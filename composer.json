@@ -15,8 +15,7 @@
     "prefer-stable": true,
     "require-dev": {},
     "require": {
-        "php": ">=7.4",
-        "symfony/polyfill-php80": "^1.20",
+        "php": ">=8.1",
         "symfony/polyfill-mbstring": "^1.20"
     },
     "autoload": {
