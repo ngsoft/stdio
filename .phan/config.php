@@ -64,6 +64,7 @@ return [
         // TODO: Fix edge cases in --automatic-fix for PhanPluginRedundantClosureComment
         'PhanPluginRedundantClosureComment',
         'PhanTypeInstantiateTraitStaticOrSelf',
-        'PhanUnusedPublicFinalMethodParameter'
+        'PhanUnusedPublicFinalMethodParameter',
+        'PhanRedefinedInheritedInterface',
     ]
 ];
