@@ -33,4 +33,8 @@ class Color extends Value {
         return static::hasValue($colorValue);
     }
 
+    public function getUnsetValue(): int {
+        return 39;
+    }
+
 }

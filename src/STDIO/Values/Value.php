@@ -168,6 +168,7 @@ abstract class Value implements Stringable, JsonSerializable {
     }
 
     public function __toString(): string {
+
         return sprintf('%s::%s', static::class, $this->label);
     }
 
