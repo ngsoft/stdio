@@ -12,6 +12,8 @@ use RuntimeException;
  */
 final class Terminal {
 
+    public readonly bool $colors;
+
     /**
      * Get unique instance
      * @staticvar Terminal $instance
@@ -70,6 +72,7 @@ final class Terminal {
 
     public function __construct() {
         if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
+        $this->colors = $this->hasColorSupport();
     }
 
     /**
@@ -159,7 +162,7 @@ final class Terminal {
         return [
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),
-            'colors' => $this->hasColorSupport(),
+            'colors' => $this->colors,
         ];
     }
 
