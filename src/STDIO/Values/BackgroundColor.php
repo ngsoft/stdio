@@ -16,4 +16,6 @@ class BackgroundColor extends Color {
     public const WHITE = 47;
     public const UNSET = 49;
 
+    protected string $tagModifier = 'bg_';
+
 }
