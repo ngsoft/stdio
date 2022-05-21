@@ -26,27 +26,4 @@ class Color extends Value {
     public const WHITE = 37;
     public const UNSET = 39;
 
-    protected string $tagModifier = '';
-
-    public static function isValid(Color|int $color): bool {
-
-        if ($color instanceof self) {
-            $colorValue = $color->value;
-        } else $colorValue = $color;
-
-        return static::hasValue($colorValue);
-    }
-
-    /**
-     * Get Color tag
-     * @return string
-     */
-    public function getTag(): string {
-        $label = strtolower($this->label);
-
-        if ($label === 'unset') return sprintf('</%s>', $label);
-        if (!empty($this->tagModifier)) $label .= $this->tagModifier;
-        return sprintf('<%s>', $label);
-    }
-
 }
