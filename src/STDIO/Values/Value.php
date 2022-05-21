@@ -118,7 +118,7 @@ abstract class Value implements Stringable, JsonSerializable {
 
                     if (array_key_exists($name, $declared)) continue;
                     if (in_array($value, $currentValues, true)) {
-                        throw new RuntimeException('Duplicate value ' . $value);
+                        throw new RuntimeException(sprintf('Duplicate value %s::%s => %s', $reflector->getName(), $name, (string) $value));
                     }
 
 
@@ -179,12 +179,13 @@ abstract class Value implements Stringable, JsonSerializable {
     }
 
     public function jsonSerialize(): mixed {
-        return [$this->__toString() => $this->value];
+        return [
+            static::class . '::' . $this->label => $this->value
+        ];
     }
 
     public function __toString(): string {
-
-        return sprintf('%s::%s', static::class, $this->label);
+        return (string) $this->value;
     }
 
     public function __clone() {
