@@ -190,4 +190,11 @@ abstract class Value implements Stringable, JsonSerializable {
         throw new LogicException('Values are not serializable');
     }
 
+    public function __debugInfo() {
+        return [
+            'label' => $this->label,
+            'value' => $this->value
+        ];
+    }
+
 }

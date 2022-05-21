@@ -4,6 +4,27 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
+/**
+ * @method static static ESCAPE()
+ * @method static static STYLE_SUFFIX()
+ * @method static static CLEAR_END_LINE()
+ * @method static static CLEAR_START_LINE()
+ * @method static static CLEAR_LINE()
+ * @method static static CLEAR_DOWN()
+ * @method static static CLEAR_UP()
+ * @method static static CLEAR_SCREEN()
+ * @method static static SCROLL_UP()
+ * @method static static SCROLL_DOWN()
+ * @method static static CURSOR_SUFFIX_TO()
+ * @method static static CURSOR_UP()
+ * @method static static CURSOR_DOWN()
+ * @method static static CURSOR_RIGHT()
+ * @method static static CURSOR_LEFT()
+ * @method static static CURSOR_NEXT_LINE()
+ * @method static static CURSOR_PREV_LINE()
+ * @method static static CURSOR_SAVE_POS()
+ * @method static static CURSOR_LOAD_POS()
+ */
 class Ansi extends Value {
 
     public const ESCAPE = "\033[";
