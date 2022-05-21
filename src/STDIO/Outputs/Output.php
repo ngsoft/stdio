@@ -34,7 +34,7 @@ class Output implements OutputInterface {
     }
 
     protected function flushStream(string $message) {
-        if (false === @fwrite($this->stream, $message)) {
+        if (false === fwrite($this->stream, $message)) {
             throw new RuntimeException('Unable to write output.');
         }
         fflush($this->stream);
