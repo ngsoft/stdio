@@ -12,6 +12,7 @@ namespace NGSOFT\STDIO\Values;
  * @method static static PURPLE()
  * @method static static CYAN()
  * @method static static WHITE()
+ * @method static static UNSET()
  */
 class Color extends Value {
 
@@ -23,6 +24,7 @@ class Color extends Value {
     public const PURPLE = 35;
     public const CYAN = 36;
     public const WHITE = 37;
+    public const UNSET = 39;
 
     public static function isColor(Color|int $color): bool {
 
@@ -33,8 +35,16 @@ class Color extends Value {
         return static::hasValue($colorValue);
     }
 
+    public function getBackgroundValue(): int {
+        return $this->value + self::BACKGROUND_MODIFIER;
+    }
+
     public function getUnsetValue(): int {
         return 39;
+    }
+
+    public function getBackgroundUnsetValue(): int {
+        return $this->getUnsetValue() + self::BACKGROUND_MODIFIER;
     }
 
 }
