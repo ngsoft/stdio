@@ -38,10 +38,10 @@ class Buffer implements Countable, IteratorAggregate {
     /**
      * Flush buffer into Output
      *
-     * @param OutputInterface $output
+     * @param Output $output
      * @return void
      */
-    public function flush(OutputInterface $output): void {
+    public function flush(Output $output): void {
         foreach ($this as $line) {
             $output->write($line);
         }

@@ -28,6 +28,7 @@ namespace NGSOFT\STDIO\Values;
 class Ansi extends Value {
 
     public const ESCAPE = "\033[";
+    public const ESCAPE2 = "\x1b[";
     public const STYLE_SUFFIX = "m";
     public const CLEAR_END_LINE = self::ESCAPE . 'K';
     public const CLEAR_START_LINE = self::ESCAPE . '1K';

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO;
 
-use RuntimeException;
+use NGSOFT\STDIO\Utils\Utils,
+    RuntimeException;
 
 /**
  * @property-read int $width Terminal Width
@@ -13,6 +14,7 @@ use RuntimeException;
 final class Terminal {
 
     public readonly bool $colors;
+    public readonly bool $tty;
 
     /**
      * Get unique instance
@@ -25,39 +27,9 @@ final class Terminal {
         return $instance;
     }
 
-    private static function readFromProcess(string $command): ?string {
-
-        if (!function_exists('proc_open')) {
-            return null;
-        }
-
-
-        $process = @proc_open(
-                        $command,
-                        [
-                            1 => ['pipe', 'w'],
-                            2 => ['pipe', 'w'],
-                        ],
-                        $pipes,
-                        null,
-                        null,
-                        ['suppress_errors' => true]
-        );
-        if (!\is_resource($process)) {
-            return null;
-        }
-
-        $result = stream_get_contents($pipes[1]);
-
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process);
-        return $result;
-    }
-
     private static function getSize(): ?string {
         if (DIRECTORY_SEPARATOR === '\\') {
-            if ($out = self::readFromProcess('mode con /status')) {
+            if ($out = Utils::executeProcess('mode con /status')) {
                 $out = explode("\n", $out);
                 $result = [];
                 foreach ([$out[3], $out[4]] as $line) {
@@ -67,12 +39,13 @@ final class Terminal {
                 return implode(' ', $result);
             }
         }
-        return self::readFromProcess('stty size 2>&1');
+        return Utils::executeProcess('stty size 2>&1');
     }
 
     public function __construct() {
         if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
         $this->colors = $this->hasColorSupport();
+        $this->tty = $this->supportsTTY();
     }
 
     /**
@@ -115,7 +88,7 @@ final class Terminal {
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    public function hasColorSupport(): bool {
+    private function hasColorSupport(): bool {
 
         static $result;
 
@@ -140,21 +113,49 @@ final class Terminal {
         return $result;
     }
 
+    /**
+     * Returns true if the terminal supports tty.
+     *
+     * @staticvar type $supported
+     * @return bool
+     */
+    private function supportsTTY(): bool {
+        static $supported;
+
+        if (null === $supported) {
+            if (function_exists('proc_open')) {
+                $supported = (bool) proc_open(
+                                'echo 1 >/dev/null',
+                                [
+                                    ['file', '/dev/tty', 'r'],
+                                    ['file', '/dev/tty', 'w'],
+                                    ['file', '/dev/tty', 'w']
+                                ], $pipes,
+                                null,
+                                null,
+                                ['suppress_errors' => true]
+                );
+            } else $supported = false;
+        }
+
+        return $supported;
+    }
+
     public function __isset($name) {
         return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
-    public function __get($name) {
+    public function __get(string $name): mixed {
         $method = sprintf('get%s', ucfirst($name));
         if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
         return call_user_func([$this, $method]);
     }
 
-    public function __set($name, $value) {
+    public function __set(string $name, mixed $value) {
 
     }
 
-    public function __unset($name) {
+    public function __unset(string $name) {
 
     }
 
@@ -163,6 +164,7 @@ final class Terminal {
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),
             'colors' => $this->colors,
+            'tty' => $this->tty,
         ];
     }
 

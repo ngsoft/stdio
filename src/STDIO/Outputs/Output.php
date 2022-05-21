@@ -8,7 +8,7 @@ use RuntimeException,
     Stringable,
     TypeError;
 
-class Output implements OutputInterface {
+class Output {
 
     /** @var resource */
     protected $stream;
@@ -38,6 +38,15 @@ class Output implements OutputInterface {
             throw new RuntimeException('Unable to write output.');
         }
         fflush($this->stream);
+    }
+
+    /**
+     * Output Stream
+     *
+     * @return resource
+     */
+    public function getStream() {
+        return $this->stream;
     }
 
 }
