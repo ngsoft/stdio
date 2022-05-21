@@ -66,5 +66,6 @@ return [
         'PhanTypeInstantiateTraitStaticOrSelf',
         'PhanUnusedPublicFinalMethodParameter',
         'PhanRedefinedInheritedInterface',
+        'PhanParamTooManyInternal',
     ]
 ];

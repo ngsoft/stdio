@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
-use Generator,
+use BadMethodCallException,
+    Generator,
+    InvalidArgumentException,
     JsonSerializable,
     LogicException,
     ReflectionClass,
@@ -89,21 +91,26 @@ abstract class Value implements Stringable, JsonSerializable {
     /**
      * Get Class declared public constants
      *
+     *
+     * @phan-suppress PhanTypeInstantiateAbstractStatic
      * @return array
      * @throws RuntimeException
      */
     final public static function getConstants(): array {
+
+
         if (!isset(self::$_constants[static::class])) {
             self::$_constants[static::class] = self::$_labels[static::class] = self::$_methods[static::class] = [];
 
             $declared = &self::$_constants[static::class];
+            $currentValues = [];
 
             /** @var ReflectionClass $reflector */
             $reflector = new ReflectionClass(static::class);
 
             do {
                 if ($reflector->getName() === self::class) break;
-                $currentValues = [];
+
                 /** @var ReflectionClassConstant $classConstant */
                 foreach ($reflector->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC) as $classConstant) {
                     $name = $classConstant->getName();
@@ -113,6 +120,8 @@ abstract class Value implements Stringable, JsonSerializable {
                     if (in_array($value, $currentValues, true)) {
                         throw new RuntimeException('Duplicate value ' . $value);
                     }
+
+
                     self::$_labels[static::class][$name] = self::$_methods[static::class] [strtolower($name)] = new static($name, $value);
                     self::$_constants[static::class][$name] = $value;
                     $currentValues[] = $value;
