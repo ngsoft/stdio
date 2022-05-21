@@ -86,6 +86,12 @@ abstract class Value implements Stringable, JsonSerializable {
         return in_array($value, $constants);
     }
 
+    /**
+     * Get Class declared public constants
+     *
+     * @return array
+     * @throws RuntimeException
+     */
     final public static function getConstants(): array {
         if (!isset(self::$_constants[static::class])) {
             self::$_constants[static::class] = self::$_labels[static::class] = self::$_methods[static::class] = [];

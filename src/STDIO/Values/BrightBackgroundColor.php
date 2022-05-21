@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
-class BrightBackgroundColor extends BrightColor {
+class BrightBackgroundColor extends BackgroundColor {
 
     public const BLACK = 100;
     public const RED = 101;
