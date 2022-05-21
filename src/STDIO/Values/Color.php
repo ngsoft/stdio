@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
+/**
+ * @method static static BLACK()
+ * @method static static RED()
+ * @method static static YELLOW()
+ * @method static static BLUE()
+ * @method static static PURPLE()
+ * @method static static CYAN()
+ * @method static static WHITE()
+ */
 class Color extends Value {
 
     public const BLACK = 30;
@@ -14,5 +23,14 @@ class Color extends Value {
     public const PURPLE = 35;
     public const CYAN = 36;
     public const WHITE = 37;
+
+    public static function isColor(Color|int $color): bool {
+
+        if ($color instanceof self) {
+            $colorValue = $color->value;
+        } else $colorValue = $color;
+
+        return static::hasValue($colorValue);
+    }
 
 }

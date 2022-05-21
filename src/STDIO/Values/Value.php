@@ -13,7 +13,7 @@ use Generator,
     Stringable;
 
 /**
- * Advanced Enums
+ * Advanced Enums Support
  */
 abstract class Value implements Stringable, JsonSerializable {
 
@@ -114,7 +114,7 @@ abstract class Value implements Stringable, JsonSerializable {
             } while (($reflector = $reflector->getParentClass()) instanceof ReflectionClass);
         }
 
-        return $constants[static::class];
+        return self::$_constants[static::class];
     }
 
     /**
@@ -143,8 +143,9 @@ abstract class Value implements Stringable, JsonSerializable {
         //build the cache
         $constants = static::getConstants();
         $key = array_search($value, $constants, true);
-        if (false === $key) throw new RuntimeException('Invalid value supplied.');
-        return self::$_labels[$key];
+
+        if (false === $key) throw new RuntimeException("Invalid value $value supplied.");
+        return self::$_labels[static::class][$key];
     }
 
     ////////////////////////////   Interfaces/Magics   ////////////////////////////
@@ -156,8 +157,10 @@ abstract class Value implements Stringable, JsonSerializable {
         }
 
         static::getConstants();
-        if (!isset(self::$_methods[static::class][$name])) throw new BadMethodCallException(sprintf('Invalid Method %s::%s().', static::class, $name));
-        return self::$_methods[static::class][$name];
+        $method = strtolower($name);
+
+        if (!isset(self::$_methods[static::class][$method])) throw new BadMethodCallException(sprintf('Invalid Method %s::%s().', static::class, $name));
+        return self::$_methods[static::class][$method];
     }
 
     public function jsonSerialize(): mixed {
