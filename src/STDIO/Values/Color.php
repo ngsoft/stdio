@@ -42,8 +42,10 @@ class Color extends Value {
      * @return string
      */
     public function getTag(): string {
-        $label = $this->tagModifier . strtolower($this->label);
+        $label = strtolower($this->label);
+
         if ($label === 'unset') return sprintf('</%s>', $label);
+        if (!empty($this->tagModifier)) $label .= $this->tagModifier;
         return sprintf('<%s>', $label);
     }
 

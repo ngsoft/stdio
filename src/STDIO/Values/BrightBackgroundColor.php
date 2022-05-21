@@ -15,6 +15,6 @@ class BrightBackgroundColor extends BackgroundColor {
     public const CYAN = 106;
     public const WHITE = 107;
 
-    protected string $tagModifier = 'bg_b_';
+    protected string $tagModifier = ' background bright';
 
 }

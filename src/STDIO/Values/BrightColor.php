@@ -15,6 +15,6 @@ class BrightColor extends Color {
     public const CYAN = 96;
     public const WHITE = 97;
 
-    protected string $tagModifier = 'b_';
+    protected string $tagModifier = ' bright';
 
 }
