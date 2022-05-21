@@ -11,7 +11,7 @@ use RuntimeException,
 class Output implements OutputInterface {
 
     /** @var resource */
-    private $stream;
+    protected $stream;
 
     public function __construct() {
         $this->stream = fopen('php://stdout', 'w'); ;
