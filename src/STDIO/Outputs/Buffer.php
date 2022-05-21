@@ -7,7 +7,9 @@ namespace NGSOFT\STDIO\Outputs;
 use Countable,
     IteratorAggregate,
     RuntimeException,
-    Stringable;
+    Stringable,
+    Traversable,
+    TypeError;
 
 class Buffer implements Countable, IteratorAggregate {
 
@@ -26,7 +28,7 @@ class Buffer implements Countable, IteratorAggregate {
         $message = is_array($message) ? $message : [$message];
 
         foreach ($message as $line) {
-            if (!is_string($line) && $line instanceof \Stringable === false) throw new \TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
+            if (!is_string($line) && $line instanceof \Stringable === false) throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             $this->buffer[] = $line;
         }
     }
@@ -53,7 +55,7 @@ class Buffer implements Countable, IteratorAggregate {
         return count($this->buffer);
     }
 
-    public function getIterator(): \Traversable {
+    public function getIterator(): Traversable {
         $buffer = $this->buffer;
         foreach ($buffer as $line) yield $line;
     }
