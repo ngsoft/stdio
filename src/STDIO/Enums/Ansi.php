@@ -7,6 +7,7 @@ namespace NGSOFT\STDIO\Enums;
 use NGSOFT\Enums\Enum;
 
 /**
+ *
  * @method static static ESCAPE()
  * @method static static STYLE_SUFFIX()
  * @method static static CLEAR_END_LINE()
@@ -22,6 +23,8 @@ use NGSOFT\Enums\Enum;
  * @method static static CURSOR_DOWN()
  * @method static static CURSOR_RIGHT()
  * @method static static CURSOR_LEFT()
+ * @method static static CURSOR_COL()
+ * @method static static CURSOR_POS()
  * @method static static CURSOR_NEXT_LINE()
  * @method static static CURSOR_PREV_LINE()
  * @method static static CURSOR_SAVE_POS()

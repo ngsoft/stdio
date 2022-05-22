@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO;
 
 use NGSOFT\STDIO\{
-    Inputs\Input, Outputs\Output, Utils\Utils, Values\Ansi
+    Inputs\Input, Outputs\Output, Utils\Utils, Enums\Ansi
 };
 use RuntimeException;
 

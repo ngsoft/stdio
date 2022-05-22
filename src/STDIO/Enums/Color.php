@@ -15,6 +15,7 @@ use NGSOFT\Enums\Enum;
  * @method static static CYAN()
  * @method static static WHITE()
  * @method static static UNSET()
+ * @method static static GREEN()
  */
 class Color extends Enum {
 

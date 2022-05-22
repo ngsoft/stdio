@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Styles;
 
 use InvalidArgumentException;
 use NGSOFT\STDIO\{
-    Terminal, Values\Ansi, Values\BackgroundColor, Values\BrightBackgroundColor, Values\BrightColor, Values\Color, Values\Format
+    Terminal, Enums\Ansi, Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format
 };
 use Stringable;
 
@@ -47,7 +47,7 @@ class Style {
             if ($this->background) $params[] = $this->background;
 
             if (count($params) > 0) {
-                $paramsInt = array_map(fn($val) => $val->getValue(), $params);
+                $paramsInt = array_map(fn($val) => $val->value, $params);
                 $result = Ansi::ESCAPE . implode(';', $paramsInt) . Ansi::STYLE_SUFFIX;
             }
             $this->prefix = $result;
@@ -98,9 +98,9 @@ class Style {
 
 
         $formats = [];
-        if ($this->color) $formats[] = sprintf('%s::%s', get_class($this->color), $this->color->label);
-        if ($this->background) $formats[] = sprintf('%s::%s', get_class($this->background), $this->background->label);
-        if (!empty($this->formats)) $formats = array_merge($formats, array_map(fn($val) => get_class($val) . '::' . $val->label, $this->formats));
+        if ($this->color) $formats[] = sprintf('%s::%s', get_class($this->color), $this->color->name);
+        if ($this->background) $formats[] = sprintf('%s::%s', get_class($this->background), $this->background->name);
+        if (!empty($this->formats)) $formats = array_merge($formats, array_map(fn($val) => get_class($val) . '::' . $val->name, $this->formats));
 
         return [
             'label' => $this->label,

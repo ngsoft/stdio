@@ -9,7 +9,7 @@ use ArrayAccess,
     InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\STDIO\{
-    Outputs\Output, Styles\Style, Values\BackgroundColor, Values\BrightBackgroundColor, Values\BrightColor, Values\Color, Values\Format
+    Outputs\Output, Styles\Style, Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format
 };
 use Traversable;
 
@@ -109,8 +109,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
             $colorSupport = $this->colorSupport;
 
             foreach ($prefixes as $className => $prefix) {
-                foreach ($className::getValues() as $format) {
-                    $label = $prefix . strtolower($format->getLabel());
+                foreach ($className::cases() as $format) {
+                    $label = $prefix . strtolower($format->name);
                     $cache[$label] = $this->createStyle($label, $format);
                 }
             }
