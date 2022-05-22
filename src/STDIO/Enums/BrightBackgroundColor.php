@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\STDIO\Values;
+namespace NGSOFT\STDIO\Enums;
 
 class BrightBackgroundColor extends BackgroundColor {
 

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\STDIO\Values;
+namespace NGSOFT\STDIO\Enums;
+
+use NGSOFT\Enums\Enum;
 
 /**
  * @method static static ESCAPE()
@@ -25,7 +27,7 @@ namespace NGSOFT\STDIO\Values;
  * @method static static CURSOR_SAVE_POS()
  * @method static static CURSOR_LOAD_POS()
  */
-class Ansi extends \NGSOFT\Enums\Enum {
+class Ansi extends Enum {
 
     public const ESCAPE = "\x1b[";
     public const STYLE_SUFFIX = "m";
