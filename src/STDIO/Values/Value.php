@@ -27,8 +27,8 @@ abstract class Value implements Stringable, JsonSerializable {
 
 
     protected function __construct(
-            public readonly string $label,
-            public readonly mixed $value
+            public readonly mixed $value,
+            public readonly string $label = ''
     ) {
 
     }
@@ -122,7 +122,7 @@ abstract class Value implements Stringable, JsonSerializable {
                     }
 
 
-                    self::$_labels[static::class][$name] = self::$_methods[static::class] [strtolower($name)] = new static($name, $value);
+                    self::$_labels[static::class][$name] = self::$_methods[static::class] [strtolower($name)] = new static($value, $name);
                     self::$_constants[static::class][$name] = $value;
                     $currentValues[] = $value;
                 }

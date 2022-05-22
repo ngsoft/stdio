@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
+/**
+ * @method static static RESET()
+ * @method static static BOLD()
+ * @method static static DIM()
+ * @method static static ITALIC()
+ * @method static static UNDERLINE()
+ * @method static static INVERSE()
+ * @method static static HIDDEN()
+ * @method static static STRIKETROUGH()
+ */
 class Format extends Value {
 
     public const RESET = 0;
