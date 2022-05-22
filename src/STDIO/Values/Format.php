@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
+use NGSOFT\Enums\Enum;
+
 /**
  * @method static static RESET()
  * @method static static BOLD()
@@ -14,7 +16,7 @@ namespace NGSOFT\STDIO\Values;
  * @method static static HIDDEN()
  * @method static static STRIKETROUGH()
  */
-class Format extends Value {
+class Format extends Enum {
 
     public const RESET = 0;
     public const BOLD = 1;

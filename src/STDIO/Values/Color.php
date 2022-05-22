@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Values;
 
+use NGSOFT\Enums\Enum;
+
 /**
  * @method static static BLACK()
  * @method static static RED()
@@ -14,7 +16,7 @@ namespace NGSOFT\STDIO\Values;
  * @method static static WHITE()
  * @method static static UNSET()
  */
-class Color extends Value {
+class Color extends Enum {
 
     public const BLACK = 30;
     public const RED = 31;
