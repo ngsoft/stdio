@@ -163,6 +163,23 @@ abstract class Value implements Stringable, JsonSerializable {
         return self::$_labels[static::class][$key];
     }
 
+    /**
+     * Returns instance for specified value
+     *
+     * @param string|int|float $value
+     * @return ?static
+     * @throws RuntimeException
+     */
+    final public static function tryFrom(string|int|float $value): ?static {
+
+        try {
+            $instance = static::from($value);
+            return $instance;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     ////////////////////////////   Interfaces/Magics   ////////////////////////////
 
     /** {@inheritdoc} */

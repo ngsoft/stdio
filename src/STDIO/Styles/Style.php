@@ -61,48 +61,39 @@ class Style {
     public function withColor(Color|int $color): static {
         $clone = clone $this;
         if (is_int($color)) {
-            /** @var Color $instance */
-            foreach (Color::getValues() as $instance) {
-                if ($instance->getValue() === $color) {
-                    $clone->color = $instance;
-                    return $clone;
-                }
-            }
-
-            foreach (BrightColor::getValues() as $instance) {
-                if ($instance->getValue() === $color) {
-                    $clone->color = $instance;
-                    return $clone;
-                }
-            }
-
-            throw new InvalidArgumentException(sprintf('Invalid color %d', $color));
-        }
-        $clone->color = $color;
+            if ($instance = Color::tryFrom($color) ?? BrightColor::tryFrom($color)) $clone->color = $instance;
+            else throw new InvalidArgumentException(sprintf('Invalid color %d', $color));
+        } else $clone->color = $color;
         return $clone;
     }
 
     public function withBackground(BackgroundColor|int $color): static {
         $clone = clone $this;
         if (is_int($color)) {
-            /** @var BackgroundColor $instance */
-            foreach (BackgroundColor::getValues() as $instance) {
-                if ($instance->getValue() === $color) {
-                    $clone->background = $instance;
-                    return $clone;
-                }
-            }
 
-            foreach (BrightBackgroundColor::getValues() as $instance) {
-                if ($instance->getValue() === $color) {
-                    $clone->background = $instance;
-                    return $clone;
-                }
-            }
 
-            throw new InvalidArgumentException(sprintf('Invalid background color %d', $color));
+            if ($instance = BackgroundColor::tryFrom($color) ?? BrightBackgroundColor::tryFrom($color)) $clone->color = $instance;
+            else throw new InvalidArgumentException(sprintf('Invalid background color %d', $color));
+        } else $clone->color = $color;
+        return $clone;
+    }
+
+    public function withFormats(Format|int ...$formats): static {
+
+        $clone = clone $this;
+
+        $result = [];
+
+        foreach ($formats as $format) {
+
+            if (is_int($format)) {
+                if ($instance = Format::tryFrom($format)) {
+                    $result[] = $instance;
+                } else throw new InvalidArgumentException(sprintf('Invalid format %d', $format));
+            } else $result[] = $instance;
         }
-        $clone->color = $color;
+
+        $clone->formats = $result;
         return $clone;
     }
 
