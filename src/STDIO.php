@@ -5,30 +5,20 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Terminal
+    Cursor, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
 };
 
 final class STDIO {
 
     public const VERSION = '3.0';
 
-    /** @var Output */
-    private $output;
-
-    /** @var ErrorOutput */
-    private $errorOutput;
-
-    /** @var Input */
-    private $input;
-
-    /** @var Buffer */
-    private $buffer;
-
-    /** @var Terminal */
-    private $terminal;
-
-    /** @var Cursor */
-    private $cursor;
+    private Output $output;
+    private ErrorOutput $errorOutput;
+    private Input $input;
+    private Buffer $buffer;
+    private Terminal $terminal;
+    private Cursor $cursor;
+    private StyleSheet $styles;
 
     /**
      * Get STDIO Instance
@@ -42,13 +32,17 @@ final class STDIO {
         return $instance;
     }
 
-    public function __construct() {
+    /**
+     * @param ?bool $forceColorSupport Overrides color support detection
+     */
+    public function __construct(bool $forceColorSupport = null) {
         $this->output = new Output();
         $this->errorOutput = new ErrorOutput();
         $this->input = new Input();
         $this->buffer = new Buffer();
         $this->terminal = Terminal::create();
         $this->cursor = new Cursor($this->output, $this->input);
+        $this->styles = new StyleSheet($forceColorSupport);
     }
 
     public function getOutput(): Output {
@@ -73,6 +67,10 @@ final class STDIO {
 
     public function getCursor(): Cursor {
         return $this->cursor;
+    }
+
+    public function getStyles(): StyleSheet {
+        return $this->styles;
     }
 
 }

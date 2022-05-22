@@ -12,14 +12,14 @@ use Stringable;
 
 class Style {
 
-    private ?string $label;
-    private ?Color $color;
-    private ?BackgroundColor $background;
+    private ?string $label = null;
+    private ?Color $color = null;
+    private ?BackgroundColor $background = null;
 
     /** @var Format[] */
     private array $formats = [];
-    private ?string $prefix;
-    private ?string $suffix;
+    private ?string $prefix = null;
+    private ?string $suffix = null;
     private bool $supported;
 
     public function __construct(?bool $supported) {
@@ -43,7 +43,7 @@ class Style {
 
             if (count($params) > 0) {
                 $paramsInt = array_map(fn($val) => $val->getValue(), $params);
-                $result .= Ansi::ESCAPE . implode(';', $paramsInt) . Ansi::STYLE_SUFFIX;
+                $result = Ansi::ESCAPE . implode(';', $paramsInt) . Ansi::STYLE_SUFFIX;
             }
             $this->prefix = $result;
         }
@@ -67,9 +67,9 @@ class Style {
 
             if (count($params) > 0) {
                 $paramsInt = array_map(fn($val) => $val->getUnsetValue(), $params);
-                $result .= Ansi::ESCAPE . implode(';', $paramsInt) . Ansi::STYLE_SUFFIX;
+                $result = Ansi::ESCAPE . implode(';', $paramsInt) . Ansi::STYLE_SUFFIX;
             }
-            $this->prefix = $result;
+            $this->suffix = $result;
         }
         return $this->suffix;
     }
@@ -87,6 +87,20 @@ class Style {
     public function format(string|Stringable $message): string {
         if ($message instanceof Stringable) $message = $message->__toString();
         return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
+    }
+
+    public function __debugInfo(): array {
+
+
+        $formats = [];
+        if ($this->color) $formats[] = sprintf('%s::%s', get_class($this->color), $this->color->label);
+        if ($this->background) $formats[] = sprintf('%s::%s', get_class($this->background), $this->background->label);
+        if (!empty($this->formats)) $formats = array_merge($formats, array_map(fn($val) => get_class($val) . '::' . $val->label, $this->formats));
+
+        return [
+            'label' => $this->label,
+            'formats' => $formats,
+        ];
     }
 
     ////////////////////////////   Creator   ////////////////////////////

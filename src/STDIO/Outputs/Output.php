@@ -17,7 +17,13 @@ class Output {
         $this->stream = fopen('php://stdout', 'w'); ;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * Write message to the output
+     *
+     * @param string|Stringable|array $message
+     * @return void
+     * @throws TypeError
+     */
     public function write(string|Stringable|array $message): void {
         $messages = is_array($message) ? $message : [$message];
 
@@ -31,6 +37,17 @@ class Output {
 
             $this->flushStream($line);
         }
+    }
+
+    /**
+     * Write message to the output and creates a new line
+     *
+     * @param string|Stringable|array $message
+     * @return void
+     */
+    public function writeln(string|Stringable|array $message): void {
+        $this->write($message);
+        $this->write("\n");
     }
 
     protected function flushStream(string $message) {
