@@ -12,7 +12,7 @@ use Stringable;
 
 class Style {
 
-    private ?string $label = null;
+    private string $label = '';
     private ?Color $color = null;
     private ?BackgroundColor $background = null;
 

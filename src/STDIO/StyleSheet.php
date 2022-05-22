@@ -6,6 +6,7 @@ namespace NGSOFT\STDIO;
 
 use ArrayAccess,
     Countable,
+    InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\STDIO\{
     Outputs\Output, Styles\Style, Values\BackgroundColor, Values\BrightBackgroundColor, Values\BrightColor, Values\Color, Values\Format
@@ -45,17 +46,30 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param Color|Format ...$formats
      * @return static
      */
-    public function addStyle(string $label, Color|Format ...$formats): static {
+    public function addStyle(string $label, Color|Format|int ...$formats): static {
         $this->styles[$label] = $this->createStyle($label, ...$formats);
         return $this;
     }
 
-    protected function createStyle(string $label, Color|Format ...$formats): Style {
+    protected function createStyle(string $label, Color|Format|int ...$formats): Style {
 
         $style = new Style($this->colorSupport);
         $style = $style->withLabel($label);
 
         foreach ($formats as $format) {
+            if (is_int($format)) {
+                if (
+                        $implFormat = Color::tryFrom($format) ??
+                        BrightColor::tryFrom($format) ??
+                        BackgroundColor::tryFrom($format) ??
+                        BrightBackgroundColor::tryFrom($format) ??
+                        Format::tryFrom($format)
+                ) {
+                    $format = $implFormat;
+                } else throw new InvalidArgumentException(sprintf('Invalid format %d.', $format));
+            }
+
+
             if ($format instanceof BackgroundColor) {
                 $style = $style->withBackground($format);
             } elseif ($format instanceof Color) {
