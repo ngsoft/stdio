@@ -24,6 +24,9 @@ class Color extends Value {
     public const PURPLE = 35;
     public const CYAN = 36;
     public const WHITE = 37;
-    public const UNSET = 39;
+
+    public function getUnsetValue(): int {
+        return 39;
+    }
 
 }

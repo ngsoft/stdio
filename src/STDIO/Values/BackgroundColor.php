@@ -14,6 +14,9 @@ class BackgroundColor extends Color {
     public const PURPLE = 45;
     public const CYAN = 46;
     public const WHITE = 47;
-    public const UNSET = 49;
+
+    public function getUnsetValue(): int {
+        return 49;
+    }
 
 }
