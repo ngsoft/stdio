@@ -16,7 +16,7 @@
     "require-dev": {},
     "require": {
         "php": ">=8.1",
-        "symfony/polyfill-mbstring": "^1.20"
+        "ngsoft/tools": "^3.1"
     },
     "autoload": {
         "psr-4": {
