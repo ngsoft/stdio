@@ -8,6 +8,11 @@ use NGSOFT\STDIO\{
     Cursor, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
 };
 
+/**
+ * STDIO Super Object
+ * Gives access to all components
+ * 
+ */
 final class STDIO {
 
     public const VERSION = '3.0';

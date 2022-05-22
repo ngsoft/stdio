@@ -40,8 +40,9 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
 
     /**
      * Adds Custom style
+     *
      * @param string $label
-     * @param Color|Format $formats
+     * @param Color|Format ...$formats
      * @return static
      */
     public function addStyle(string $label, Color|Format ...$formats): static {
