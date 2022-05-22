@@ -20,6 +20,11 @@ class Style {
     private array $formats = [];
     private ?string $prefix = null;
     private ?string $suffix = null;
+
+    /**
+     * Mutes style if set to false
+     * @var bool
+     */
     private bool $supported;
 
     public function __construct(?bool $supported) {
@@ -99,7 +104,8 @@ class Style {
 
         return [
             'label' => $this->label,
-            'formats' => $formats,
+            'styles' => $formats,
+            'format' => $this->format($this->label)
         ];
     }
 
