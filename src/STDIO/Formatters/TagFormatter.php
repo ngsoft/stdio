@@ -92,16 +92,14 @@ class TagFormatter implements FormatterInterface {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
+            // defined tags <br> <hr> or custom <bg=black;fg="white" options=bold,italic> (mix can work too)
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
                 $closing = !empty($closing);
-
+                // </> or <>
                 if (!empty($contents)) {
                     $params = preg_split('#[\h;]+#', $contents);
-
                     if (!empty($params)) {
-
-
                         $tagName = strtolower($params[0]);
 
                         /** @var Tag $tagInstance */
@@ -111,6 +109,7 @@ class TagFormatter implements FormatterInterface {
 
                         foreach ($params as $param) {
                             if (preg_match('#([\w\-]+)(?:="?([\w\-]*)"?)#', $param, $matched)) {
+                                // <key=value>
                                 if ($tagName === $param) $tagName = '';
                                 list(, $key, $value) = $matched;
                                 if ($key === 'tagName') continue;
@@ -125,16 +124,12 @@ class TagFormatter implements FormatterInterface {
                     }
                 }
 
-
-
-
                 return $input;
             }, $message);
-
+            // prebuild tags
             $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
-
+            //unknown tags
             $message = strip_tags($message);
-
             $result .= $message;
         }
 
