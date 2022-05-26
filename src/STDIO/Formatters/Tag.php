@@ -10,7 +10,7 @@ abstract class Tag {
 
     public function __construct() {
         $class = explode(NAMESPACE_SEPARATOR, static::class);
-        $this->tagName = strtoupper($class);
+        $this->tagName = strtoupper(array_pop($class));
     }
 
     public function getName(): string {
