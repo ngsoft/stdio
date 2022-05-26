@@ -70,5 +70,6 @@ return [
         'PhanUnusedPublicFinalMethodParameter',
         'PhanRedefinedInheritedInterface',
         'PhanParamTooManyInternal',
+    //'PhanUnreferencedUseNormal',
     ]
 ];

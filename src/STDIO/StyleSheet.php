@@ -213,7 +213,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     }
 
     /**
-     * @return array<string,Formats>
+     * @return array<string,Format>
      */
     public function getFormats(): array {
         return $this->formats;

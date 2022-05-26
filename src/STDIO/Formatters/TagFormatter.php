@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Formatters\Tags\DefaultTag, Formatters\Tags\HR, Styles\Style, StyleSheet
+    Formatters\Tags\BR, Formatters\Tags\DefaultTag, Formatters\Tags\HR, Formatters\Tags\Tab, StyleSheet
 };
 use Stringable,
     ValueError;
@@ -14,6 +14,8 @@ class TagFormatter implements FormatterInterface {
 
     protected const BUILTIN = [
         HR::class,
+        BR::class,
+        Tab::class,
     ];
 
     /** @var array<string,string> */
@@ -43,11 +45,9 @@ class TagFormatter implements FormatterInterface {
 
         $result = [
             '</>' => $this->styles['reset']->getPrefix(),
-            '<br>' => "\n",
-            '<tab>' => "  "
         ];
 
-        /** @var Style $style */
+        /** @var \NGSOFT\STDIO\Styles\Style $style */
         foreach ($this->styles as $tagName => $style) {
             $result[sprintf('<%s>', $tagName)] = $style->getPrefix();
             $result[sprintf('</%s>', $tagName)] = $style->getSuffix();
@@ -92,10 +92,6 @@ class TagFormatter implements FormatterInterface {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
-
-
-            // $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
-
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
                 $closing = !empty($closing);
@@ -134,6 +130,10 @@ class TagFormatter implements FormatterInterface {
 
                 return $input;
             }, $message);
+
+            $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
+
+            $message = strip_tags($message);
 
             $result .= $message;
         }
