@@ -179,7 +179,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     /**
      * @return array<string,Style>
      */
-    public function getBackgroundColors($param): array {
+    public function getBackgroundColors(): array {
 
         return $this->bg;
     }
@@ -187,8 +187,22 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     /**
      * @return array<string,Style>
      */
-    public function getForegroundColors($param): array {
+    public function getForegroundColors(): array {
         return $this->fg;
+    }
+
+    /**
+     * @return ?Style
+     */
+    public function getBackgroundColor(string $alias): ?Style {
+        return $this->bg[strtolower($alias)] ?? null;
+    }
+
+    /**
+     * @return ?Style
+     */
+    public function getForegroundColor(string $alias): ?Style {
+        return $this->fg[strtolower($alias)] ?? null;
     }
 
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Formatters\Tags\Format, Formatters\Tags\HR, Styles\Style, StyleSheet
+    Formatters\Tags\DefaultTag, Formatters\Tags\HR, Styles\Style, StyleSheet
 };
 use Stringable,
     ValueError;
@@ -32,7 +32,7 @@ class TagFormatter implements FormatterInterface {
 
     public function __construct(StyleSheet $styles) {
         $this->styles = $styles;
-        $this->setDefaultTag(new Format($styles));
+        $this->setDefaultTag(new DefaultTag($styles));
         foreach (self::BUILTIN as $className) {
             $this->addTag(new $className($this->styles));
         }
@@ -92,9 +92,9 @@ class TagFormatter implements FormatterInterface {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
-            var_dump(array_values($this->replaceTags));
 
-            $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
+
+            // $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
 
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
@@ -114,17 +114,18 @@ class TagFormatter implements FormatterInterface {
                         $implParams = [];
 
                         foreach ($params as $param) {
-                            if (preg_match('#([\w\-]+)(?:="?([\w\-]*)"?)*#', $param, $matched)) {
-                                $implParams[$matched[1]] = $matched[2] ?? null;
+                            if (preg_match('#([\w\-]+)(?:="?([\w\-]*)"?)#', $param, $matched)) {
+                                if ($tagName === $param) $tagName = '';
+                                list(, $key, $value) = $matched;
+                                if ($key === 'tagName') continue;
+                                $value = explode(',', $value);
+                                $value = array_map(fn($v) => trim($v), $value);
+                                $implParams[$key] = count($value) === 1 ? $value[0] : $value;
                             }
                         }
-
-
-
-
-                        $result = $tagInstance->format($input, $implParams);
-
-                        var_dump($input, $result);
+                        $implParams['tagName'] = $tagName;
+                        $implParams['closing'] = $closing;
+                        return $tagInstance->format($input, $implParams);
                     }
                 }
 
@@ -133,6 +134,8 @@ class TagFormatter implements FormatterInterface {
 
                 return $input;
             }, $message);
+
+            $result .= $message;
         }
 
         return $result;
