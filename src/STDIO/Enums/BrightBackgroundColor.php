@@ -4,7 +4,18 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
-class BrightBackgroundColor extends BackgroundColor {
+/**
+ *
+ * @method static static BLACK()
+ * @method static static RED()
+ * @method static static GREEN()
+ * @method static static YELLOW()
+ * @method static static BLUE()
+ * @method static static PURPLE()
+ * @method static static CYAN()
+ * @method static static WHITE()
+ */
+class BrightBackgroundColor extends \NGSOFT\STDIO\Enums\BackgroundColor {
 
     public const BLACK = 100;
     public const RED = 101;

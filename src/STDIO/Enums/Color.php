@@ -7,15 +7,15 @@ namespace NGSOFT\STDIO\Enums;
 use NGSOFT\Enums\Enum;
 
 /**
+ *
  * @method static static BLACK()
  * @method static static RED()
+ * @method static static GREEN()
  * @method static static YELLOW()
  * @method static static BLUE()
  * @method static static PURPLE()
  * @method static static CYAN()
  * @method static static WHITE()
- * @method static static UNSET()
- * @method static static GREEN()
  */
 class Color extends Enum {
 

@@ -28,8 +28,7 @@ class Style {
     private bool $supported;
 
     public function __construct(?bool $supported) {
-        if (is_bool($supported)) $this->supported = $supported;
-        else $this->supported = Terminal::create()->colors;
+        $this->supported = is_bool($supported) ? $supported : Terminal::create()->colors;
     }
 
     /**

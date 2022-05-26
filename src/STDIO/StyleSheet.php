@@ -19,8 +19,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     protected bool $colorSupport;
 
     public function __construct(bool $colorSupport = null, array $styles = []) {
-        if (!is_bool($colorSupport)) $colorSupport = Terminal::create()->colors;
-        $this->colorSupport = $colorSupport;
+        $this->colorSupport = is_bool($colorSupport) ? $colorSupport : Terminal::create()->colors;
         if (empty($styles)) $this->buildStyles();
         else $this->styles = $styles;
     }
@@ -106,7 +105,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
             'shout' => [Color::RED(), Format::BOLD()],
         ];
         if (empty($cache)) {
-            $colorSupport = $this->colorSupport;
+
 
             foreach ($prefixes as $className => $prefix) {
                 foreach ($className::cases() as $format) {
