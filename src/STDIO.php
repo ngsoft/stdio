@@ -42,14 +42,14 @@ final class STDIO {
      * @param ?bool $forceColorSupport Overrides color support detection
      */
     public function __construct(bool $forceColorSupport = null) {
-        $this->output = new Output();
-        $this->errorOutput = new ErrorOutput();
-        $this->input = new Input();
-        $this->buffer = new Buffer();
         $this->terminal = Terminal::create();
-        $this->cursor = new Cursor($this->output, $this->input);
         $this->styles = new StyleSheet($forceColorSupport);
         $this->formatter = new TagFormatter($this->styles);
+        $this->buffer = new Buffer();
+        $this->output = new Output($this->formatter);
+        $this->errorOutput = new ErrorOutput($this->formatter);
+        $this->input = new Input();
+        $this->cursor = new Cursor($this->output, $this->input);
     }
 
     public function getOutput(): Output {

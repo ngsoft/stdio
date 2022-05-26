@@ -29,7 +29,7 @@ class Cursor {
             Input $input = null
     ) {
         $this->terminal = Terminal::create();
-        $this->output = $output ?? new Output();
+        $this->output = $output ?? new Output(new Formatters\TagFormatter(new StyleSheet()));
         $this->input = $input ?? new Input();
     }
 

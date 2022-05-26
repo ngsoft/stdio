@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
+use NGSOFT\STDIO\Formatters\{
+    FormatterInterface, TagFormatter
+};
 use RuntimeException,
     Stringable,
     TypeError;
@@ -13,7 +16,11 @@ class Output {
     /** @var resource */
     protected $stream;
 
-    public function __construct() {
+    /** @var FormatterInterface */
+    protected $formatter;
+
+    public function __construct(FormatterInterface $formatter = null) {
+        $this->formatter = $formatter ?? new TagFormatter();
         $this->stream = fopen('php://stdout', 'w'); ;
     }
 
@@ -30,10 +37,11 @@ class Output {
         foreach ($messages as $line) {
             if ($line instanceof Stringable) $line = $line->__toString();
 
-
             if (!is_string($line)) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
+
+            $line = $this->formatter->format($message);
 
             $this->flushStream($line);
         }
