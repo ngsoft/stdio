@@ -213,9 +213,9 @@ class Cursor {
             $code = fread($input, 1024);
             shell_exec(sprintf('stty %s', $mode));
             sscanf($code, "\x1b[%d;%dR", $row, $col);
-            $enabled = true;
+            $enabled = 1;
         }
-        return [$col, $row, 1];
+        return [$col, $row, $enabled];
     }
 
     /**
