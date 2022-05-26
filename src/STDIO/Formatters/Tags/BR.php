@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters\Tags;
 
 use NGSOFT\STDIO\Formatters\Tag,
-    RuntimeException;
+    ValueError;
 
 class BR extends Tag {
 
@@ -13,7 +13,7 @@ class BR extends Tag {
 
         $count = $params['count'][0] ?? '1';
         if (!preg_match('#\d+#', $count)) {
-            throw new \ValueError(sprintf('Invalid value "%s" for int count argument.', $count));
+            throw new ValueError(sprintf('Invalid value "%s" for int count argument.', $count));
         }
         $count = max(1, intval($count));
 

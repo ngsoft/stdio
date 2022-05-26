@@ -14,7 +14,7 @@ class HR extends Tag {
         $width = Terminal::create()->width;
         $width -= 8;
         $str = "\n\t\t";
-        $char = $params['char'] ?? "=";
+        $char = $params['char'][0] ?? "=";
         $char = $char[0];
         for ($i = 0; $i < $width; $i++) $str .= $char;
         $str .= "\n";
