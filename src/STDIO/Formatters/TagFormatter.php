@@ -93,6 +93,8 @@ class TagFormatter implements FormatterInterface {
             }
 
             // defined tags <br> <hr> or custom <bg=black;fg="white";options=bold,italic>
+            // <tagname;param1=value1;title="my long title...";param2=value 2,value3>
+
 
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
