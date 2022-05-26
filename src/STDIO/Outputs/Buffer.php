@@ -33,6 +33,17 @@ class Buffer implements Countable, IteratorAggregate {
         }
     }
 
+    /**
+     * Write message to the buffer and creates a new line
+     *
+     * @param string|Stringable|array $message
+     * @return void
+     */
+    public function writeln(string|Stringable|array $message): void {
+        $this->write($message);
+        $this->write("\n");
+    }
+
     public function clear(): void {
         $this->buffer = [];
     }
