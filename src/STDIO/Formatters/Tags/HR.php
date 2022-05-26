@@ -10,7 +10,7 @@ use NGSOFT\STDIO\{
 
 class HR extends Tag {
 
-    public function format(array $params): string {
+    public function format(string $message, array $params): string {
         $width = Terminal::create()->width;
         $width -= 4;
         $str = "\n\t";
@@ -18,7 +18,6 @@ class HR extends Tag {
         if (is_string($params['char'])) $char = $params['char'][0];
         for ($i = 0; $i < $width; $i++) $str .= $char;
         $str .= "\n";
-
         return $str;
     }
 

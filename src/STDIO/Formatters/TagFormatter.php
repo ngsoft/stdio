@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Formatters\Tags\HR, StyleSheet
+    Formatters\Tags\Format, Formatters\Tags\HR, Styles\Style, StyleSheet
 };
 use Stringable,
     ValueError;
@@ -27,23 +27,27 @@ class TagFormatter implements FormatterInterface {
     /** @var array<string,string> */
     protected array $replaceTags = [];
     protected array $tags = [];
+    protected Tag $defaultTag;
+    protected StyleSheet $styles;
 
-    public function __construct(protected StyleSheet $styles) {
-        $this->build();
+    public function __construct(StyleSheet $styles) {
+        $this->styles = $styles;
+        $this->setDefaultTag(new Format($styles));
         foreach (self::BUILTIN as $className) {
-            $this->addTag(new $className);
+            $this->addTag(new $className($this->styles));
         }
+        $this->build();
     }
 
     protected function build(): void {
 
         $result = [
-            '</>' => $this->styles['reset'],
+            '</>' => $this->styles['reset']->getPrefix(),
             '<br>' => "\n",
             '<tab>' => "  "
         ];
 
-        /** @var \NGSOFT\STDIO\Styles\Style $style */
+        /** @var Style $style */
         foreach ($this->styles as $tagName => $style) {
             $result[sprintf('<%s>', $tagName)] = $style->getPrefix();
             $result[sprintf('</%s>', $tagName)] = $style->getSuffix();
@@ -62,6 +66,21 @@ class TagFormatter implements FormatterInterface {
         return $this;
     }
 
+    /**
+     * Default Managed Tag
+     *
+     * @return Tag
+     */
+    public function getDefaultTag(): Tag {
+        return $this->defaultTag;
+    }
+
+    public function setDefaultTag(Tag $defaultTag): static {
+        $this->addTag($defaultTag);
+        $this->defaultTag = $defaultTag;
+        return $this;
+    }
+
     public function format(string|Stringable|array $messages): string {
 
         if (!is_array($messages)) $messages = [$messages];
@@ -70,24 +89,45 @@ class TagFormatter implements FormatterInterface {
         foreach ($messages as $message) {
             if ($message instanceof Stringable) $message = $message->__toString();
             if (!is_string($message)) {
-                throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[].');
+                throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
+            var_dump(array_values($this->replaceTags));
 
+            $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
 
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
                 $closing = !empty($closing);
 
-                $params = preg_split('#[\h;]+#', $contents);
+                if (!empty($contents)) {
+                    $params = preg_split('#[\h;]+#', $contents);
 
-                if (!empty($params)) {
+                    if (!empty($params)) {
 
-                    foreach ($params as $param) {
 
-                        var_dump($param);
+                        $tagName = strtolower($params[0]);
+
+                        /** @var Tag $tagInstance */
+                        $tagInstance = $this->tags[$tagName] ?? $this->defaultTag;
+
+                        $implParams = [];
+
+                        foreach ($params as $param) {
+                            if (preg_match('#([\w\-]+)(?:="?([\w\-]*)"?)*#', $param, $matched)) {
+                                $implParams[$matched[1]] = $matched[2] ?? null;
+                            }
+                        }
+
+
+
+
+                        $result = $tagInstance->format($input, $implParams);
+
+                        var_dump($input, $result);
                     }
                 }
+
 
 
 
