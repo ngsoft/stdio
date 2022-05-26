@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Styles;
 
 use InvalidArgumentException;
-use NGSOFT\STDIO\{
-    Terminal, Enums\Ansi, Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format
+use NGSOFT\STDIO\Enums\{
+    Ansi, BackgroundColor, BrightBackgroundColor, BrightColor, Color, Format
 };
 use Stringable;
 
@@ -21,14 +21,8 @@ class Style {
     private ?string $prefix = null;
     private ?string $suffix = null;
 
-    /**
-     * Mutes style if set to false
-     * @var bool
-     */
-    private bool $supported;
+    public function __construct(private readonly bool $colorSupport) {
 
-    public function __construct(?bool $supported) {
-        $this->supported = is_bool($supported) ? $supported : Terminal::create()->colors;
     }
 
     /**
@@ -38,7 +32,7 @@ class Style {
      */
     public function getPrefix(): string {
         if (!is_string($this->prefix)) {
-            if (!$this->supported) return $this->prefix = '';
+            if (!$this->colorSupport) return $this->prefix = '';
             $result = '';
             $params = [];
             if (count($this->formats) > 0) $params = $this->formats;
@@ -62,7 +56,7 @@ class Style {
      */
     public function getSuffix(): string {
         if (!is_string($this->suffix)) {
-            if (!$this->supported) return $this->suffix = '';
+            if (!$this->colorSupport) return $this->suffix = '';
             $result = '';
             $params = [];
             if (count($this->formats) > 0) $params = $this->formats;
@@ -104,7 +98,8 @@ class Style {
         return [
             'label' => $this->label,
             'styles' => $formats,
-            'format' => $this->format($this->label)
+            'format' => $this->format($this->label),
+            'colorSupport' => $this->colorSupport,
         ];
     }
 
@@ -112,7 +107,7 @@ class Style {
 
     /** {@inheritdoc} */
     public function __clone() {
-        if ($this->supported) $this->prefix = $this->suffix = null;
+        $this->prefix = $this->suffix = null;
     }
 
     /**

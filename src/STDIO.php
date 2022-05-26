@@ -11,7 +11,7 @@ use NGSOFT\STDIO\{
 /**
  * STDIO Super Object
  * Gives access to all components
- * 
+ *
  */
 final class STDIO {
 

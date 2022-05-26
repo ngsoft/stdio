@@ -53,6 +53,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     protected function createStyle(string $label, Color|Format|int ...$formats): Style {
 
         $style = new Style($this->colorSupport);
+
         $style = $style->withLabel($label);
 
         foreach ($formats as $format) {
@@ -104,22 +105,26 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
             'whisper' => [Color::WHITE(), Format::DIM()],
             'shout' => [Color::RED(), Format::BOLD()],
         ];
-        if (empty($cache)) {
+
+        $key = (int) $this->colorSupport;
+
+        // create cache for color support(false, true)
+        if (!isset($cache[$key])) {
 
 
             foreach ($prefixes as $className => $prefix) {
                 foreach ($className::cases() as $format) {
                     $label = $prefix . strtolower($format->name);
-                    $cache[$label] = $this->createStyle($label, $format);
+                    $cache[$key][$label] = $this->createStyle($label, $format);
                 }
             }
 
             foreach ($custom as $label => $params) {
-                $cache[$label] = $this->createStyle($label, ...$params);
+                $cache[$key][$label] = $this->createStyle($label, ...$params);
             }
         }
 
-        $this->styles = $cache;
+        $this->styles = $cache[$key];
     }
 
     public function offsetExists(mixed $offset): bool {
