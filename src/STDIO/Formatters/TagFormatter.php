@@ -13,13 +13,15 @@ use Stringable,
 class TagFormatter implements FormatterInterface {
 
     /** @var array<string,string> */
-    protected $replacements = [
+    protected array $replacements = [
         "\s" => " ",
         "\t" => "  ",
         '&gt;' => '>',
         '&lt;' => '<',
     ];
-    protected $tags = [];
+
+    /** @var array<string,string> */
+    protected array $tags = [];
 
     public function __construct(protected StyleSheet $styles) {
         $this->build();
