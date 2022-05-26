@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO;
 
 use NGSOFT\STDIO\{
-    Inputs\Input, Outputs\Output, Utils\Utils, Enums\Ansi
+    Enums\Ansi, Inputs\Input, Outputs\Output, Utils\Utils
 };
 use RuntimeException;
 
 /**
  * @property int $posX CursorX
  * @property int $posY CursorY
- * @property-read $enabled
+ * @property-read bool $enabled
  */
 class Cursor {
 
@@ -30,7 +30,7 @@ class Cursor {
             Input $input = null
     ) {
         $this->terminal = Terminal::create();
-        $this->output = $output ?? new Output(new Formatters\TagFormatter(new StyleSheet()));
+        $this->output = $output ?? new Output();
         $this->input = $input ?? new Input();
     }
 
@@ -256,17 +256,17 @@ class Cursor {
 
     public function __set(string $name, mixed $value) {
 
-        if ($name === 'x' && is_int($value)) {
+        if ($name === 'posX' && is_int($value)) {
             list(, $y) = $this->getCurrentPosition();
             $this->setCurrentPosition($value, $y);
-        } elseif ($name === 'y' && is_int($value)) {
+        } elseif ($name === 'posY' && is_int($value)) {
             list($x) = $this->getCurrentPosition();
             $this->setCurrentPosition($x, $value);
         }
     }
 
     public function __unset(string $name) {
-
+        throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
     public function __debugInfo() {

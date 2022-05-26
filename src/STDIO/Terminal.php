@@ -153,10 +153,11 @@ final class Terminal {
 
     public function __set(string $name, mixed $value) {
 
+        throw new RuntimeException(sprintf('%s::%s cannot be set.', static::class, $name));
     }
 
     public function __unset(string $name) {
-
+        throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
     public function __debugInfo() {
