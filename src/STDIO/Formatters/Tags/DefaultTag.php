@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
-use NGSOFT\STDIO\Formatters\Tag;
+use NGSOFT\STDIO\Formatters\Tag,
+    RuntimeException;
 
 /**
  * Used to manage tags without tag name but with params
@@ -30,14 +31,15 @@ class DefaultTag extends Tag {
         }
 
         foreach ($params['options'] as $formatName) {
-            if ($format = $this->styles->getBackgroundColor($colorName)) $formats[] = $format;
-            else throw new RuntimeException(sprintf('Invalid background color %s', $colorName));
+            if ($format = $this->styles->getFormat($formatName)) $formats[] = $format;
+            else throw new RuntimeException(sprintf('Invalid format %s', $formatName));
         }
 
-
-
-
-        var_dump($formats);
+        if (count($formats) > 0) {
+            $label = trim(trim($message, '</>'));
+            $style = $this->styles->createStyle($label, ... $formats);
+            return $closing ? $style->getSuffix() : $style->getPrefix();
+        }
 
         return $message;
     }

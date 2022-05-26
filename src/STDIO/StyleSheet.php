@@ -57,38 +57,48 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * Create Custom Style
      *
      * @param string $label
-     * @param Color|Format|int $formats
+     * @param Color|Format|int ...$formats
      * @return Style
      * @throws InvalidArgumentException
      */
     public function createStyle(string $label, Color|Format|int ...$formats): Style {
 
-        $style = new Style($this->colorSupport);
+        static $cache = [0 => [], 1 => []];
+        $cacheKey = (int) $this->colorSupport;
+        $cached = &$cache[$cacheKey];
+        if (count($formats) > 0) {
 
-        $style = $style->withLabel($label);
+            $key = $label . serialize($formats);
+            if (isset($cached[$key])) return $cached[$key];
 
-        foreach ($formats as $format) {
-            if (is_int($format)) {
-                if (
-                        $implFormat = Color::tryFrom($format) ??
-                        BrightColor::tryFrom($format) ??
-                        BackgroundColor::tryFrom($format) ??
-                        BrightBackgroundColor::tryFrom($format) ??
-                        Format::tryFrom($format)
-                ) {
-                    $format = $implFormat;
-                } else throw new InvalidArgumentException(sprintf('Invalid format %d.', $format));
+
+            $style = new Style($this->colorSupport);
+            $style = $style->withLabel($label);
+
+            foreach ($formats as $format) {
+                if (is_int($format)) {
+                    if (
+                            $implFormat = Color::tryFrom($format) ??
+                            BrightColor::tryFrom($format) ??
+                            BackgroundColor::tryFrom($format) ??
+                            BrightBackgroundColor::tryFrom($format) ??
+                            Format::tryFrom($format)
+                    ) {
+                        $format = $implFormat;
+                    } else throw new InvalidArgumentException(sprintf('Invalid format %d.', $format));
+                }
+                if ($format instanceof BackgroundColor) {
+                    $style = $style->withBackground($format);
+                } elseif ($format instanceof Color) {
+                    $style = $style->withColor($format);
+                } else $style = $style->withFormats($format);
             }
 
 
-            if ($format instanceof BackgroundColor) {
-                $style = $style->withBackground($format);
-            } elseif ($format instanceof Color) {
-                $style = $style->withColor($format);
-            } else $style = $style->withFormats($format);
+            return $cached[$key] = $style;
         }
 
-        return $style;
+        return (new Style($this->colorSupport))->withLabel($label);
     }
 
     protected function buildStyles(): void {

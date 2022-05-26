@@ -25,21 +25,6 @@ class Style {
 
     }
 
-    public function setColor(?Color $color) {
-        $this->color = $color;
-        return $this;
-    }
-
-    public function setBackground(?BackgroundColor $background) {
-        $this->background = $background;
-        return $this;
-    }
-
-    public function setFormats(array $formats) {
-        $this->formats = $formats;
-        return $this;
-    }
-
     /**
      * Get style prefix
      *
@@ -173,11 +158,9 @@ class Style {
     public function withBackground(BackgroundColor|int $color): static {
         $clone = clone $this;
         if (is_int($color)) {
-
-
-            if ($instance = BackgroundColor::tryFrom($color) ?? BrightBackgroundColor::tryFrom($color)) $clone->color = $instance;
+            if ($instance = BackgroundColor::tryFrom($color) ?? BrightBackgroundColor::tryFrom($color)) $clone->background = $instance;
             else throw new InvalidArgumentException(sprintf('Invalid background color %d', $color));
-        } else $clone->color = $color;
+        } else $clone->background = $color;
         return $clone;
     }
 
