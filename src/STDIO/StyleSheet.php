@@ -177,21 +177,18 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     }
 
     /**
-     * @return \Generator<string,Style>
+     * @return array<string,Style>
      */
-    public function getBackgroundColors($param): \Traversable {
-        foreach ($this->bg as $label => $style) {
-            yield $label => $style;
-        }
+    public function getBackgroundColors($param): array {
+
+        return $this->bg;
     }
 
     /**
-     * @return \Generator<string,Style>
+     * @return array<string,Style>
      */
-    public function getForegroundColors($param): \Traversable {
-        foreach ($this->fg as $label => $style) {
-            yield $label => $style;
-        }
+    public function getForegroundColors($param): array {
+        return $this->fg;
     }
 
 }

@@ -29,16 +29,15 @@ class TagFormatter implements FormatterInterface {
 
         $result = [
             '</>' => $this->styles['reset'],
+            '<br>' => "\n",
+            '<tab>' => "  "
         ];
 
         /** @var Style $style */
         foreach ($this->styles as $tagName => $style) {
-
+            $result[sprintf('<%s>', $tagName)] = $style->getPrefix();
+            $result[sprintf('</%s>', $tagName)] = $style->getSuffix();
         }
-
-
-
-
         $this->tags = $result;
     }
 
@@ -53,6 +52,12 @@ class TagFormatter implements FormatterInterface {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[].');
             }
         }
+    }
+
+    public function __debugInfo(): array {
+        return [
+            'tags' => $this->tags,
+        ];
     }
 
 }
