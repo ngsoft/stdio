@@ -11,14 +11,15 @@ class Tab extends Tag {
 
     public function format(string $message, array $params): string {
 
-        if (isset($params['count'])) {
-            $count = $params['count'][0];
-            if (!preg_match('/^\d+$/', $count)) {
-                throw new RuntimeException(sprintf('Invalid value "%s" for int param count.', $count));
-            }
-            $count = max(1, intval($count));
-        } else $count = 1;
 
+        $count = $params['count'][0] ?? '1';
+
+        if (!preg_match('#\d+#', $count)) {
+            throw new \ValueError(sprintf('Invalid value "%s" for int count argument.', $count));
+        }
+
+
+        $count = max(1, intval($count));
 
         $str = '';
 

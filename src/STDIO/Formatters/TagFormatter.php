@@ -92,36 +92,34 @@ class TagFormatter implements FormatterInterface {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
-            // defined tags <br> <hr> or custom <bg=black;fg="white" options=bold,italic> (mix can work too)
+            // defined tags <br> <hr> or custom <bg=black;fg="white";options=bold,italic>
+
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
                 $closing = !empty($closing);
                 // </> or <>
                 if (!empty($contents)) {
-                    $params = preg_split('#[\h;]+#', $contents);
-                    if (!empty($params)) {
-                        $tagName = strtolower($params[0]);
+                    $params = preg_split('#;+#', $contents);
+                    $tagName = strtolower($params[0]);
+                    /** @var Tag $tagInstance */
+                    $tagInstance = $this->tags[$tagName] ?? $this->defaultTag;
 
-                        /** @var Tag $tagInstance */
-                        $tagInstance = $this->tags[$tagName] ?? $this->defaultTag;
+                    $implParams = [];
 
-                        $implParams = [];
-
-                        foreach ($params as $param) {
-                            if (preg_match('#([\w\-]+)(?:="?([\w\-]*)"?)#', $param, $matched)) {
-                                // <key=value>
-                                if ($tagName === $param) $tagName = '';
-                                list(, $key, $value) = $matched;
-                                if ($key === 'tagName') continue;
-                                $value = explode(',', $value);
-                                $value = array_map(fn($v) => trim($v), $value);
-                                $implParams[$key] = $value;
-                            }
+                    foreach ($params as $param) {
+                        if (preg_match('#([\w\-]+)=(.*)#', $param, $matched)) {
+                            // <key=value>
+                            if ($tagName === $param) $tagName = '';
+                            list(, $key, $value) = $matched;
+                            $value = trim($value, '"');
+                            $value = explode(',', $value);
+                            $value = array_map(fn($v) => trim($v), $value);
+                            $implParams[$key] = $value;
                         }
-                        $implParams['tagName'] = $tagName;
-                        $implParams['closing'] = $closing;
-                        return $tagInstance->format($input, $implParams);
                     }
+                    $implParams['tagName'] = $tagName;
+                    $implParams['closing'] = $closing;
+                    return $tagInstance->format($input, $implParams);
                 }
 
                 return $input;
@@ -133,8 +131,6 @@ class TagFormatter implements FormatterInterface {
             // \t \s and other things
             $message = str_replace(array_keys($this->replacements), array_values($this->replacements), $message);
 
-            if (str_contains($message, "\t")) echo "Tab detected.";
-
             $result .= $message;
         }
 
@@ -142,9 +138,7 @@ class TagFormatter implements FormatterInterface {
     }
 
     public function __debugInfo(): array {
-        return [
-            'tags' => $this->tags,
-        ];
+        return [];
     }
 
 }
