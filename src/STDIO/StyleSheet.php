@@ -121,8 +121,6 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
 
             foreach ($prefixes as $className => $prefix) {
 
-
-
                 foreach ($className::cases() as $format) {
                     $cleanName = strtolower($format->name);
                     if ($format instanceof BrightBackgroundColor || $format instanceof BrightColor) $cleanName = "b$cleanName";
@@ -169,12 +167,29 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     }
 
     /**
-     *
-     * @return Traversable<string,Style>
+     * @return \Generator<string,Style>
      */
     public function getIterator(): Traversable {
 
         foreach ($this->styles as $label => $style) {
+            yield $label => $style;
+        }
+    }
+
+    /**
+     * @return \Generator<string,Style>
+     */
+    public function getBackgroundColors($param): \Traversable {
+        foreach ($this->bg as $label => $style) {
+            yield $label => $style;
+        }
+    }
+
+    /**
+     * @return \Generator<string,Style>
+     */
+    public function getForegroundColors($param): \Traversable {
+        foreach ($this->fg as $label => $style) {
             yield $label => $style;
         }
     }
