@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
+    Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
 };
 
 /**
@@ -24,6 +24,7 @@ final class STDIO {
     private Terminal $terminal;
     private Cursor $cursor;
     private StyleSheet $styles;
+    private TagFormatter $formatter;
 
     /**
      * Get STDIO Instance
@@ -48,6 +49,7 @@ final class STDIO {
         $this->terminal = Terminal::create();
         $this->cursor = new Cursor($this->output, $this->input);
         $this->styles = new StyleSheet($forceColorSupport);
+        $this->formatter = new TagFormatter($this->styles);
     }
 
     public function getOutput(): Output {
@@ -76,6 +78,10 @@ final class STDIO {
 
     public function getStyles(): StyleSheet {
         return $this->styles;
+    }
+
+    public function getFormatter(): TagFormatter {
+        return $this->formatter;
     }
 
 }

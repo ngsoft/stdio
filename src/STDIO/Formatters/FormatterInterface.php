@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
+use NGSOFT\STDIO\Enums\{
+    Color, Format
+};
 use Stringable;
 
 interface FormatterInterface {
@@ -11,8 +14,8 @@ interface FormatterInterface {
     /**
      * Format a message
      *
-     * @param string|Stringable|string[]|Stringable[] $message
+     * @param string|Stringable|string[]|Stringable[] $messages
      * @return string
      */
-    public function format(string|Stringable|array $message): string;
+    public function format(string|Stringable|array $messages): string;
 }

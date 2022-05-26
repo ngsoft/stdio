@@ -16,6 +16,8 @@ use Traversable;
 class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
 
     protected array $styles = [];
+    protected array $fg = [];
+    protected array $bg = [];
     protected bool $colorSupport;
 
     public function __construct(bool $colorSupport = null, array $styles = []) {
@@ -111,20 +113,36 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
         // create cache for color support(false, true)
         if (!isset($cache[$key])) {
 
+            $cache[$key] = [
+                'styles' => [],
+                'fg' => [],
+                'bg' => []
+            ];
 
             foreach ($prefixes as $className => $prefix) {
+
+
+
                 foreach ($className::cases() as $format) {
+                    $cleanName = strtolower($format->name);
+                    if ($format instanceof BrightBackgroundColor || $format instanceof BrightColor) $cleanName = "b$cleanName";
+                    if ($format instanceof BackgroundColor) $cache[$key]['bg'][$cleanName] = $this->createStyle($cleanName, $format);
+                    elseif ($format instanceof Color) $cache[$key]['fg'][$cleanName] = $this->createStyle($cleanName, $format);
+
                     $label = $prefix . strtolower($format->name);
-                    $cache[$key][$label] = $this->createStyle($label, $format);
+                    $cache[$key]['styles'][$label] = $this->createStyle($label, $format);
                 }
             }
 
             foreach ($custom as $label => $params) {
-                $cache[$key][$label] = $this->createStyle($label, ...$params);
+                $cache[$key]['styles'][$label] = $this->createStyle($label, ...$params);
             }
         }
 
-        $this->styles = $cache[$key];
+        $this->styles = $cache[$key]['styles'];
+
+        $this->bg = $cache[$key]['bg'];
+        $this->fg = $cache[$key]['fg'];
     }
 
     public function offsetExists(mixed $offset): bool {
@@ -150,6 +168,10 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
         return count($this->styles);
     }
 
+    /**
+     *
+     * @return Traversable<string,Style>
+     */
     public function getIterator(): Traversable {
 
         foreach ($this->styles as $label => $style) {
