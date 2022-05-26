@@ -34,7 +34,7 @@ class TagFormatter implements FormatterInterface {
 
     public function __construct(StyleSheet $styles = null) {
         $this->styles = $styles ?? new StyleSheet();
-        $this->setDefaultTag(new DefaultTag($styles));
+        $this->setDefaultTag(new DefaultTag($this->styles));
         foreach (self::BUILTIN as $className) {
             $this->addTag(new $className($this->styles));
         }
