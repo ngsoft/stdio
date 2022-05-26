@@ -10,8 +10,8 @@ use NGSOFT\STDIO\{
 use RuntimeException;
 
 /**
- * @property int $x CursorX
- * @property int $y CursorY
+ * @property int $posX CursorX
+ * @property int $posY CursorY
  */
 class Cursor {
 
@@ -219,7 +219,7 @@ class Cursor {
      * Cursor X
      * @return int
      */
-    protected function getX(): int {
+    protected function getPosX(): int {
         return $this->getCurrentPosition()[0];
     }
 
@@ -227,7 +227,7 @@ class Cursor {
      * Cursor Y
      * @return int
      */
-    protected function getY(): int {
+    protected function getPosY(): int {
         return $this->getCurrentPosition()[1];
     }
 
@@ -258,8 +258,8 @@ class Cursor {
 
     public function __debugInfo() {
         return [
-            'x' => $this->getX(),
-            'y' => $this->getY(),
+            'x' => $this->getPosX(),
+            'y' => $this->getPosY(),
         ];
     }
 
