@@ -120,7 +120,7 @@ class TagFormatter implements FormatterInterface {
                                 if ($key === 'tagName') continue;
                                 $value = explode(',', $value);
                                 $value = array_map(fn($v) => trim($v), $value);
-                                $implParams[$key] = count($value) === 1 ? $value[0] : $value;
+                                $implParams[$key] = $value;
                             }
                         }
                         $implParams['tagName'] = $tagName;

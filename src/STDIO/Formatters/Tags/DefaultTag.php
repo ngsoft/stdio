@@ -17,19 +17,27 @@ class DefaultTag extends Tag {
 
         $closing = $params['closing'];
 
-        $styles = [];
-        if (isset($params['fg'])) {
-            $fg = is_array($params['fg']) ? $params['fg'] : [$params['fg']];
+        $formats = [];
 
-            foreach ($fg as $colorName) {
-                if ($style = $this->styles->getForegroundColor($colorName)) {
-                    $styles[] = $style;
-                }
-            }
+        foreach ($params['fg'] ?? [] as $colorName) {
+            if ($format = $this->styles->getForegroundColor($colorName)) $formats[] = $format;
+            else throw new RuntimeException(sprintf('Invalid foreground color %s', $colorName));
+        }
+
+        foreach ($params['bg'] ?? [] as $colorName) {
+            if ($format = $this->styles->getBackgroundColor($colorName)) $formats[] = $format;
+            else throw new RuntimeException(sprintf('Invalid background color %s', $colorName));
+        }
+
+        foreach ($params['options'] as $formatName) {
+            if ($format = $this->styles->getBackgroundColor($colorName)) $formats[] = $format;
+            else throw new RuntimeException(sprintf('Invalid background color %s', $colorName));
         }
 
 
 
+
+        var_dump($formats);
 
         return $message;
     }

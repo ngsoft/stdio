@@ -9,7 +9,7 @@ use ArrayAccess,
     InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\STDIO\{
-    Outputs\Output, Styles\Style, Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format
+    Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format, Outputs\Output, Styles\Style
 };
 use Traversable;
 
@@ -18,6 +18,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     protected array $styles = [];
     protected array $fg = [];
     protected array $bg = [];
+    protected array $formats = [];
     protected bool $colorSupport;
 
     public function __construct(bool $colorSupport = null, array $styles = []) {
@@ -52,7 +53,15 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
         return $this;
     }
 
-    protected function createStyle(string $label, Color|Format|int ...$formats): Style {
+    /**
+     * Create Custom Style
+     *
+     * @param string $label
+     * @param Color|Format|int $formats
+     * @return Style
+     * @throws InvalidArgumentException
+     */
+    public function createStyle(string $label, Color|Format|int ...$formats): Style {
 
         $style = new Style($this->colorSupport);
 
@@ -116,7 +125,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
             $cache[$key] = [
                 'styles' => [],
                 'fg' => [],
-                'bg' => []
+                'bg' => [],
+                'formats' => [],
             ];
 
             foreach ($prefixes as $className => $prefix) {
@@ -124,8 +134,9 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
                 foreach ($className::cases() as $format) {
                     $cleanName = strtolower($format->name);
                     if ($format instanceof BrightBackgroundColor || $format instanceof BrightColor) $cleanName = "b$cleanName";
-                    if ($format instanceof BackgroundColor) $cache[$key]['bg'][$cleanName] = $this->createStyle($cleanName, $format);
-                    elseif ($format instanceof Color) $cache[$key]['fg'][$cleanName] = $this->createStyle($cleanName, $format);
+                    if ($format instanceof BackgroundColor) $cache[$key]['bg'][$cleanName] = $format;
+                    elseif ($format instanceof Color) $cache[$key]['fg'][$cleanName] = $format;
+                    elseif ($format instanceof Format) $cache[$key]['formats'] = $format;
 
                     $label = $prefix . strtolower($format->name);
                     $cache[$key]['styles'][$label] = $this->createStyle($label, $format);
@@ -177,7 +188,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     }
 
     /**
-     * @return array<string,Style>
+     * @return array<string,BackgroundColor>
      */
     public function getBackgroundColors(): array {
 
@@ -185,24 +196,41 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     }
 
     /**
-     * @return array<string,Style>
+     * @return array<string,Color>
      */
     public function getForegroundColors(): array {
         return $this->fg;
     }
 
     /**
-     * @return ?Style
+     * @return array<string,Formats>
      */
-    public function getBackgroundColor(string $alias): ?Style {
+    public function getFormats(): array {
+        return $this->formats;
+    }
+
+    /**
+     * @param string $alias
+     * @return BackgroundColor|null
+     */
+    public function getBackgroundColor(string $alias): ?BackgroundColor {
         return $this->bg[strtolower($alias)] ?? null;
     }
 
     /**
-     * @return ?Style
+     * @param string $alias
+     * @return Color|null
      */
-    public function getForegroundColor(string $alias): ?Style {
+    public function getForegroundColor(string $alias): ?Color {
         return $this->fg[strtolower($alias)] ?? null;
+    }
+
+    /**
+     * @param string $alias
+     * @return Format|null
+     */
+    public function getFormat(string $alias): ?Format {
+        return $this->formats[strtolower($alias)] ?? null;
     }
 
 }

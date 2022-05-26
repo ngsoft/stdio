@@ -25,18 +25,6 @@ class Style {
 
     }
 
-    public function getColor(): ?Color {
-        return $this->color;
-    }
-
-    public function getBackground(): ?BackgroundColor {
-        return $this->background;
-    }
-
-    public function getFormats(): array {
-        return $this->formats;
-    }
-
     public function setColor(?Color $color) {
         $this->color = $color;
         return $this;
