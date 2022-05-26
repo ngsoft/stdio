@@ -146,7 +146,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
                     if ($format instanceof BrightBackgroundColor || $format instanceof BrightColor) $cleanName = "b$cleanName";
                     if ($format instanceof BackgroundColor) $cache[$key]['bg'][$cleanName] = $format;
                     elseif ($format instanceof Color) $cache[$key]['fg'][$cleanName] = $format;
-                    elseif ($format instanceof Format) $cache[$key]['formats'] = $format;
+                    elseif ($format instanceof Format) $cache[$key]['formats'][$cleanName] = $format;
 
                     $label = $prefix . strtolower($format->name);
                     $cache[$key]['styles'][$label] = $this->createStyle($label, $format);
@@ -162,6 +162,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
 
         $this->bg = $cache[$key]['bg'];
         $this->fg = $cache[$key]['fg'];
+        $this->formats = $cache[$key]['formats'];
     }
 
     public function offsetExists(mixed $offset): bool {

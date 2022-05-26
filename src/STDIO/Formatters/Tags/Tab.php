@@ -14,7 +14,7 @@ class Tab extends Tag {
         if (isset($params['count'])) {
             $count = $params['count'][0];
             if (!preg_match('/^\d+$/', $count)) {
-                throw new RuntimeException(sprintf('Invalid value for int param count %s', $count));
+                throw new RuntimeException(sprintf('Invalid value "%s" for int param count.', $count));
             }
             $count = max(1, intval($count));
         } else $count = 1;

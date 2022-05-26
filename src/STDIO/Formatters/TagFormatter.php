@@ -20,10 +20,10 @@ class TagFormatter implements FormatterInterface {
 
     /** @var array<string,string> */
     protected array $replacements = [
-        "\s" => " ",
         "\t" => "  ",
-        '&gt;' => '>',
-        '&lt;' => '<',
+        "\s" => " ",
+        "&gt;" => '>',
+        "&lt;" => '<',
     ];
 
     /** @var array<string,string> */
@@ -130,6 +130,11 @@ class TagFormatter implements FormatterInterface {
             $message = str_replace(array_keys($this->replaceTags), array_values($this->replaceTags), $message);
             //unknown tags
             $message = strip_tags($message);
+            // \t \s and other things
+            $message = str_replace(array_keys($this->replacements), array_values($this->replacements), $message);
+
+            if (str_contains($message, "\t")) echo "Tab detected.";
+
             $result .= $message;
         }
 

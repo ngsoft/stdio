@@ -12,10 +12,11 @@ class HR extends Tag {
 
     public function format(string $message, array $params): string {
         $width = Terminal::create()->width;
-        $width -= 4;
-        $str = "\n\t";
-        $char = "-";
-        if (is_string($params['char'])) $char = $params['char'][0];
+        $width -= 8;
+        $str = "\n\t\t";
+        $char = "=";
+        if (count($params['char'] ?? []) > 0) $char = $params['char'][0];
+        $char = $char[0];
         for ($i = 0; $i < $width; $i++) $str .= $char;
         $str .= "\n";
         return $str;

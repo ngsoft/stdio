@@ -38,6 +38,8 @@ class DefaultTag extends Tag {
         if (count($formats) > 0) {
             $label = trim(trim($message, '</>'));
             $style = $this->styles->createStyle($label, ... $formats);
+
+            var_dump($style);
             return $closing ? $style->getSuffix() : $style->getPrefix();
         }
 
