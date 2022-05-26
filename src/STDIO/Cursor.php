@@ -12,6 +12,7 @@ use RuntimeException;
 /**
  * @property int $posX CursorX
  * @property int $posY CursorY
+ * @property-read $enabled
  */
 class Cursor {
 
@@ -201,6 +202,7 @@ class Cursor {
         $input = $this->input->getStream();
 
         $row = $col = 1;
+        $enabled = 0;
 
         if (
                 $ttySupport && $stty &&
@@ -211,8 +213,19 @@ class Cursor {
             $code = fread($input, 1024);
             shell_exec(sprintf('stty %s', $mode));
             sscanf($code, "\x1b[%d;%dR", $row, $col);
+            $enabled = true;
         }
-        return [$col, $row];
+        return [$col, $row, 1];
+    }
+
+    /**
+     * Can cursor position be read?
+     *
+     * @return bool
+     */
+    protected function getEnabled(): bool {
+        list(,, $result) = $this->getCurrentPosition();
+        return (bool) $result;
     }
 
     /**

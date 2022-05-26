@@ -7,6 +7,7 @@ namespace NGSOFT;
 use NGSOFT\STDIO\{
     Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
 };
+use Stringable;
 
 /**
  * STDIO Super Object
@@ -82,6 +83,59 @@ final class STDIO {
 
     public function getFormatter(): TagFormatter {
         return $this->formatter;
+    }
+
+    ////////////////////////////   Helpers   ////////////////////////////
+
+    /**
+     * Write message into the buffer
+     *
+     * @param string|Stringable|array $messages
+     * @return static
+     */
+    public function write(string|Stringable|array $messages): static {
+
+        $this->buffer->write($messages);
+        return $this;
+    }
+
+    /**
+     *  Write message into the buffer and creates a new line
+     * @param string|Stringable|array $messages
+     * @return static
+     */
+    public function writeln(string|Stringable|array $messages): static {
+        $this->buffer->writeln($messages);
+        return $this;
+    }
+
+    /**
+     * Prints message or flush buffer to the output
+     *
+     * @param string|Stringable|array|null $messages flush the buffer if set to null
+     * @return static
+     */
+    public function out(string|Stringable|array $messages = null): static {
+
+        if (!is_null($messages)) {
+            $this->buffer->clear();
+            $this->output->write($messages);
+        } else $this->buffer->flush($this->output);
+        return $this;
+    }
+
+    /**
+     * Prints message or flush buffer to the error output
+     *
+     * @param string|Stringable|string[]|Stringable[]|null $messages flush the buffer if set to null
+     * @return static
+     */
+    public function err(string|Stringable|array $messages = null): static {
+        if (!is_null($messages)) {
+            $this->buffer->clear();
+            $this->errorOutput->write($messages);
+        } else $this->buffer->flush($this->errorOutput);
+        return $this;
     }
 
 }
