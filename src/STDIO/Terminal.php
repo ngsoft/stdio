@@ -22,6 +22,7 @@ final class Terminal {
      * @return static
      */
     public static function create(): self {
+
         static $instance;
         $instance = $instance ?? new static();
         return $instance;
@@ -141,7 +142,7 @@ final class Terminal {
         return $supported;
     }
 
-    public function __isset($name) {
+    public function __isset(string $name): bool {
         return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
@@ -151,16 +152,17 @@ final class Terminal {
         return call_user_func([$this, $method]);
     }
 
-    public function __set(string $name, mixed $value) {
+    public function __set(string $name, mixed $value): void {
 
         throw new RuntimeException(sprintf('%s::%s cannot be set.', static::class, $name));
     }
 
-    public function __unset(string $name) {
+    public function __unset(string $name): void {
+
         throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
-    public function __debugInfo() {
+    public function __debugInfo(): array {
         return [
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),

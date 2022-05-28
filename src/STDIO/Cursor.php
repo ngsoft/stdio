@@ -244,7 +244,7 @@ class Cursor {
         return $this->getCurrentPosition()[1];
     }
 
-    public function __isset($name) {
+    public function __isset(string $name): bool {
         return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
@@ -254,7 +254,7 @@ class Cursor {
         return call_user_func([$this, $method]);
     }
 
-    public function __set(string $name, mixed $value) {
+    public function __set(string $name, mixed $value): void {
 
         if ($name === 'posX' && is_int($value)) {
             list(, $y) = $this->getCurrentPosition();
@@ -265,11 +265,11 @@ class Cursor {
         }
     }
 
-    public function __unset(string $name) {
+    public function __unset(string $name): void {
         throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
-    public function __debugInfo() {
+    public function __debugInfo(): array {
         return [
             'x' => $this->getPosX(),
             'y' => $this->getPosY(),

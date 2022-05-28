@@ -106,7 +106,7 @@ class Style {
     ////////////////////////////   Creator   ////////////////////////////
 
     /** {@inheritdoc} */
-    public function __clone() {
+    public function __clone(): void {
         $this->prefix = $this->suffix = null;
     }
 
