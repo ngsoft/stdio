@@ -10,11 +10,14 @@ use NGSOFT\STDIO\{
 use RuntimeException;
 
 /**
- * @property int $posX CursorX
- * @property int $posY CursorY
+ * @property int left
+ * @property int top
+ * @property-read int width
+ * @property-read int height
  * @property-read bool $enabled
  */
-class Cursor {
+class Cursor
+{
 
     /** @var Terminal */
     private $terminal;
@@ -28,7 +31,8 @@ class Cursor {
     public function __construct(
             Output $output = null,
             Input $input = null
-    ) {
+    )
+    {
         $this->terminal = Terminal::create();
         $this->output = $output ?? new Output();
         $this->input = $input ?? new Input();
@@ -40,7 +44,8 @@ class Cursor {
      * @param int $lines
      * @return static
      */
-    public function moveUp(int $lines = 1): static {
+    public function moveUp(int $lines = 1): static
+    {
         $lines = max(1, $lines);
         $this->output->write(sprintf(Ansi::CURSOR_UP, $lines));
         return $this;
@@ -52,7 +57,8 @@ class Cursor {
      * @param int $lines
      * @return static
      */
-    public function moveDown(int $lines = 1): static {
+    public function moveDown(int $lines = 1): static
+    {
         $lines = max(1, $lines);
         $this->output->write(sprintf(Ansi::CURSOR_DOWN, $lines));
         return $this;
@@ -63,7 +69,8 @@ class Cursor {
      * @param int $cols
      * @return static
      */
-    public function moveRight(int $cols = 1): static {
+    public function moveRight(int $cols = 1): static
+    {
         $cols = max(1, $cols);
         $this->output->write(sprintf(Ansi::CURSOR_RIGHT, $cols));
         return $this;
@@ -75,7 +82,8 @@ class Cursor {
      * @param int $cols
      * @return static
      */
-    public function moveLeft(int $cols = 1): static {
+    public function moveLeft(int $cols = 1): static
+    {
         $cols = max(1, $cols);
         $this->output->write(sprintf(Ansi::CURSOR_LEFT, $cols));
         return $this;
@@ -86,7 +94,8 @@ class Cursor {
      * @param int $col
      * @return static
      */
-    public function moveToColumn(int $col): static {
+    public function moveToColumn(int $col): static
+    {
         $col = max(1, $col);
         $this->output->write(sprintf(Ansi::CURSOR_COL, $col));
         return $this;
@@ -96,7 +105,8 @@ class Cursor {
      * Save cursor position
      * @return static
      */
-    public function savePosition(): static {
+    public function savePosition(): static
+    {
         $this->output->write(Ansi::CURSOR_SAVE_POS);
         return $this;
     }
@@ -105,7 +115,8 @@ class Cursor {
      * loads cursor position
      * @return static
      */
-    public function restorePosition(): static {
+    public function restorePosition(): static
+    {
         $this->output->write(Ansi::CURSOR_LOAD_POS);
 
         return $this;
@@ -115,7 +126,8 @@ class Cursor {
      * Clears current line
      * @return static
      */
-    public function clearLine(): static {
+    public function clearLine(): static
+    {
         $this->output->write(Ansi::CLEAR_LINE);
 
         return $this;
@@ -125,7 +137,8 @@ class Cursor {
      * Clears from the cursor to the end of the line
      * @return static
      */
-    public function clearEndLine(): static {
+    public function clearEndLine(): static
+    {
         $this->output->write(Ansi::CLEAR_END_LINE);
 
         return $this;
@@ -135,7 +148,8 @@ class Cursor {
      * Clears from the beginning of the line to the cursor
      * @return static
      */
-    public function clearStartLine(): static {
+    public function clearStartLine(): static
+    {
         $this->output->write(Ansi::CLEAR_START_LINE);
 
         return $this;
@@ -145,7 +159,8 @@ class Cursor {
      * Clears from the top of the screen to the cursor
      * @return static
      */
-    public function clearUp(): static {
+    public function clearUp(): static
+    {
         $this->output->write(Ansi::CLEAR_UP);
 
         return $this;
@@ -155,7 +170,8 @@ class Cursor {
      * Clears from the cursor to the bottom of the screen
      * @return static
      */
-    public function clearDown(): static {
+    public function clearDown(): static
+    {
         $this->output->write(Ansi::CLEAR_DOWN);
 
         return $this;
@@ -166,7 +182,8 @@ class Cursor {
      *
      * @return static
      */
-    public function clearScreen(): static {
+    public function clearScreen(): static
+    {
         $this->output->write(Ansi::CLEAR_SCREEN);
 
         return $this;
@@ -179,7 +196,8 @@ class Cursor {
      * @param int $y
      * @return static
      */
-    public function setCurrentPosition(int $x, int $y): static {
+    public function setCurrentPosition(int $x, int $y): static
+    {
         $x = max(1, $x);
         $y = max(1, $y);
         $this->output->write(sprintf(Ansi::CURSOR_POS, $y, $x));
@@ -193,18 +211,31 @@ class Cursor {
      * @staticvar type $ttySupport
      * @return int[]
      */
-    public function getCurrentPosition(): array {
+    public function getCurrentPosition(): array
+    {
 
-        static $stty, $ttySupport;
+        static $stty, $ttySupport, $ps;
 
         $stty = $stty ?? !empty(Utils::executeProcess('stty'));
+        $ps = $ps ?? !empty(Utils::executeProcess('powershell -?'));
         $ttySupport = $ttySupport ?? $this->terminal->tty;
         $input = $this->input->getStream();
 
         $row = $col = 1;
         $enabled = 0;
 
-        if (
+        if (DIRECTORY_SEPARATOR === '\\' && $ps) {
+            $pos = shell_exec('powershell.exe $console=$Host.UI.RawUI;$curPos=$console.CursorPosition;$X=$curpos.X;$Y=$curpos.Y;Write-Output "$X $Y";');
+            $out = preg_split('#[\n\r]+#', $pos);
+            list($col, $row) = $out;
+            $col = (int) $col;
+            $row = (int) $row;
+            if ($col !== 0 || $row !== 0) {
+                $col++;
+                $row++;
+                $enabled = 1;
+            } else $col = $row = 1;
+        } elseif (
                 $ttySupport && $stty &&
                 is_string($mode = shell_exec('stty -g'))
         ) {
@@ -218,12 +249,24 @@ class Cursor {
         return [$col, $row, $enabled];
     }
 
+    protected function getWidth(): int
+    {
+
+        return $this->terminal->getWidth();
+    }
+
+    protected function getHeight(): int
+    {
+        return $this->terminal->getHeight();
+    }
+
     /**
      * Can cursor position be read?
      *
      * @return bool
      */
-    protected function getEnabled(): bool {
+    protected function getEnabled(): bool
+    {
         list(,, $result) = $this->getCurrentPosition();
         return (bool) $result;
     }
@@ -232,7 +275,8 @@ class Cursor {
      * Cursor X
      * @return int
      */
-    protected function getPosX(): int {
+    protected function getLeft(): int
+    {
         return $this->getCurrentPosition()[0];
     }
 
@@ -240,39 +284,46 @@ class Cursor {
      * Cursor Y
      * @return int
      */
-    protected function getPosY(): int {
+    protected function getTop(): int
+    {
         return $this->getCurrentPosition()[1];
     }
 
-    public function __isset(string $name): bool {
+    public function __isset(string $name): bool
+    {
         return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
-    public function __get(string $name): mixed {
+    public function __get(string $name): mixed
+    {
         $method = sprintf('get%s', ucfirst($name));
         if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
         return call_user_func([$this, $method]);
     }
 
-    public function __set(string $name, mixed $value): void {
+    public function __set(string $name, mixed $value): void
+    {
 
-        if ($name === 'posX' && is_int($value)) {
+
+        if (in_array($name, ['left']) && is_int($value)) {
             list(, $y) = $this->getCurrentPosition();
             $this->setCurrentPosition($value, $y);
-        } elseif ($name === 'posY' && is_int($value)) {
+        } elseif (in_array($name, ['top']) && is_int($value)) {
             list($x) = $this->getCurrentPosition();
             $this->setCurrentPosition($x, $value);
         }
     }
 
-    public function __unset(string $name): void {
+    public function __unset(string $name): void
+    {
         throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
-    public function __debugInfo(): array {
+    public function __debugInfo(): array
+    {
         return [
-            'x' => $this->getPosX(),
-            'y' => $this->getPosY(),
+            'top/left' => [$this->getTop(), $this->getLeft(),],
+            'width/height' => [$this->getWidth(), $this->getHeight()],
         ];
     }
 
