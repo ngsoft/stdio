@@ -14,7 +14,8 @@ use Stringable;
  * Gives access to all components
  *
  */
-final class STDIO {
+final class STDIO
+{
 
     public const VERSION = '3.0';
 
@@ -33,7 +34,8 @@ final class STDIO {
      * @staticvar type $instance
      * @return static
      */
-    public static function create(): static {
+    public static function create(): static
+    {
         static $instance;
         $instance = $instance ?? new static();
         return $instance;
@@ -42,7 +44,8 @@ final class STDIO {
     /**
      * @param ?bool $forceColorSupport Overrides color support detection
      */
-    public function __construct(bool $forceColorSupport = null) {
+    public function __construct(bool $forceColorSupport = null)
+    {
         $this->terminal = Terminal::create();
         $this->styles = new StyleSheet($forceColorSupport);
         $this->formatter = new TagFormatter($this->styles);
@@ -53,35 +56,43 @@ final class STDIO {
         $this->cursor = new Cursor($this->output, $this->input);
     }
 
-    public function getOutput(): Output {
+    public function getOutput(): Output
+    {
         return $this->output;
     }
 
-    public function getErrorOutput(): ErrorOutput {
+    public function getErrorOutput(): ErrorOutput
+    {
         return $this->errorOutput;
     }
 
-    public function getInput(): Input {
+    public function getInput(): Input
+    {
         return $this->input;
     }
 
-    public function getBuffer(): Buffer {
+    public function getBuffer(): Buffer
+    {
         return $this->buffer;
     }
 
-    public function getTerminal(): Terminal {
+    public function getTerminal(): Terminal
+    {
         return $this->terminal;
     }
 
-    public function getCursor(): Cursor {
+    public function getCursor(): Cursor
+    {
         return $this->cursor;
     }
 
-    public function getStyles(): StyleSheet {
+    public function getStyles(): StyleSheet
+    {
         return $this->styles;
     }
 
-    public function getFormatter(): TagFormatter {
+    public function getFormatter(): TagFormatter
+    {
         return $this->formatter;
     }
 
@@ -93,7 +104,8 @@ final class STDIO {
      * @param string|Stringable|array $messages
      * @return static
      */
-    public function write(string|Stringable|array $messages): static {
+    public function write(string|Stringable|array $messages): static
+    {
 
         $this->buffer->write($messages);
         return $this;
@@ -104,7 +116,8 @@ final class STDIO {
      * @param string|Stringable|array $messages
      * @return static
      */
-    public function writeln(string|Stringable|array $messages): static {
+    public function writeln(string|Stringable|array $messages): static
+    {
         $this->buffer->writeln($messages);
         return $this;
     }
@@ -115,7 +128,8 @@ final class STDIO {
      * @param string|Stringable|array|null $messages flush the buffer if set to null
      * @return static
      */
-    public function out(string|Stringable|array $messages = null): static {
+    public function out(string|Stringable|array $messages = null): static
+    {
 
         if (!is_null($messages)) {
             $this->buffer->clear();
@@ -130,12 +144,25 @@ final class STDIO {
      * @param string|Stringable|string[]|Stringable[]|null $messages flush the buffer if set to null
      * @return static
      */
-    public function err(string|Stringable|array $messages = null): static {
+    public function err(string|Stringable|array $messages = null): static
+    {
         if (!is_null($messages)) {
             $this->buffer->clear();
             $this->errorOutput->write($messages);
         } else $this->buffer->flush($this->errorOutput);
         return $this;
+    }
+
+    /**
+     * Read lines from the input
+     *
+     * @param int $lines
+     * @return string[]|string
+     */
+    public function read(int $lines = 1): array|string
+    {
+        $result = $this->input->read($lines);
+        return $lines === 1 ? $result[0] : $result;
     }
 
 }
