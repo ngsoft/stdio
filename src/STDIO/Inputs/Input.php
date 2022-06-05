@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Inputs;
 
-class Input {
+class Input
+{
 
     /** @var resource */
     protected $stream;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->stream = fopen('php://stdin', 'r+');
     }
 
@@ -18,7 +20,8 @@ class Input {
      *
      * @return resource
      */
-    public function getStream() {
+    public function getStream()
+    {
         return $this->stream;
     }
 
@@ -26,13 +29,19 @@ class Input {
      * Read lines from the input
      *
      * @param int $lines Number of lines to read
+     * @param bool $allowEmptyLines 
      * @return string[]
      */
-    public function read(int $lines = 1): array {
+    public function read(int $lines = 1, bool $allowEmptyLines = true): array
+    {
         $result = [];
         do {
             $line = fgets($this->stream);
             $line = rtrim($line, "\r\n");
+            if (!$allowEmptyLines && empty($line)) {
+                continue;
+            }
+
             $result[] = $line;
         } while (count($result) !== $lines);
         return $result;

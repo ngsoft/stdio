@@ -157,11 +157,12 @@ final class STDIO
      * Read lines from the input
      *
      * @param int $lines
+     * @param bool $allowEmptyLines
      * @return string[]|string
      */
-    public function read(int $lines = 1): array|string
+    public function read(int $lines = 1, bool $allowEmptyLines = true): array|string
     {
-        $result = $this->input->read($lines);
+        $result = $this->input->read($lines, $allowEmptyLines);
         return $lines === 1 ? $result[0] : $result;
     }
 
