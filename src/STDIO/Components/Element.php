@@ -15,20 +15,24 @@ class Element implements Countable, Stringable
     protected ?Style $style = null;
     protected string $value = '';
     protected int $length = 0;
+    protected array $properties = [];
 
     /** @var self[] */
     protected array $children = [];
 
-    public function __construct(
-            public readonly string $name
-    )
+    public function setProperty(string $property, mixed $value): static
     {
+        $this->properties[$property] = $value;
+        return $this;
+    }
 
+    public function getProperty(string $property): mixed
+    {
+        return $this->properties[$property] ?? null;
     }
 
     public function appendChild(self $element): static
     {
-
         array_push($this->children, $element);
         return $this;
     }
