@@ -41,7 +41,7 @@ class DefaultTag extends Tag
 
         if (count($formats) > 0) {
             $label = trim(trim($message, '</>'));
-            $style = StyleSheet::createStyle($label, ... $formats);
+            $style = $this->createStyle($label, ... $formats);
 
             return $closing ? $style->getSuffix() : $style->getPrefix();
         }

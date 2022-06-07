@@ -53,7 +53,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
      */
     public function addStyle(string $label, Color|Format|int ...$formats): static
     {
-        $this->styles[$label] = static::createStyle($label, ...$formats);
+        $this->styles[$label] = $this->createStyle($label, ...$formats);
         return $this;
     }
 
@@ -65,7 +65,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
      * @return Style
      * @throws InvalidArgumentException
      */
-    public static function createStyle(string $label, Color|Format|int ...$formats): Style
+    public function createStyle(string $label, Color|Format|int ...$formats): Style
     {
 
         static $cache = [0 => [], 1 => []];
@@ -155,12 +155,12 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
                     elseif ($format instanceof Format) $cache[$key]['formats'][$cleanName] = $format;
 
                     $label = $prefix . strtolower($format->name);
-                    $cache[$key]['styles'][$label] = static::createStyle($label, $format);
+                    $cache[$key]['styles'][$label] = $this->createStyle($label, $format);
                 }
             }
 
             foreach ($custom as $label => $params) {
-                $cache[$key]['styles'][$label] = static::createStyle($label, ...$params);
+                $cache[$key]['styles'][$label] = $this->createStyle($label, ...$params);
             }
         }
 
