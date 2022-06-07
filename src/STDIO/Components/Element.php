@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components;
 
-use Countable;
+use Countable,
+    IteratorAggregate;
 use NGSOFT\STDIO\{
     Outputs\Output, Styles\Style
 };
-use Stringable;
+use Stringable,
+    Traversable;
 use function mb_strlen;
 
-class Element implements Countable, Stringable, \IteratorAggregate
+class Element implements Countable, Stringable, IteratorAggregate
 {
 
     protected ?Style $style = null;
@@ -102,7 +104,7 @@ class Element implements Countable, Stringable, \IteratorAggregate
         return $this->render();
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
 
         foreach ($this->children as $element) {

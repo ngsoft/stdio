@@ -10,4 +10,6 @@ interface ProgressElement
     public function setTotal(int $total): static;
 
     public function setCurrent(int $current): static;
+
+    public function isComplete(): bool;
 }

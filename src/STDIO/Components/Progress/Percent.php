@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components\Progress;
 
-class Percent extends \NGSOFT\STDIO\Components\Element implements ProgressElement
+use NGSOFT\STDIO\Components\{
+    Element, ProgressElement
+};
+
+class Percent extends Element implements ProgressElement
 {
 
     public function __construct(
@@ -15,13 +19,13 @@ class Percent extends \NGSOFT\STDIO\Components\Element implements ProgressElemen
 
     }
 
-    public function setTotal(int $total)
+    public function setTotal(int $total): static
     {
         $this->total = $total;
         return $this;
     }
 
-    public function setCurrent(int $current)
+    public function setCurrent(int $current): static
     {
         $this->current = $current;
 
@@ -36,6 +40,11 @@ class Percent extends \NGSOFT\STDIO\Components\Element implements ProgressElemen
         $this->setValue($percent);
 
         return $this;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->total === $this->current;
     }
 
     public function getPercent(): int

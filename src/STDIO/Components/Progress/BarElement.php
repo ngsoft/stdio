@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components\Progress;
 
-class BarElement extends \NGSOFT\STDIO\Components\Element implements ProgressElement
+use NGSOFT\STDIO\Components\{
+    Element, ProgressElement
+};
+
+class BarElement extends Element implements ProgressElement
 {
 
     protected const ICON_PROGRESS = "▓";
@@ -20,7 +24,7 @@ class BarElement extends \NGSOFT\STDIO\Components\Element implements ProgressEle
         $this->setCurrent($current);
     }
 
-    public function setTotal(int $total)
+    public function setTotal(int $total): static
     {
         $this->total = $total;
         $this->setCurrent(0);
@@ -50,6 +54,11 @@ class BarElement extends \NGSOFT\STDIO\Components\Element implements ProgressEle
         $this->setValue($content);
 
         return $this;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->total === $this->current;
     }
 
     public function getPercent(): int

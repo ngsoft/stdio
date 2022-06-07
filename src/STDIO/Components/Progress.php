@@ -35,14 +35,35 @@ class Progress extends Element implements ProgressElement
     public function setTotal(int $total): static
     {
         $this->total = $total;
+
+        foreach ($this->children as $element) {
+            if ($element instanceof ProgressElement) {
+                $element->setTotal($total);
+            }
+        }
+
+
         $this->setCurrent(0);
         return $this;
     }
 
     public function setCurrent(int $current): static
     {
-        $this->current = min($current, $this->total);
+        $current = min($current, $this->total);
+
+        $this->current = $current;
+
+        foreach ($this->children as $element) {
+            if ($element instanceof ProgressElement) {
+                $element->setCurrent($current);
+            }
+        }
         return $this;
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->total === $this->current;
     }
 
 }
