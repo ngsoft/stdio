@@ -38,8 +38,11 @@ class Element implements Countable, Stringable, IteratorAggregate
 
     public function appendChild(self $element): static
     {
-        $element->parent = $this;
-        array_push($this->children, $element);
+
+        if ($element !== $this && !in_array($element, $this->children, true)) {
+            $element->parent = $this;
+            array_push($this->children, $element);
+        }
         return $this;
     }
 

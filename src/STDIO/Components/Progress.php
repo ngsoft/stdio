@@ -4,19 +4,27 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components;
 
+use NGSOFT\STDIO\{
+    Components\Progress\BarElement, Components\Progress\Percent, Cursor, Outputs\Output
+};
+
 class Progress extends Element implements ProgressElement
 {
 
-    protected Progress\BarElement $bar;
-    protected Progress\Percent $percent;
+    protected Cursor $cursor;
+    protected BarElement $bar;
+    protected Percent $percent;
 
     public function __construct(
+            protected ?Output $output = null,
             protected int $total = 100,
             protected int $current = 0
     )
     {
-        $this->bar = new Progress\BarElement($total, $current);
-        $this->percent = new Progress\Percent($total, $current);
+        $this->output = $output ?? new Output();
+        $this->cursor = new Cursor($this->output);
+        $this->bar = new BarElement($total, $current);
+        $this->percent = new Percent($total, $current);
         $this
                 ->appendChild($this->bar)
                 ->appendChild($this->percent);
