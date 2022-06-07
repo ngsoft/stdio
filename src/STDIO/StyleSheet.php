@@ -13,7 +13,8 @@ use NGSOFT\STDIO\{
 };
 use Traversable;
 
-class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
+class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
+{
 
     protected array $styles = [];
     protected array $fg = [];
@@ -21,7 +22,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     protected array $formats = [];
     protected bool $colorSupport;
 
-    public function __construct(bool $colorSupport = null, array $styles = []) {
+    public function __construct(bool $colorSupport = null, array $styles = [])
+    {
         $this->colorSupport = is_bool($colorSupport) ? $colorSupport : Terminal::create()->colors;
         if (empty($styles)) $this->buildStyles();
         else $this->styles = $styles;
@@ -33,7 +35,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param Output $output
      * @return void
      */
-    public function displayStyles(Output $output): void {
+    public function displayStyles(Output $output): void
+    {
 
         /** @var Style $style */
         foreach ($this as $style) {
@@ -48,8 +51,9 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param Color|Format ...$formats
      * @return static
      */
-    public function addStyle(string $label, Color|Format|int ...$formats): static {
-        $this->styles[$label] = $this->createStyle($label, ...$formats);
+    public function addStyle(string $label, Color|Format|int ...$formats): static
+    {
+        $this->styles[$label] = static::createStyle($label, ...$formats);
         return $this;
     }
 
@@ -61,7 +65,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @return Style
      * @throws InvalidArgumentException
      */
-    public function createStyle(string $label, Color|Format|int ...$formats): Style {
+    public static function createStyle(string $label, Color|Format|int ...$formats): Style
+    {
 
         static $cache = [0 => [], 1 => []];
         $cacheKey = (int) $this->colorSupport;
@@ -101,7 +106,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
         return (new Style($this->colorSupport))->withLabel($label);
     }
 
-    protected function buildStyles(): void {
+    protected function buildStyles(): void
+    {
         static
         $cache = [],
         $custom,
@@ -149,12 +155,12 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
                     elseif ($format instanceof Format) $cache[$key]['formats'][$cleanName] = $format;
 
                     $label = $prefix . strtolower($format->name);
-                    $cache[$key]['styles'][$label] = $this->createStyle($label, $format);
+                    $cache[$key]['styles'][$label] = static::createStyle($label, $format);
                 }
             }
 
             foreach ($custom as $label => $params) {
-                $cache[$key]['styles'][$label] = $this->createStyle($label, ...$params);
+                $cache[$key]['styles'][$label] = static::createStyle($label, ...$params);
             }
         }
 
@@ -165,25 +171,30 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
         $this->formats = $cache[$key]['formats'];
     }
 
-    public function offsetExists(mixed $offset): bool {
+    public function offsetExists(mixed $offset): bool
+    {
 
         return isset($this->styles[$offset]);
     }
 
-    public function offsetGet(mixed $offset): mixed {
+    public function offsetGet(mixed $offset): mixed
+    {
         return $this->styles[$offset] ?? null;
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void {
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
         if ($value instanceof Style) $this->styles[$offset] = $value;
     }
 
-    public function offsetUnset(mixed $offset): void {
+    public function offsetUnset(mixed $offset): void
+    {
 
         unset($this->styles[$offset]);
     }
 
-    public function count(): int {
+    public function count(): int
+    {
 
         return count($this->styles);
     }
@@ -191,7 +202,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     /**
      * @return \Generator<string,Style>
      */
-    public function getIterator(): Traversable {
+    public function getIterator(): Traversable
+    {
 
         foreach ($this->styles as $label => $style) {
             yield $label => $style;
@@ -201,7 +213,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     /**
      * @return array<string,BackgroundColor>
      */
-    public function getBackgroundColors(): array {
+    public function getBackgroundColors(): array
+    {
 
         return $this->bg;
     }
@@ -209,14 +222,16 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
     /**
      * @return array<string,Color>
      */
-    public function getForegroundColors(): array {
+    public function getForegroundColors(): array
+    {
         return $this->fg;
     }
 
     /**
      * @return array<string,Format>
      */
-    public function getFormats(): array {
+    public function getFormats(): array
+    {
         return $this->formats;
     }
 
@@ -224,7 +239,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param string $alias
      * @return BackgroundColor|null
      */
-    public function getBackgroundColor(string $alias): ?BackgroundColor {
+    public function getBackgroundColor(string $alias): ?BackgroundColor
+    {
         return $this->bg[strtolower($alias)] ?? null;
     }
 
@@ -232,7 +248,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param string $alias
      * @return Color|null
      */
-    public function getForegroundColor(string $alias): ?Color {
+    public function getForegroundColor(string $alias): ?Color
+    {
         return $this->fg[strtolower($alias)] ?? null;
     }
 
@@ -240,7 +257,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable {
      * @param string $alias
      * @return Format|null
      */
-    public function getFormat(string $alias): ?Format {
+    public function getFormat(string $alias): ?Format
+    {
         return $this->formats[strtolower($alias)] ?? null;
     }
 

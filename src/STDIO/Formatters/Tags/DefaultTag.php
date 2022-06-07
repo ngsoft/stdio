@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
-use NGSOFT\STDIO\Formatters\Tag,
-    RuntimeException;
+use NGSOFT\STDIO\{
+    Formatters\Tag, StyleSheet
+};
+use RuntimeException;
 
 /**
  * Used to manage tags without tag name but with params
  */
-class DefaultTag extends Tag {
+class DefaultTag extends Tag
+{
 
-    public function format(string $message, array $params): string {
+    public function format(string $message, array $params): string
+    {
 
         if (!empty($params['tagName'])) return $message;
 
@@ -37,7 +41,7 @@ class DefaultTag extends Tag {
 
         if (count($formats) > 0) {
             $label = trim(trim($message, '</>'));
-            $style = $this->styles->createStyle($label, ... $formats);
+            $style = StyleSheet::createStyle($label, ... $formats);
 
             return $closing ? $style->getSuffix() : $style->getPrefix();
         }

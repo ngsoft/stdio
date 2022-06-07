@@ -10,10 +10,10 @@ use NGSOFT\STDIO\{
 use RuntimeException;
 
 /**
- * @property int left
- * @property int top
- * @property-read int width
- * @property-read int height
+ * @property int $left
+ * @property int $top
+ * @property-read int $width
+ * @property-read int $height
  * @property-read bool $enabled
  */
 class Cursor
@@ -226,15 +226,17 @@ class Cursor
 
         if (DIRECTORY_SEPARATOR === '\\' && $ps) {
             $pos = shell_exec('powershell.exe $console=$Host.UI.RawUI;$curPos=$console.CursorPosition;$X=$curpos.X;$Y=$curpos.Y;Write-Output "$X $Y";');
-            $out = preg_split('#[\n\r]+#', $pos);
-            list($col, $row) = $out;
-            $col = (int) $col;
-            $row = (int) $row;
-            if ($col !== 0 || $row !== 0) {
-                $col++;
-                $row++;
-                $enabled = 1;
-            } else $col = $row = 1;
+            if (is_string($pos)) {
+                $out = preg_split('#[\n\r]+#', $pos);
+                list($col, $row) = $out;
+                $col = (int) $col;
+                $row = (int) $row;
+                if ($col !== 0 || $row !== 0) {
+                    $col++;
+                    $row++;
+                    $enabled = 1;
+                } else $col = $row = 1;
+            }
         } elseif (
                 $ttySupport && $stty &&
                 is_string($mode = shell_exec('stty -g'))
@@ -249,13 +251,13 @@ class Cursor
         return [$col, $row, $enabled];
     }
 
-    protected function getWidth(): int
+    public function getWidth(): int
     {
 
         return $this->terminal->getWidth();
     }
 
-    protected function getHeight(): int
+    public function getHeight(): int
     {
         return $this->terminal->getHeight();
     }
@@ -265,7 +267,7 @@ class Cursor
      *
      * @return bool
      */
-    protected function getEnabled(): bool
+    public function getEnabled(): bool
     {
         list(,, $result) = $this->getCurrentPosition();
         return (bool) $result;
@@ -275,7 +277,7 @@ class Cursor
      * Cursor X
      * @return int
      */
-    protected function getLeft(): int
+    public function getLeft(): int
     {
         return $this->getCurrentPosition()[0];
     }
@@ -284,7 +286,7 @@ class Cursor
      * Cursor Y
      * @return int
      */
-    protected function getTop(): int
+    public function getTop(): int
     {
         return $this->getCurrentPosition()[1];
     }
