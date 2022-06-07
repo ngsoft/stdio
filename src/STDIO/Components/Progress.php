@@ -28,6 +28,9 @@ class Progress extends Element implements ProgressElement
         $this
                 ->appendChild($this->bar)
                 ->appendChild($this->percent);
+
+        $this->setTotal($total);
+        $this->setCurrent($current);
     }
 
     public function getTotal(): int
@@ -72,6 +75,11 @@ class Progress extends Element implements ProgressElement
     public function isComplete(): bool
     {
         return $this->total === $this->current;
+    }
+
+    public function display()
+    {
+        $this->output($this->output);
     }
 
 }
