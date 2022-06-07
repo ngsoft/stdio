@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components\Progress;
 
-class BarElement extends \NGSOFT\STDIO\Components\Element
+class BarElement extends \NGSOFT\STDIO\Components\Element implements ProgressElement
 {
 
     protected const ICON_PROGRESS = "▓";

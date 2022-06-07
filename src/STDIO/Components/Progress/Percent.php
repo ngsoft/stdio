@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Components\Progress;
 
-class Percent extends \NGSOFT\STDIO\Components\Element
+class Percent extends \NGSOFT\STDIO\Components\Element implements ProgressElement
 {
 
     public function __construct(
@@ -30,6 +30,8 @@ class Percent extends \NGSOFT\STDIO\Components\Element
         while (strlen($percent) < 3) {
             $percent = " {$percent}";
         }
+
+        $percent .= "%";
 
         $this->setValue($percent);
 
