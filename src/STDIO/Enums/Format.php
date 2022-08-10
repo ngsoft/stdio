@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
-use NGSOFT\Enums\Enum;
+use NGSOFT\Enums\EnumUtils;
 
 /**
  * @method static static RESET()
@@ -16,18 +16,23 @@ use NGSOFT\Enums\Enum;
  * @method static static HIDDEN()
  * @method static static STRIKETROUGH()
  */
-class Format extends Enum {
+enum Format: int
+{
 
-    public const RESET = 0;
-    public const BOLD = 1;
-    public const DIM = 2;
-    public const ITALIC = 3;
-    public const UNDERLINE = 4;
-    public const INVERSE = 7;
-    public const HIDDEN = 8;
-    public const STRIKETROUGH = 9;
+    use EnumUtils;
 
-    public function getUnsetValue(): int {
+    case RESET = 0;
+    case BOLD = 1;
+    case DIM = 2;
+    case ITALIC = 3;
+    case UNDERLINE = 4;
+    case INVERSE = 7;
+    case HIDDEN = 8;
+    case STRIKETROUGH = 9;
+
+    public function getUnsetValue(): int
+    {
+
         static $format_unset = [
             0 => 0, 1 => 22, 2 => 22, 3 => 23,
             4 => 24, 7 => 27, 8 => 28, 9 => 29
