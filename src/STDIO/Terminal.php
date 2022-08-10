@@ -11,7 +11,8 @@ use NGSOFT\STDIO\Utils\Utils,
  * @property-read int $width Terminal Width
  * @property-read int $height Terminal Height
  */
-final class Terminal {
+final class Terminal
+{
 
     public readonly bool $colors;
     public readonly bool $tty;
@@ -21,14 +22,16 @@ final class Terminal {
      * @staticvar Terminal $instance
      * @return static
      */
-    public static function create(): self {
+    public static function create(): self
+    {
 
         static $instance;
         $instance = $instance ?? new static();
         return $instance;
     }
 
-    private static function getSize(): ?string {
+    private static function getSize(): ?string
+    {
         if (DIRECTORY_SEPARATOR === '\\') {
             if ($out = Utils::executeProcess('mode con /status')) {
                 $out = explode("\n", $out);
@@ -43,7 +46,8 @@ final class Terminal {
         return Utils::executeProcess('stty size 2>&1');
     }
 
-    public function __construct() {
+    public function __construct()
+    {
         if (php_sapi_name() !== "cli") throw new RuntimeException("Can only be run under CLI Environnement");
         $this->colors = $this->hasColorSupport();
         $this->tty = $this->supportsTTY();
@@ -53,7 +57,8 @@ final class Terminal {
      * Get Terminal Width
      * @return int
      */
-    public function getWidth(): int {
+    public function getWidth(): int
+    {
         if ($width = getenv('COLUMNS')) return (int) trim($width);
         if ($out = self::getSize()) {
             $list = explode(' ', $out);
@@ -66,7 +71,8 @@ final class Terminal {
      * Get Terminal Height
      * @return int
      */
-    public function getHeight(): int {
+    public function getHeight(): int
+    {
         if ($height = getenv('LINES')) return (int) trim($height);
         if ($out = self::getSize()) {
             $list = explode(' ', $out);
@@ -89,7 +95,8 @@ final class Terminal {
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    private function hasColorSupport(): bool {
+    private function hasColorSupport(): bool
+    {
 
         static $result;
 
@@ -99,9 +106,9 @@ final class Terminal {
             $stream = fopen("php://stdout", "w");
             if (DIRECTORY_SEPARATOR === '\\') {
                 return
-                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') > 0 or
-                        false !== getenv('ANSICON') or
-                        'ON' === getenv('ConEmuANSI') or
+                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') > 0 ||
+                        false !== getenv('ANSICON') ||
+                        'ON' === getenv('ConEmuANSI') ||
                         (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream));
             }
             if (function_exists('stream_isatty')) return $result = @stream_isatty($stream);
@@ -120,7 +127,8 @@ final class Terminal {
      * @staticvar type $supported
      * @return bool
      */
-    private function supportsTTY(): bool {
+    private function supportsTTY(): bool
+    {
         static $supported;
 
         if (null === $supported) {
@@ -142,27 +150,32 @@ final class Terminal {
         return $supported;
     }
 
-    public function __isset(string $name): bool {
+    public function __isset(string $name): bool
+    {
         return method_exists($this, sprintf('get%s', ucfirst($name)));
     }
 
-    public function __get(string $name): mixed {
+    public function __get(string $name): mixed
+    {
         $method = sprintf('get%s', ucfirst($name));
-        if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
+        if ( ! method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
         return call_user_func([$this, $method]);
     }
 
-    public function __set(string $name, mixed $value): void {
+    public function __set(string $name, mixed $value): void
+    {
 
         throw new RuntimeException(sprintf('%s::%s cannot be set.', static::class, $name));
     }
 
-    public function __unset(string $name): void {
+    public function __unset(string $name): void
+    {
 
         throw new RuntimeException(sprintf('Cannot unset %s::$%s', static::class, $name));
     }
 
-    public function __debugInfo(): array {
+    public function __debugInfo(): array
+    {
         return [
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),
