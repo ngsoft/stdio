@@ -16,19 +16,19 @@ use NGSOFT\Enums\EnumTrait;
  * @method static static CYAN()
  * @method static static WHITE()
  */
-enum Color: int
+enum BackgroundColor: int
 {
 
     use EnumTrait;
 
-    case BLACK = 30;
-    case RED = 31;
-    case GREEN = 32;
-    case YELLOW = 33;
-    case BLUE = 34;
-    case PURPLE = 35;
-    case CYAN = 36;
-    case WHITE = 37;
+    case BLACK = 40;
+    case RED = 41;
+    case GREEN = 42;
+    case YELLOW = 43;
+    case BLUE = 44;
+    case PURPLE = 45;
+    case CYAN = 46;
+    case WHITE = 47;
 
     public function getUnsetValue(): int
     {

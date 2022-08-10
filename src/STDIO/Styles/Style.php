@@ -10,7 +10,8 @@ use NGSOFT\STDIO\Enums\{
 };
 use Stringable;
 
-class Style {
+class Style
+{
 
     private string $label = '';
     private ?Color $color = null;
@@ -21,7 +22,8 @@ class Style {
     private ?string $prefix = null;
     private ?string $suffix = null;
 
-    public function __construct(private readonly bool $colorSupport) {
+    public function __construct(private readonly bool $colorSupport)
+    {
 
     }
 
@@ -30,9 +32,10 @@ class Style {
      *
      * @return string
      */
-    public function getPrefix(): string {
-        if (!is_string($this->prefix)) {
-            if (!$this->colorSupport) return $this->prefix = '';
+    public function getPrefix(): string
+    {
+        if ( ! is_string($this->prefix)) {
+            if ( ! $this->colorSupport) return $this->prefix = '';
             $result = '';
             $params = [];
             if (count($this->formats) > 0) $params = $this->formats;
@@ -54,9 +57,10 @@ class Style {
      *
      * @return string
      */
-    public function getSuffix(): string {
-        if (!is_string($this->suffix)) {
-            if (!$this->colorSupport) return $this->suffix = '';
+    public function getSuffix(): string
+    {
+        if ( ! is_string($this->suffix)) {
+            if ( ! $this->colorSupport) return $this->suffix = '';
             $result = '';
             $params = [];
             if (count($this->formats) > 0) $params = $this->formats;
@@ -72,7 +76,8 @@ class Style {
         return $this->suffix;
     }
 
-    public function getLabel(): string {
+    public function getLabel(): string
+    {
         return $this->label ?? '';
     }
 
@@ -82,18 +87,20 @@ class Style {
      * @param string|Stringable $message
      * @return string
      */
-    public function format(string|Stringable $message): string {
+    public function format(string|Stringable $message): string
+    {
         if ($message instanceof Stringable) $message = $message->__toString();
         return sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix());
     }
 
-    public function __debugInfo(): array {
+    public function __debugInfo(): array
+    {
 
 
         $formats = [];
         if ($this->color) $formats[] = sprintf('%s::%s', get_class($this->color), $this->color->name);
         if ($this->background) $formats[] = sprintf('%s::%s', get_class($this->background), $this->background->name);
-        if (!empty($this->formats)) $formats = array_merge($formats, array_map(fn($val) => get_class($val) . '::' . $val->name, $this->formats));
+        if ( ! empty($this->formats)) $formats = array_merge($formats, array_map(fn($val) => get_class($val) . '::' . $val->name, $this->formats));
 
         return [
             'label' => $this->label,
@@ -106,7 +113,8 @@ class Style {
     ////////////////////////////   Creator   ////////////////////////////
 
     /** {@inheritdoc} */
-    public function __clone(): void {
+    public function __clone(): void
+    {
         $this->prefix = $this->suffix = null;
     }
 
@@ -115,7 +123,8 @@ class Style {
      * @param string $label
      * @return static
      */
-    public function withLabel(string $label): static {
+    public function withLabel(string $label): static
+    {
         $clone = clone $this;
         $clone->label = $label;
         return $clone;
@@ -128,7 +137,8 @@ class Style {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withColor(Color|int $color): static {
+    public function withColor(Color|int $color): static
+    {
         $clone = clone $this;
         if (is_int($color)) {
             if ($instance = Color::tryFrom($color) ?? BrightColor::tryFrom($color)) $clone->color = $instance;
@@ -142,7 +152,8 @@ class Style {
      *
      * @return static
      */
-    public function withoutColor(): static {
+    public function withoutColor(): static
+    {
         $clone = clone $this;
         $clone->color = null;
         return $clone;
@@ -155,7 +166,8 @@ class Style {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withBackground(BackgroundColor|int $color): static {
+    public function withBackground(BackgroundColor|int $color): static
+    {
         $clone = clone $this;
         if (is_int($color)) {
             if ($instance = BackgroundColor::tryFrom($color) ?? BrightBackgroundColor::tryFrom($color)) $clone->background = $instance;
@@ -168,7 +180,8 @@ class Style {
      * Removes background color
      * @return static
      */
-    public function withoutBackground(): static {
+    public function withoutBackground(): static
+    {
         $clone = clone $this;
         $clone->background = null;
         return $clone;
@@ -181,7 +194,8 @@ class Style {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withFormats(Format|int ...$formats): static {
+    public function withFormats(Format|int ...$formats): static
+    {
 
         $clone = clone $this;
 
@@ -207,7 +221,8 @@ class Style {
      * @return static
      * @throws InvalidArgumentException
      */
-    public function withAddedFormats(Format|int ...$formats): static {
+    public function withAddedFormats(Format|int ...$formats): static
+    {
         $clone = clone $this;
 
         $result = $clone->formats;
@@ -228,7 +243,8 @@ class Style {
      *
      * @return static
      */
-    public function withoutFormat(): static {
+    public function withoutFormat(): static
+    {
         $clone = clone $this;
         $clone->formats = [];
         return $clone;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
-class Ansi
+interface Ansi
 {
 
     public const ESCAPE = "\x1b[";

@@ -120,7 +120,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
         ];
 
         $custom = $custom ?? [
-            'emergency' => [Color::YELLOW(), BackgroundColor::RED(), Format::BOLD()],
+            'emergency' => [Color::YELLOW(), Color::RED()->getBackgroundColor(), Format::BOLD()],
             'alert' => [Color::RED(), Format::BOLD()],
             'critical' => [Color::RED(), Format::BOLD()],
             'error' => [Color::RED()],
@@ -136,7 +136,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
         $key = (int) $this->colorSupport;
 
         // create cache for color support(false, true)
-        if (!isset($cache[$key])) {
+        if ( ! isset($cache[$key])) {
 
             $cache[$key] = [
                 'styles' => [],
