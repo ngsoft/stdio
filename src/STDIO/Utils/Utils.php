@@ -53,7 +53,7 @@ class Utils
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    public static function hasColorSupport(): bool
+    public static function supportsColors(): bool
     {
 
         static $result;
