@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
-use NGSOFT\Enums\EnumUtils;
+use NGSOFT\Enums\EnumTrait;
 
 /**
  * @method static static BLACK()
@@ -19,7 +19,7 @@ use NGSOFT\Enums\EnumUtils;
 enum Color: int
 {
 
-    use EnumUtils;
+    use EnumTrait;
 
     case BLACK = 30;
     case RED = 31;

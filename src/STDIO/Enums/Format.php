@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
-use NGSOFT\Enums\EnumUtils;
+use NGSOFT\Enums\EnumTrait;
 
 /**
  * @method static static RESET()
@@ -19,7 +19,7 @@ use NGSOFT\Enums\EnumUtils;
 enum Format: int
 {
 
-    use EnumUtils;
+    use EnumTrait;
 
     case RESET = 0;
     case BOLD = 1;
