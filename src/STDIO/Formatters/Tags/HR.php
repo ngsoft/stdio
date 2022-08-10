@@ -8,15 +8,17 @@ use NGSOFT\STDIO\{
     Formatters\Tag, Terminal
 };
 
-class HR extends Tag {
+class HR extends Tag
+{
 
-    public function format(string $message, array $params): string {
+    public function format(string $message, array $params): string
+    {
         $width = Terminal::create()->width;
         $width -= 8;
         $str = "\n\t\t";
-        $char = $params['char'][0] ?? "=";
+        $char = $params['char'][0] ?? "─";
         $char = $char[0];
-        for ($i = 0; $i < $width; $i++) $str .= $char;
+        for ($i = 0; $i < $width; $i ++) { $str .= $char; }
         $str .= "\n";
         return $str;
     }
