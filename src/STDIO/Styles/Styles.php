@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
+use ArrayAccess,
+    Countable,
+    IteratorAggregate;
 use NGSOFT\{
-    Enums\Enum, Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output
 };
+use OutOfBoundsException,
+    Traversable,
+    ValueError;
+use function get_debug_type;
 
-class Styles
+class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
 
     /** @var Style[] */
@@ -54,6 +61,81 @@ class Styles
         return $style->setStyles(...$styles);
     }
 
+    /**
+     * @return array<string,BackgroundColor>
+     */
+    public function getBackgroundColors(): array
+    {
+        return array_map(fn($label) => $this->styles[$label], $this->aliases[BackgroundColor::class]);
+    }
+
+    /**
+     * @return array<string,Color>
+     */
+    public function getForegroundColors(): array
+    {
+        return array_map(fn($label) => $this->styles[$label], $this->aliases[Color::class]);
+    }
+
+    /**
+     * @return array<string,Format>
+     */
+    public function getFormats(): array
+    {
+        return array_map(fn($label) => $this->styles[$label], $this->aliases[Format::class]);
+    }
+
+    /** {@inheritdoc} */
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->styles[$offset]);
+    }
+
+    /** {@inheritdoc} */
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->styles[$offset] ?? null;
+    }
+
+    /** {@inheritdoc} */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+
+        if ( ! is_string($offset)) {
+            throw new OutOfBoundsException(sprintf('Offset of type string expected, %s given.', get_debug_type($offset)));
+        }
+
+        if ( ! ($value instanceof Style)) {
+            throw new ValueError(
+                            sprintf(
+                                    "Invalid type for value %s['%s']: %s expected, %s given",
+                                    get_class($this), (string) $offset, Style::class, get_debug_type($value)
+                            )
+            );
+        }
+
+
+        $this->styles[$offset] = $value;
+    }
+
+    /** {@inheritdoc} */
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->styles[$offset]);
+    }
+
+    /** {@inheritdoc} */
+    public function count(): int
+    {
+        return count($this->styles);
+    }
+
+    /** {@inheritdoc} */
+    public function getIterator(): Traversable
+    {
+        yield from $this->styles;
+    }
+
     protected function buildStyles(): void
     {
         static $cache = [], $aliases = [], $custom = [
@@ -63,25 +145,26 @@ class Styles
             'error' => [Color::RED],
             'warning' => [Color::YELLOW],
             'notice' => [Color::CYAN],
-            'info' => [Color::CYAN],
+            'info' => [Color::GREEN],
             'debug' => [Color::PURPLE],
             'comment' => [Color::YELLOW],
-            'whisper' => [Color::WHITE, Format::DIM],
+            'whisper' => [Color::GRAY, Format::DIM],
             'shout' => [Color::RED, Format::BOLD],
         ];
 
         if (empty($cache)) {
 
-            /** @var Enum $enum */
-            /** @var Color|BackgroundColor|Format $format */
             foreach ([Format::class, Color::class, BackgroundColor::class] as $enum) {
-
                 $aliases[$enum] = [];
-
                 foreach ($enum::cases() as $format) {
                     $aliases[$enum] [strtolower($format->getName())] = $format->getTag();
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                 }
+            }
+
+
+            foreach ($custom as $label => $styles) {
+                $cache[$label] = $this->createStyle($label, ...$styles);
             }
         }
 
