@@ -128,16 +128,11 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         ];
 
         if (empty($cache)) {
-
             foreach ([Format::class, Color::class, BackgroundColor::class] as $enum) {
-                $aliases[$enum] = [];
                 foreach ($enum::cases() as $format) {
-                    $aliases[$enum] [strtolower($format->getName())] = $format->getTag();
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                 }
             }
-
-
             foreach ($custom as $label => $styles) {
                 $cache[$label] = $this->createStyle($label, ...$styles);
             }
