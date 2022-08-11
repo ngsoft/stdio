@@ -20,7 +20,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     /** @var Style[] */
     protected array $styles = [];
-    protected array $aliases = [];
 
     public function __construct(
             protected ?bool $colors = null
@@ -59,30 +58,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     {
         $style = new Style($label);
         return $style->setStyles(...$styles);
-    }
-
-    /**
-     * @return array<string,BackgroundColor>
-     */
-    public function getBackgroundColors(): array
-    {
-        return array_map(fn($label) => $this->styles[$label], $this->aliases[BackgroundColor::class]);
-    }
-
-    /**
-     * @return array<string,Color>
-     */
-    public function getForegroundColors(): array
-    {
-        return array_map(fn($label) => $this->styles[$label], $this->aliases[Color::class]);
-    }
-
-    /**
-     * @return array<string,Format>
-     */
-    public function getFormats(): array
-    {
-        return array_map(fn($label) => $this->styles[$label], $this->aliases[Format::class]);
     }
 
     /** {@inheritdoc} */
@@ -138,7 +113,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     protected function buildStyles(): void
     {
-        static $cache = [], $aliases = [], $custom = [
+        static $cache = [], $custom = [
             'emergency' => [Color::YELLOW, BackgroundColor::RED, Format::BOLD],
             'alert' => [Color::RED, Format::BOLD],
             'critical' => [Color::RED, Format::BOLD],
@@ -170,7 +145,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
 
         $this->styles = $cache;
-        $this->aliases = $aliases;
     }
 
 }

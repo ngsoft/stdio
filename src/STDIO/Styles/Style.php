@@ -73,7 +73,7 @@ class Style
         return [
             'label' => $this->label,
             'styles' => array_map(fn($enum) => $enum->name, $this->styles),
-            'format' => $this->format($this->label, true)
+            'format' => $this->format($this->label)
         ];
     }
 
