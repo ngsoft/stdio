@@ -97,14 +97,7 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
     {
         static
         $cache = [],
-        $custom,
-        $prefixes = [
-            Color::class => '',
-            BackgroundColor::class => 'bg:',
-            Format::class => ''
-        ];
-
-        $custom ??= [
+        $custom = [
             'emergency' => [Color::YELLOW, BackgroundColor::RED, Format::BOLD],
             'alert' => [Color::RED, Format::BOLD],
             'critical' => [Color::RED, Format::BOLD],
@@ -116,6 +109,11 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
             'comment' => [Color::YELLOW],
             'whisper' => [Color::WHITE, Format::DIM],
             'shout' => [Color::RED, Format::BOLD],
+                ],
+        $prefixes = [
+            Color::class => '',
+            BackgroundColor::class => 'bg:',
+            Format::class => ''
         ];
 
         $key = (int) $this->colorSupport;
@@ -158,7 +156,6 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
 
     public function offsetExists(mixed $offset): bool
     {
-
         return isset($this->styles[$offset]);
     }
 
@@ -180,7 +177,6 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
 
     public function count(): int
     {
-
         return count($this->styles);
     }
 
@@ -189,7 +185,6 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
      */
     public function getIterator(): Traversable
     {
-
         foreach ($this->styles as $label => $style) {
             yield $label => $style;
         }

@@ -35,4 +35,14 @@ enum Color: int
         return 39;
     }
 
+    public function getTag(): string
+    {
+        return strtolower($this->getName());
+    }
+
+    public function getAlias(): string
+    {
+        sprintf('color:%s', $this->getTag());
+    }
+
 }

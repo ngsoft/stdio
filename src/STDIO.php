@@ -47,6 +47,7 @@ final class STDIO
     {
         $this->styles = new StyleSheet($forceColorSupport);
         $this->formatter = new TagFormatter($this->styles);
+
         $this->buffer = new Buffer();
         $this->output = new Output($this->formatter);
         $this->errorOutput = new ErrorOutput($this->formatter);
@@ -99,7 +100,6 @@ final class STDIO
      */
     public function write(string|Stringable|array $messages): static
     {
-
         $this->buffer->write($messages);
         return $this;
     }
