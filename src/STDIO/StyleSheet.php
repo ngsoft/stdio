@@ -8,8 +8,9 @@ use ArrayAccess,
     Countable,
     InvalidArgumentException,
     IteratorAggregate;
-use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\BrightBackgroundColor, Enums\BrightColor, Enums\Color, Enums\Format, Outputs\Output, Styles\Style
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output,
+    STDIO\Styles\Style
 };
 use Traversable;
 
@@ -20,20 +21,15 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
     protected array $fg = [];
     protected array $bg = [];
     protected array $formats = [];
-    protected bool $colorSupport;
 
-    public function __construct(bool $colorSupport = null, array $styles = [])
+    public function __construct(protected bool $colorSupport = null)
     {
-        $this->colorSupport = is_bool($colorSupport) ? $colorSupport : Terminal::create()->colors;
-        if (empty($styles)) $this->buildStyles();
-        else $this->styles = $styles;
+        $this->colorSupport ??= Terminal::supportsColors();
+        $this->buildStyles();
     }
 
     /**
      * Displays current styles to the output
-     *
-     * @param Output $output
-     * @return void
      */
     public function displayStyles(Output $output): void
     {
@@ -46,12 +42,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Adds Custom style
-     *
-     * @param string $label
-     * @param Color|Format ...$formats
-     * @return static
      */
-    public function addStyle(string $label, Color|Format|int ...$formats): static
+    public function addStyle(string $label, Color|BackgroundColor|Format|int ...$formats): static
     {
         $this->styles[$label] = $this->createStyle($label, ...$formats);
         return $this;
@@ -59,13 +51,8 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Create Custom Style
-     *
-     * @param string $label
-     * @param Color|Format|int ...$formats
-     * @return Style
-     * @throws InvalidArgumentException
      */
-    public function createStyle(string $label, Color|Format|int ...$formats): Style
+    public function createStyle(string $label, Color|BackgroundColor|Format|int ...$formats): Style
     {
 
         static $cache = [0 => [], 1 => []];
@@ -113,24 +100,22 @@ class StyleSheet implements ArrayAccess, IteratorAggregate, Countable
         $custom,
         $prefixes = [
             Color::class => '',
-            BrightColor::class => 'bright-',
-            BackgroundColor::class => 'bg-',
-            BrightBackgroundColor::class => 'bg-bright-',
+            BackgroundColor::class => 'bg:',
             Format::class => ''
         ];
 
-        $custom = $custom ?? [
-            'emergency' => [Color::YELLOW(), Color::RED()->getBackgroundColor(), Format::BOLD()],
-            'alert' => [Color::RED(), Format::BOLD()],
-            'critical' => [Color::RED(), Format::BOLD()],
-            'error' => [Color::RED()],
-            'warning' => [Color::YELLOW()],
-            'notice' => [Color::CYAN()],
-            'info' => [Color::CYAN()],
-            'debug' => [Color::PURPLE()],
-            'comment' => [Color::YELLOW()],
-            'whisper' => [Color::WHITE(), Format::DIM()],
-            'shout' => [Color::RED(), Format::BOLD()],
+        $custom ??= [
+            'emergency' => [Color::YELLOW, BackgroundColor::RED, Format::BOLD],
+            'alert' => [Color::RED, Format::BOLD],
+            'critical' => [Color::RED, Format::BOLD],
+            'error' => [Color::RED],
+            'warning' => [Color::YELLOW],
+            'notice' => [Color::CYAN],
+            'info' => [Color::CYAN],
+            'debug' => [Color::PURPLE],
+            'comment' => [Color::YELLOW],
+            'whisper' => [Color::WHITE, Format::DIM],
+            'shout' => [Color::RED, Format::BOLD],
         ];
 
         $key = (int) $this->colorSupport;
