@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO;
 
-use NGSOFT\STDIO\{
-    Enums\Ansi, Inputs\Input, Outputs\Output, Utils\Utils
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Inputs\Input, STDIO\Outputs\Output
 };
 use RuntimeException;
 
@@ -19,9 +19,6 @@ use RuntimeException;
 class Cursor
 {
 
-    /** @var Terminal */
-    private $terminal;
-
     /** @var Input */
     private $input;
 
@@ -33,7 +30,7 @@ class Cursor
             Input $input = null
     )
     {
-        $this->terminal = Terminal::create();
+
         $this->output = $output ?? new Output();
         $this->input = $input ?? new Input();
     }
@@ -205,61 +202,23 @@ class Cursor
     }
 
     /**
-     * Returns Current Cursor position as [x,y] coor
-     *
-     * @staticvar type $stty
-     * @staticvar type $ttySupport
+     * Returns Current Cursor position as [x,y] coordinates
      * @return int[]
      */
     public function getCurrentPosition(): array
     {
-
-        static $stty, $ttySupport, $ps;
-
-        $stty = $stty ?? !empty(Utils::executeProcess('stty'));
-        $ps = $ps ?? !empty(Utils::executeProcess('powershell -?'));
-        $ttySupport = $ttySupport ?? $this->terminal->tty;
-        $input = $this->input->getStream();
-
-        $row = $col = 1;
-        $enabled = 0;
-
-        if (DIRECTORY_SEPARATOR === '\\' && $ps) {
-            $pos = shell_exec('powershell.exe $console=$Host.UI.RawUI;$curPos=$console.CursorPosition;$X=$curpos.X;$Y=$curpos.Y;Write-Output "$X $Y";');
-            if (is_string($pos)) {
-                $out = preg_split('#[\n\r]+#', $pos);
-                list($col, $row) = $out;
-                $col = (int) $col;
-                $row = (int) $row;
-                if ($col !== 0 || $row !== 0) {
-                    $col++;
-                    $row++;
-                    $enabled = 1;
-                } else $col = $row = 1;
-            }
-        } elseif (
-                $ttySupport && $stty &&
-                is_string($mode = shell_exec('stty -g'))
-        ) {
-            shell_exec('stty -icanon -echo');
-            @fwrite($input, "\x1b[6n");
-            $code = fread($input, 1024);
-            shell_exec(sprintf('stty %s', $mode));
-            sscanf($code, "\x1b[%d;%dR", $row, $col);
-            $enabled = 1;
-        }
-        return [$col, $row, $enabled];
+        return Terminal::getCursorPosition();
     }
 
     public function getWidth(): int
     {
 
-        return $this->terminal->getWidth();
+        return Terminal::getWidth();
     }
 
     public function getHeight(): int
     {
-        return $this->terminal->getHeight();
+        return Terminal::getHeight();
     }
 
     /**
@@ -269,7 +228,7 @@ class Cursor
      */
     public function getEnabled(): bool
     {
-        list(,, $result) = $this->getCurrentPosition();
+        Terminal::getCursorPosition($result);
         return (bool) $result;
     }
 
@@ -299,7 +258,7 @@ class Cursor
     public function __get(string $name): mixed
     {
         $method = sprintf('get%s', ucfirst($name));
-        if (!method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
+        if ( ! method_exists($this, $method)) throw new RuntimeException("Invalid property $name.");
         return call_user_func([$this, $method]);
     }
 

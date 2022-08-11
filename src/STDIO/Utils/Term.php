@@ -55,26 +55,29 @@ final class Term
 
     /**
      * Get cursor position
-     * @return int[] list($top,$left)
+     * @return int[] list($top,$left,$enabled)
      */
-    public function getCursorPosition(): array
+    public function getCursorPosition(bool &$enabled = null): array
     {
         static $input;
         $input ??= fopen('php://stdin', 'r+');
         $top = $left = 1;
+        $enabled = false;
 
         if (Utils::supportsPowershell()) {
             $top = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.Y'))) + 1;
             $left = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.X'))) + 1;
+            $enabled = true;
         } elseif ($this->tty && Utils::supportsSTTY() && is_string($mode = shell_exec('stty -g'))) {
             shell_exec('stty -icanon -echo');
             @fwrite($input, "\x1b[6n");
             $code = fread($input, 1024);
             shell_exec(sprintf('stty %s', $mode));
             sscanf($code, "\x1b[%d;%dR", $top, $left);
+            $enabled = true;
         }
 
-        return [(int) $top, (int) $left];
+        return [(int) $left, (int) $top];
     }
 
     /**
@@ -82,7 +85,7 @@ final class Term
      */
     public function getTop(): int
     {
-        return $this->getCursorPosition()[0];
+        return $this->getCursorPosition()[1];
     }
 
     /**
@@ -90,7 +93,23 @@ final class Term
      */
     public function getLeft(): int
     {
-        return $this->getCursorPosition()[1];
+        return $this->getCursorPosition()[0];
+    }
+
+    public function __debugInfo(): array
+    {
+
+        return [
+            'colors' => $this->colors,
+            'dimensions' => [
+                'width' => $this->getWidth(),
+                'height' => $this->getHeight(),
+            ],
+            'cursor' => [
+                'left' => $this->getLeft(),
+                'top' => $this->getTop(),
+            ]
+        ];
     }
 
 }

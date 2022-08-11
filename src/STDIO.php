@@ -23,7 +23,6 @@ final class STDIO
     private ErrorOutput $errorOutput;
     private Input $input;
     private Buffer $buffer;
-    private Terminal $terminal;
     private Cursor $cursor;
     private StyleSheet $styles;
     private TagFormatter $formatter;
@@ -46,7 +45,6 @@ final class STDIO
      */
     public function __construct(bool $forceColorSupport = null)
     {
-        $this->terminal = Terminal::create();
         $this->styles = new StyleSheet($forceColorSupport);
         $this->formatter = new TagFormatter($this->styles);
         $this->buffer = new Buffer();
@@ -74,11 +72,6 @@ final class STDIO
     public function getBuffer(): Buffer
     {
         return $this->buffer;
-    }
-
-    public function getTerminal(): Terminal
-    {
-        return $this->terminal;
     }
 
     public function getCursor(): Cursor
@@ -131,7 +124,7 @@ final class STDIO
     public function out(string|Stringable|array $messages = null): static
     {
 
-        if (!is_null($messages)) {
+        if ( ! is_null($messages)) {
             $this->buffer->clear();
             $this->output->write($messages);
         } else $this->buffer->flush($this->output);
@@ -146,7 +139,7 @@ final class STDIO
      */
     public function err(string|Stringable|array $messages = null): static
     {
-        if (!is_null($messages)) {
+        if ( ! is_null($messages)) {
             $this->buffer->clear();
             $this->errorOutput->write($messages);
         } else $this->buffer->flush($this->errorOutput);
