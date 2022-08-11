@@ -77,11 +77,17 @@ final class Term
         return [(int) $top, (int) $left];
     }
 
+    /**
+     * Cursor top position
+     */
     public function getTop(): int
     {
         return $this->getCursorPosition()[0];
     }
 
+    /**
+     * Cursor Left position
+     */
     public function getLeft(): int
     {
         return $this->getCursorPosition()[1];
