@@ -28,16 +28,16 @@ enum BackgroundColor: int
     case BLUE = 44;
     case PURPLE = 45;
     case CYAN = 46;
-    case WHITE = 47;
+    case GRAY = 47;
 
     public function getUnsetValue(): int
     {
-        return 39;
+        return 49;
     }
 
     public function getTag(): string
     {
-        sprintf('bg:%s', strtolower($this->getName()));
+        return sprintf('bg:%s', strtolower($this->getName()));
     }
 
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, StyleSheet, Terminal
+    Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Styles, StyleSheet
 };
 use Stringable;
 
@@ -24,7 +24,7 @@ final class STDIO
     private Input $input;
     private Buffer $buffer;
     private Cursor $cursor;
-    private StyleSheet $styles;
+    private Styles $styles;
     private TagFormatter $formatter;
 
     /**
@@ -45,7 +45,8 @@ final class STDIO
      */
     public function __construct(bool $forceColorSupport = null)
     {
-        $this->styles = new StyleSheet($forceColorSupport);
+        $this->styles = new Styles($forceColorSupport);
+
         $this->formatter = new TagFormatter($this->styles);
 
         $this->buffer = new Buffer();
@@ -80,7 +81,7 @@ final class STDIO
         return $this->cursor;
     }
 
-    public function getStyles(): StyleSheet
+    public function getStyles(): Styles
     {
         return $this->styles;
     }

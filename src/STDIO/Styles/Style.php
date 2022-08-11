@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\STDIO;
+namespace NGSOFT\STDIO\Styles;
 
 use NGSOFT\{
     Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
@@ -24,10 +24,14 @@ class Style
 
     }
 
-    public function setStyles(Format|Color|BackgroundColor ...$styles): void
+    /**
+     * Set formats for the style
+     */
+    public function setStyles(Format|Color|BackgroundColor ...$styles): static
     {
         $this->styles = $styles;
         $this->prefix = $this->suffix = null;
+        return $this;
     }
 
     public function getPrefix(): string

@@ -28,7 +28,7 @@ enum Color: int
     case BLUE = 34;
     case PURPLE = 35;
     case CYAN = 36;
-    case WHITE = 37;
+    case GRAY = 37;
 
     public function getUnsetValue(): int
     {

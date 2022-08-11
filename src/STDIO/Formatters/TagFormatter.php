@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Formatters\Tags\BR, Formatters\Tags\DefaultTag, Formatters\Tags\HR, Formatters\Tags\Tab, StyleSheet
+    Formatters\Tags\BR, Formatters\Tags\DefaultTag, Formatters\Tags\HR, Formatters\Tags\Tab, Styles\Style, Styles\Styles
 };
 use Stringable,
     ValueError;
+use function get_debug_type;
 
-class TagFormatter implements FormatterInterface {
+class TagFormatter implements FormatterInterface
+{
 
     protected const BUILTIN = [
         HR::class,
@@ -30,10 +32,10 @@ class TagFormatter implements FormatterInterface {
     protected array $replaceTags = [];
     protected array $tags = [];
     protected Tag $defaultTag;
-    protected StyleSheet $styles;
 
-    public function __construct(StyleSheet $styles = null) {
-        $this->styles = $styles ?? new StyleSheet();
+    public function __construct(protected ?Styles $styles = null)
+    {
+        $this->styles ??= new Styles();
         $this->setDefaultTag(new DefaultTag($this->styles));
         foreach (self::BUILTIN as $className) {
             $this->addTag(new $className($this->styles));
@@ -41,13 +43,14 @@ class TagFormatter implements FormatterInterface {
         $this->build();
     }
 
-    protected function build(): void {
+    protected function build(): void
+    {
 
         $result = [
             '</>' => $this->styles['reset']->getPrefix(),
         ];
 
-        /** @var \NGSOFT\STDIO\Styles\Style $style */
+        /** @var Style $style */
         foreach ($this->styles as $tagName => $style) {
             $result[sprintf('<%s>', $tagName)] = $style->getPrefix();
             $result[sprintf('</%s>', $tagName)] = $style->getSuffix();
@@ -61,7 +64,8 @@ class TagFormatter implements FormatterInterface {
      * @param Tag $tag
      * @return static
      */
-    public function addTag(Tag $tag): static {
+    public function addTag(Tag $tag): static
+    {
         $this->tags[$tag->getName()] = $tag;
         return $this;
     }
@@ -71,24 +75,27 @@ class TagFormatter implements FormatterInterface {
      *
      * @return Tag
      */
-    public function getDefaultTag(): Tag {
+    public function getDefaultTag(): Tag
+    {
         return $this->defaultTag;
     }
 
-    public function setDefaultTag(Tag $defaultTag): static {
+    public function setDefaultTag(Tag $defaultTag): static
+    {
         $this->addTag($defaultTag);
         $this->defaultTag = $defaultTag;
         return $this;
     }
 
-    public function format(string|Stringable|array $messages): string {
+    public function format(string|Stringable|array $messages): string
+    {
 
-        if (!is_array($messages)) $messages = [$messages];
+        if ( ! is_array($messages)) $messages = [$messages];
         $result = '';
 
         foreach ($messages as $message) {
             if ($message instanceof Stringable) $message = $message->__toString();
-            if (!is_string($message)) {
+            if ( ! is_string($message)) {
                 throw new ValueError('Invalid value for message string|\Stringable|string[]|\Stringable[]: ' . get_debug_type($message));
             }
 
@@ -98,9 +105,9 @@ class TagFormatter implements FormatterInterface {
 
             $message = preg_replace_callback('#<(\/)*([^>]*)>#', function ($matches) {
                 list($input, $closing, $contents) = $matches;
-                $closing = !empty($closing);
+                $closing = ! empty($closing);
                 // </> or <>
-                if (!empty($contents)) {
+                if ( ! empty($contents)) {
                     $params = preg_split('#;+#', $contents);
                     $tagName = strtolower($params[0]);
                     /** @var Tag $tagInstance */
@@ -139,7 +146,8 @@ class TagFormatter implements FormatterInterface {
         return $result;
     }
 
-    public function __debugInfo(): array {
+    public function __debugInfo(): array
+    {
         return [];
     }
 
