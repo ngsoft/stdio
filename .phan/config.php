@@ -22,6 +22,7 @@ return [
         'src',
         'vendor',
         '../tools/src',
+        '../tools/lib',
         '../tools/vendor',
     // 'vendor/psr',
     //'vendor/illuminate',

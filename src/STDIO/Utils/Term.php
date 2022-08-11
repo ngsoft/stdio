@@ -23,11 +23,11 @@ final class Term
     public function getSize(): array
     {
         $width = 80;
-        $height = 24;
+        $height = 25;
         if (Utils::isWindows()) {
             if (Utils::supportsPowershell()) {
-                $width = trim(shell_exec('powershell.exe $Host.UI.RawUI.WindowSize.Width;'));
-                $height = trim(shell_exec('powershell.exe $Host.UI.RawUI.WindowSize.Height'));
+                $width = trim(shell_exec('powershell.exe $Host.UI.RawUI.WindowSize.Width;') ?? '80');
+                $height = trim(shell_exec('powershell.exe $Host.UI.RawUI.WindowSize.Height') ?? '25');
             } elseif ($out = Utils::executeProcess('mode.com con /status')) {
                 list($height, $width) = array_map(fn($arr) => $arr[1], preg_exec('#(\d+)#', $out, 2));
             }
@@ -55,7 +55,7 @@ final class Term
 
     /**
      * Get cursor position
-     * @param bool &$enabled
+     * @param bool &$enabled true if position can be read
      * @return int[] list($top,$left,$enabled)
      */
     public function getCursorPosition(&$enabled = null): array
@@ -66,8 +66,8 @@ final class Term
         $enabled = false;
 
         if (Utils::supportsPowershell()) {
-            $top = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.Y'))) + 1;
-            $left = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.X'))) + 1;
+            $top = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.Y') ?? '0')) + 1;
+            $left = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.X') ?? '0')) + 1;
             $enabled = true;
         } elseif ($this->tty && Utils::supportsSTTY() && is_string($mode = shell_exec('stty -g'))) {
             shell_exec('stty -icanon -echo');
