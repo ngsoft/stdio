@@ -60,11 +60,12 @@ class Terminal extends Facade
 
     /**
      * Get cursor position
+     * @param bool &$enabled
      * @return int[] list($top,$left)
      */
-    public static function getCursorPosition(): array
+    public static function getCursorPosition(&$enabled = null): array
     {
-        return static::getFacadeRoot()->getCursorPosition();
+        return static::getFacadeRoot()->getCursorPosition($enabled);
     }
 
     /**

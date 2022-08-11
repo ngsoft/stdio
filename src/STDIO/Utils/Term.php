@@ -55,9 +55,10 @@ final class Term
 
     /**
      * Get cursor position
+     * @param bool &$enabled
      * @return int[] list($top,$left,$enabled)
      */
-    public function getCursorPosition(bool &$enabled = null): array
+    public function getCursorPosition(&$enabled = null): array
     {
         static $input;
         $input ??= fopen('php://stdin', 'r+');
