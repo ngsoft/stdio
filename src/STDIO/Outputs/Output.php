@@ -11,7 +11,8 @@ use RuntimeException,
     Stringable,
     TypeError;
 
-class Output {
+class Output
+{
 
     /** @var resource */
     protected $stream;
@@ -19,9 +20,10 @@ class Output {
     /** @var FormatterInterface */
     protected $formatter;
 
-    public function __construct(FormatterInterface $formatter = null) {
+    public function __construct(FormatterInterface $formatter = null)
+    {
         $this->formatter = $formatter ?? new TagFormatter();
-        $this->stream = fopen('php://stdout', 'w'); ;
+        $this->stream = fopen('php://stdout', 'w+'); ;
     }
 
     /**
@@ -31,13 +33,14 @@ class Output {
      * @return void
      * @throws TypeError
      */
-    public function write(string|Stringable|array $message): void {
+    public function write(string|Stringable|array $message): void
+    {
         $messages = is_array($message) ? $message : [$message];
 
         foreach ($messages as $line) {
             if ($line instanceof Stringable) $line = $line->__toString();
 
-            if (!is_string($line)) {
+            if ( ! is_string($line)) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
 
@@ -53,12 +56,14 @@ class Output {
      * @param string|Stringable|array $message
      * @return void
      */
-    public function writeln(string|Stringable|array $message): void {
+    public function writeln(string|Stringable|array $message): void
+    {
         $this->write($message);
         $this->write("\n");
     }
 
-    protected function flushStream(string $message) {
+    protected function flushStream(string $message)
+    {
         if (false === fwrite($this->stream, $message)) {
             throw new RuntimeException('Unable to write output.');
         }
@@ -70,7 +75,8 @@ class Output {
      *
      * @return resource
      */
-    public function getStream() {
+    public function getStream()
+    {
         return $this->stream;
     }
 

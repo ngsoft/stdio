@@ -11,7 +11,8 @@ use Countable,
     Traversable,
     TypeError;
 
-class Buffer implements Countable, IteratorAggregate {
+class Buffer implements Countable, IteratorAggregate
+{
 
     /** @var string[] */
     private $buffer = [];
@@ -23,13 +24,13 @@ class Buffer implements Countable, IteratorAggregate {
      * @return void
      * @throws RuntimeException
      */
-    public function write(string|Stringable|array $message): void {
-
-        $message = is_array($message) ? $message : [$message];
-
-        foreach ($message as $line) {
-            if (!is_string($line) && $line instanceof \Stringable === false) throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
-            $this->buffer[] = $line;
+    public function write(string|Stringable|array $message): void
+    {
+        foreach ((array) $message as $line) {
+            if ( ! is_string($line) && $line instanceof \Stringable === false) {
+                throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
+            }
+            $this->buffer[] = (string) $line;
         }
     }
 
@@ -39,12 +40,14 @@ class Buffer implements Countable, IteratorAggregate {
      * @param string|Stringable|array $message
      * @return void
      */
-    public function writeln(string|Stringable|array $message): void {
+    public function writeln(string|Stringable|array $message): void
+    {
         $this->write($message);
         $this->write("\n");
     }
 
-    public function clear(): void {
+    public function clear(): void
+    {
         $this->buffer = [];
     }
 
@@ -54,7 +57,8 @@ class Buffer implements Countable, IteratorAggregate {
      * @param Output $output
      * @return void
      */
-    public function flush(Output $output): void {
+    public function flush(Output $output): void
+    {
         foreach ($this as $line) {
             $output->write($line);
         }
@@ -62,13 +66,16 @@ class Buffer implements Countable, IteratorAggregate {
     }
 
     /** {@inheritdoc} */
-    public function count(): int {
+    public function count(): int
+    {
         return count($this->buffer);
     }
 
-    public function getIterator(): Traversable {
+    public function getIterator(): Traversable
+    {
         $buffer = $this->buffer;
-        foreach ($buffer as $line) yield $line;
+        $this->clear();
+        yield from $buffer;
     }
 
 }
