@@ -40,12 +40,12 @@ final class STDIO
     {
 
         $this->buffer = new Buffer();
-        $this->styles = new Styles($forceColorSupport);
-        $this->formatter = new TagFormatter($this->styles);
-        $this->output = new Output($this->formatter);
-        $this->errorOutput = new ErrorOutput($this->formatter);
         $this->input = new Input();
-        $this->cursor = new Cursor($this->output, $this->input);
+        $this->styles = $styles = new Styles($forceColorSupport);
+        $this->formatter = $formatter = new TagFormatter($styles);
+        $this->output = $output = new Output($formatter);
+        $this->errorOutput = new ErrorOutput($formatter);
+        $this->cursor = new Cursor($output);
     }
 
     public function getOutput(): Output
