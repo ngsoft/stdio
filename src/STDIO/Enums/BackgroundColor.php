@@ -40,4 +40,9 @@ enum BackgroundColor: int
         return sprintf('bg:%s', strtolower($this->getName()));
     }
 
+    public function getTagAttribute(): string
+    {
+        return 'bg';
+    }
+
 }

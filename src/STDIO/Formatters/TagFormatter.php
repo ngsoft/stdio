@@ -10,6 +10,12 @@ use NGSOFT\STDIO\Styles\Styles,
 class TagFormatter implements Formatter
 {
 
+    protected array $formats = [
+        'fg' => [],
+        'bg' => [],
+        'options' => []
+    ];
+
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();

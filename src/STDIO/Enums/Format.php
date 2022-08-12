@@ -46,4 +46,9 @@ enum Format: int
         return strtolower($this->getName());
     }
 
+    public function getTagAttribute(): string
+    {
+        return 'options';
+    }
+
 }
