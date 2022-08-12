@@ -39,7 +39,12 @@ class HR extends Tag
 
         $sub = '';
         $len = mb_strlen($char);
-        for ($i = 0; $i < $width; $i = $i + $len) {
+
+        for ($i = 0; $i < $width; $i += $len) {
+            if ($i + $len >= $width) {
+                $sub .= mb_substr($char, 0, max(0, $width - $i));
+                break;
+            }
             $sub .= $char;
         }
 
