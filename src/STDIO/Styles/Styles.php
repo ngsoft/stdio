@@ -77,6 +77,11 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     public function offsetSet(mixed $offset, mixed $value): void
     {
 
+        if (is_null($offset) && $value instanceof Style && ! empty($value->getLabel())) {
+            $offset = $value->getLabel();
+        }
+
+
         if ( ! is_string($offset)) {
             throw new OutOfBoundsException(sprintf('Offset of type string expected, %s given.', get_debug_type($offset)));
         }
