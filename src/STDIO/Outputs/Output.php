@@ -40,7 +40,7 @@ class Output
             }
 
 
-            if (false === @fwrite($this->stream, $this->formatter->format($line))) {
+            if (false === @fwrite($this->stream, $this->formatter->format((string) $line))) {
                 throw new RuntimeException('Unable to write output.');
             }
             fflush($this->stream);
