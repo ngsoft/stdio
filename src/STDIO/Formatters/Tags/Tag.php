@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
-use NGSOFT\STDIO\Styles\Styles;
+use BackedEnum;
+use NGSOFT\STDIO\{
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Styles\Style, Styles\Styles
+};
+use function class_basename;
 
 class Tag
 {
@@ -26,9 +30,9 @@ class Tag
         return $this->name;
     }
 
-    public function managesAttributes(array $attributes): bool
+    public function getFormat(array $attributes): string
     {
-        return false;
+        return '';
     }
 
     public function getStyle(array $attributes): Style
@@ -47,9 +51,17 @@ class Tag
             }
         }
 
+
+        $label = '';
+
         $formats = [];
 
         foreach ($attributes as $key => $val) {
+
+            if ( ! empty($label)) {
+                $label .= ';';
+            }
+            $label .= $key;
 
             if (empty($val)) {
                 if (isset($this->styles[$key])) {
@@ -57,15 +69,15 @@ class Tag
                 }
                 continue;
             }
-
-
+            $label .= sprintf('=%s', implode(',', $val));
             foreach ($val as $format) {
+
                 if (isset($availableFormats[$key][$format])) {
                     $formats[] = $availableFormats[$key][$format];
                 }
             }
         }
-        return (new \NGSOFT\STDIO\Styles\Style(''))->setStyles(...$formats);
+        return (new Style($label))->setStyles(...$formats);
     }
 
 }

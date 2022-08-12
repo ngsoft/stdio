@@ -37,7 +37,11 @@ class TagFormatter implements Formatter
 
     public function addTag(Tag $tag): void
     {
-        $this->tags[get_class($tag)] = $tag;
+        $class = get_class($tag);
+        if ($class === Tag::class) {
+            return;
+        }
+        $this->tags[$class] = $tag;
     }
 
     protected function build(): void
@@ -51,7 +55,7 @@ class TagFormatter implements Formatter
         }
     }
 
-    protected function readAttributes(array $attributes): string
+    protected function getTagsFormat(array $attributes): string
     {
         //special tags
         return '';
@@ -97,38 +101,19 @@ class TagFormatter implements Formatter
 
 
 
-                    if ( ! empty($str = $this->readAttributes($attributes))) {
+                    if ( ! empty($str = $this->getTagsFormat($attributes))) {
                         $output .= $str;
                         continue;
                     }
 
-
                     if ( ! isset($this->styles[$tag])) {
 
-                        $formats = [];
-
-                        foreach ($attributes as $key => $val) {
-
-                            if (empty($val)) {
-                                if (isset($this->styles[$key])) {
-                                    $formats = array_merge($formats, $this->styles[$key]->getStyles());
-                                }
-                                continue;
-                            }
-
-
-                            foreach ($val as $format) {
-                                if (isset($this->formats[$key][$format])) {
-                                    $formats[] = $this->formats[$key][$format];
-                                }
-                            }
-                        }
-                        $this->styles->addStyle($style = $this->styles->createStyle($tag, ...$formats));
+                        $this->styles->addStyle($style = $this->tag->getStyle($attributes));
                     } else { $style = $this->styles[$tag]; }
                 } else {
                     $style = $this->styles['reset'];
                 }
-
+                var_dump($style);
 
                 if ($this->styles->colors) {
                     $str = $closing ? $style->getSuffix() : $style->getPrefix();

@@ -24,6 +24,11 @@ class Style
 
     }
 
+    public function setLabel(string $label): void
+    {
+        $this->label = $label;
+    }
+
     /**
      * Set formats for the style
      */
