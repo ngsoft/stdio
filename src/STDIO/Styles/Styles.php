@@ -13,7 +13,8 @@ use NGSOFT\{
 use OutOfBoundsException,
     Traversable,
     ValueError;
-use function get_debug_type;
+use function get_debug_type,
+             NGSOFT\Tools\map;
 
 class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
@@ -140,6 +141,11 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
 
         $this->styles = $cache;
+    }
+
+    public function __debugInfo(): array
+    {
+        return map(fn($style, $label) => $style->format($label, $this->colors), $this->styles);
     }
 
 }
