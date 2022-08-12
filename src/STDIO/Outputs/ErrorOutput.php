@@ -9,7 +9,7 @@ use NGSOFT\STDIO\Formatters\Formatter;
 class ErrorOutput extends Output
 {
 
-    public function __construct(Formatter $formatter = null)
+    public function __construct(protected ?Formatter $formatter = null)
     {
         $this->stream = fopen('php://stderr', 'w+');
         parent::__construct($formatter);
