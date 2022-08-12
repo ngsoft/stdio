@@ -29,21 +29,22 @@ class Input
      * Read lines from the input
      *
      * @param int $lines Number of lines to read
-     * @param bool $allowEmptyLines 
+     * @param bool $allowEmptyLines
      * @return string[]
      */
     public function read(int $lines = 1, bool $allowEmptyLines = true): array
     {
         $result = [];
-        do {
+
+        while (count($result) < $lines) {
             $line = fgets($this->stream);
             $line = rtrim($line, "\r\n");
-            if (!$allowEmptyLines && empty($line)) {
+            if ( ! $allowEmptyLines && empty($line)) {
                 continue;
             }
-
             $result[] = $line;
-        } while (count($result) !== $lines);
+        }
+
         return $result;
     }
 
