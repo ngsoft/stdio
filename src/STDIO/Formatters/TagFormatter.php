@@ -121,9 +121,9 @@ class TagFormatter implements Formatter
 
                     $attributes = [];
                     foreach (preg_split('#;+#', $tag) as $attribute) {
-                        [, $key, $val] = preg_exec('#([^=]+)(?:=+(.+))?#', $attribute);
+                        [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
                         $key = strtolower(trim($key));
-                        $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => strtolower(trim($v)), preg_split('#,+#', $val)) : [];
+                        $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => trim($v), preg_split('#,+#', $val)) : [];
                     }
 
                     if ( ! empty($str = $this->getTagsFormat($attributes))) {

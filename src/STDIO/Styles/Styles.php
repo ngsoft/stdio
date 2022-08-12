@@ -84,6 +84,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             }
 
             foreach ($val as $format) {
+                $format = strtolower($format);
 
                 if (isset($availableFormats[$key][$format])) {
                     $formats[] = $availableFormats[$key][$format];
