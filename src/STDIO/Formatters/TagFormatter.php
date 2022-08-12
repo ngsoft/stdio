@@ -18,13 +18,6 @@ class TagFormatter implements Formatter
     protected const BUILTIN_TAGS = [BR::class, HR::class];
 
     protected array $replacements = [
-        // set tabs to 4 instead of 8
-        "\t" => '    ',
-        '\t' => '    ',
-        "\s" => ' ',
-        '\s' => ' ',
-        '\n' => "\n",
-        '\r' => "\r",
     ];
     protected array $tags = [];
     protected Tag $tag;
@@ -130,7 +123,17 @@ class TagFormatter implements Formatter
         }
 
         $output .= substr($message, $offset);
-        return $output;
+        return strtr($output, [
+            "\0" => '\\',
+            '\\<' => '<',
+            '\\>' => '>',
+            "\t" => '    ',
+            '\t' => '    ',
+            "\s" => ' ',
+            '\s' => ' ',
+            '\n' => "\n",
+            '\r' => "\r",
+        ]);
     }
 
 }

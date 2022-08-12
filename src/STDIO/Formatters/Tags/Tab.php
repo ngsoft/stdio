@@ -22,7 +22,7 @@ class Tab extends Tag
 
         $count = max(1, $count);
 
-        return str_repeat(' ', 4 * $count);
+        return str_repeat('\t', $count);
     }
 
 }

@@ -22,14 +22,7 @@ class BR extends Tag
 
         $count = max(1, $count);
 
-        $str = '';
-
-        for ($i = 0; $i < $count; $i ++) {
-            $str .= "\n";
-        }
-
-
-        return $str;
+        return str_repeat('\n', $count);
     }
 
 }
