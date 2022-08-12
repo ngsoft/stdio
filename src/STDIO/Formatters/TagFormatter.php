@@ -45,13 +45,61 @@ class TagFormatter implements Formatter
                 $formats[$prop] [strtolower($format->getName())] = $format;
             }
         }
-
-        var_dump(spl_object_id($this));
     }
 
     public function format(string|Stringable $message): string
     {
-        return (string) $message;
+        //$message = str_replace(array_keys($this->replacements), array_values($this->replacements), (string) $message);
+        $output = '';
+
+        $offset = 0;
+
+        if (preg_match_all('#<(([a-z](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
+
+            foreach ($matches[0] as $i => $match) {
+                [$text, $pos] = $match;
+
+                if (0 != $pos && '\\' == $message[$pos - 1]) {
+                    continue;
+                }
+
+                $tag = $matches[1][$i][0];
+                if ($closing = $tag[0] === '/') {
+                    $tag = $matches[3][$i][0] ?? '';
+                }
+
+
+                $formats = [];
+                var_dump($tag);
+                if ( ! empty($tag)) {
+                    $params = [];
+                    foreach (preg_split('#;+#', $tag) as $attribute) {
+                        [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
+
+                        $key = strtolower($key);
+                        if (isset($val)) {
+                            foreach (preg_split('#,+#', $val) as $format) {
+                                $format = strtolower($format);
+                                var_dump([$key, $format]);
+                            }
+
+
+
+
+
+                            continue;
+                        }
+
+                        $style = $this->styles[$key] ?? $this->styles->createStyle($tag);
+                    }
+                } else {
+                    $formats[] = self::EMPTY_FORMAT;
+                }
+            }
+        }
+
+
+        return $output;
     }
 
 }
