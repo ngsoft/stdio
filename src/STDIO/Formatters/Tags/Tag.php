@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
-use BackedEnum;
-use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Styles\Style, Styles\Styles
+use NGSOFT\STDIO\Styles\{
+    Style, Styles
 };
 use function class_basename;
 
-class Tag
+abstract class Tag
 {
-
-    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
 
     public readonly string $name;
 
@@ -30,54 +27,11 @@ class Tag
         return $this->name;
     }
 
-    public function getFormat(array $attributes): string
-    {
-        return '';
-    }
+    abstract public function getFormat(array $attributes): string;
 
     public function getStyle(array $attributes): Style
     {
-        static $availableFormats = [];
-
-        if (empty($availableFormats)) {
-            /** @var BackedEnum $enum */
-            /** @var Color $format */
-            foreach (self::FORMATS_ENUMS as $enum) {
-                foreach ($enum::cases() as $format) {
-                    $prop = $format->getTagAttribute();
-                    $availableFormats[$prop] ??= [];
-                    $availableFormats[$prop] [strtolower($format->getName())] = $format;
-                }
-            }
-        }
-
-
-        $label = '';
-
-        $formats = [];
-
-        foreach ($attributes as $key => $val) {
-
-            if ( ! empty($label)) {
-                $label .= ';';
-            }
-            $label .= $key;
-
-            if (empty($val)) {
-                if (isset($this->styles[$key])) {
-                    $formats = array_merge($formats, $this->styles[$key]->getStyles());
-                }
-                continue;
-            }
-            $label .= sprintf('=%s', implode(',', $val));
-            foreach ($val as $format) {
-
-                if (isset($availableFormats[$key][$format])) {
-                    $formats[] = $availableFormats[$key][$format];
-                }
-            }
-        }
-        return (new Style($label))->setStyles(...$formats);
+        return $this->styles->createStyleFromAttributes($attributes);
     }
 
 }

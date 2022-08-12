@@ -19,6 +19,8 @@ use function get_debug_type,
 class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
 
+    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+
     /** @var Style[] */
     protected array $styles = [];
 
@@ -59,6 +61,47 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
+    }
+
+    /**
+     * Create style using tag attributes
+     */
+    public function createStyleFromAttributes(array $attributes, string $label = ''): Style
+    {
+
+        static $availableFormats = [];
+
+        if (empty($availableFormats)) {
+            /** @var \BackedEnum $enum */
+            /** @var Color $format */
+            foreach (self::FORMATS_ENUMS as $enum) {
+                foreach ($enum::cases() as $format) {
+                    $prop = $format->getTagAttribute();
+                    $availableFormats[$prop] ??= [];
+                    $availableFormats[$prop] [strtolower($format->getName())] = $format;
+                }
+            }
+        }
+
+        $formats = [];
+
+        foreach ($attributes as $key => $val) {
+
+            if (empty($val)) {
+                if (isset($this[$key])) {
+                    $formats = array_merge($formats, $this[$key]->getStyles());
+                }
+                continue;
+            }
+
+            foreach ($val as $format) {
+
+                if (isset($availableFormats[$key][$format])) {
+                    $formats[] = $availableFormats[$key][$format];
+                }
+            }
+        }
+        return (new Style($label))->setStyles(...$formats);
     }
 
     /** {@inheritdoc} */
@@ -134,7 +177,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         ];
 
         if (empty($cache)) {
-            foreach ([Format::class, Color::class, BackgroundColor::class] as $enum) {
+            foreach (self::FORMATS_ENUMS as $enum) {
                 foreach ($enum::cases() as $format) {
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                 }

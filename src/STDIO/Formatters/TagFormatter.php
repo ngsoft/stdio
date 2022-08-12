@@ -19,14 +19,11 @@ class TagFormatter implements Formatter
     protected const BUILTIN_TAGS = [BR::class, HR::class];
 
     protected array $tags = [];
-    protected Tag $tag;
     protected array $stack = [];
 
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
-
-        $this->tag = new Tag($this->styles);
 
         foreach (self::BUILTIN_TAGS as $class) {
             $this->addTag(new $class($this->styles));
@@ -35,11 +32,7 @@ class TagFormatter implements Formatter
 
     public function addTag(Tag $tag): void
     {
-        $class = get_class($tag);
-        if ($class === Tag::class) {
-            return;
-        }
-        $this->tags[$class] = $tag;
+        $this->tags[$tag->getName()] = $tag;
     }
 
     protected function getTagsFormat(array $attributes): string
@@ -102,7 +95,6 @@ class TagFormatter implements Formatter
     public function format(string|Stringable $message): string
     {
 
-
         $output = '';
         $offset = 0;
 
@@ -140,7 +132,7 @@ class TagFormatter implements Formatter
                     }
 
                     if ( ! isset($this->styles[$tag])) {
-                        $this->styles->addStyle($style = $this->tag->getStyle($attributes));
+                        $this->styles->addStyle($style = $this->styles->createStyleFromAttributes($attributes, $tag));
                     } else { $style = $this->styles[$tag]; }
                 }
 
