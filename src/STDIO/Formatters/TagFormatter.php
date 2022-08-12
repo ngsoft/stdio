@@ -6,23 +6,38 @@ namespace NGSOFT\STDIO\Formatters;
 
 use BackedEnum;
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\Tag, Styles\Style, Styles\Styles
 };
 use Stringable;
+use function preg_exec,
+             str_starts_with;
 
 class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected const BUILTIN_TAGS = [];
 
-    protected array $formats = [];
     protected array $replacements = [];
     protected array $tags = [];
+    protected Tag $tag;
 
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
+
+        $this->tag = new Tag($this->styles);
+
+        foreach (self::BUILTIN_TAGS as $class) {
+            $this->addTag(new $class($this->styles));
+        }
+
         $this->build();
+    }
+
+    public function addTag(Tag $tag): void
+    {
+        $this->tags[get_class($tag)] = $tag;
     }
 
     protected function build(): void
@@ -34,16 +49,6 @@ class TagFormatter implements Formatter
             $this->replacements[sprintf('<%s>', $label)] = $style->getPrefix();
             $this->replacements[sprintf('</%s>', $label)] = $style->getSuffix();
         }
-
-        /** @var BackedEnum $enum */
-        /** @var Color $format */
-        foreach (self::FORMATS_ENUMS as $enum) {
-            foreach ($enum::cases() as $format) {
-                $prop = $format->getTagAttribute();
-                $formats[$prop] ??= [];
-                $formats[$prop] [strtolower($format->getName())] = $format;
-            }
-        }
     }
 
     protected function readAttributes(array $attributes): string
@@ -54,6 +59,7 @@ class TagFormatter implements Formatter
 
     public function format(string|Stringable $message): string
     {
+
         // builtin styles
         $message = str_replace(array_keys($this->replacements), array_values($this->replacements), (string) $message);
 

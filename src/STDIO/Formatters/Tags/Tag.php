@@ -26,6 +26,11 @@ class Tag
         return $this->name;
     }
 
+    public function managesAttributes(array $attributes): bool
+    {
+        return false;
+    }
+
     public function getStyle(array $attributes): Style
     {
         static $availableFormats = [];
@@ -60,7 +65,7 @@ class Tag
                 }
             }
         }
-        return $this->styles->createStyle('', ...$formats);
+        return (new \NGSOFT\STDIO\Styles\Style(''))->setStyles(...$formats);
     }
 
 }

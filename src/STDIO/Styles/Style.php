@@ -18,7 +18,7 @@ class Style
     protected ?string $suffix = null;
 
     public function __construct(
-            protected string $label
+            protected string $label = ''
     )
     {
 
