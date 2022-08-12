@@ -84,7 +84,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             throw new ValueError(
                             sprintf(
                                     "Invalid type for value %s['%s']: %s expected, %s given",
-                                    get_class($this), (string) $offset, Style::class, get_debug_type($value)
+                                    get_class($this), $offset, Style::class, get_debug_type($value)
                             )
             );
         }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO;
 
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Inputs\Input, STDIO\Outputs\Output
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Outputs\Output
 };
 use RuntimeException;
 
@@ -20,13 +20,10 @@ class Cursor
 {
 
     public function __construct(
-            private Output $output = null,
-            private Input $input = null
+            private Output $output = new Output()
     )
     {
 
-        $this->output ??= new Output();
-        $this->input ??= new Input();
     }
 
     /**

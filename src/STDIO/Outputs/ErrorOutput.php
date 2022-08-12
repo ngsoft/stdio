@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
-use NGSOFT\STDIO\Formatters\{
-    FormatterInterface, TagFormatter
-};
+use NGSOFT\STDIO\Formatters\Formatter;
 
 class ErrorOutput extends Output
 {
 
-    public function __construct(FormatterInterface $formatter = null)
+    public function __construct(?Formatter $formatter = null)
     {
-        $this->formatter = $formatter ?? new TagFormatter();
         $this->stream = fopen('php://stderr', 'w+');
+        parent::__construct($formatter);
     }
 
 }
