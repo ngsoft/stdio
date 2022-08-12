@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
+use InvalidArgumentException;
 use NGSOFT\STDIO\{
     Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Tag, Styles\Style, Styles\Styles
 };
@@ -17,10 +18,9 @@ class TagFormatter implements Formatter
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
     protected const BUILTIN_TAGS = [BR::class, HR::class];
 
-    protected array $replacements = [
-    ];
     protected array $tags = [];
     protected Tag $tag;
+    protected array $stack = [];
 
     public function __construct(protected ?Styles $styles = null)
     {
@@ -31,8 +31,6 @@ class TagFormatter implements Formatter
         foreach (self::BUILTIN_TAGS as $class) {
             $this->addTag(new $class($this->styles));
         }
-
-        $this->build();
     }
 
     public function addTag(Tag $tag): void
@@ -42,16 +40,6 @@ class TagFormatter implements Formatter
             return;
         }
         $this->tags[$class] = $tag;
-    }
-
-    protected function build(): void
-    {
-        $this->replacements['</>'] = $this->styles->colors ? $this->styles['reset']->getSuffix() : '';
-        /** @var Style $style */
-        foreach ($this->styles as $label => $style) {
-            $this->replacements[sprintf('<%s>', $label)] = $this->styles->colors ? $style->getPrefix() : '';
-            $this->replacements[sprintf('</%s>', $label)] = $this->styles->colors ? $style->getSuffix() : '';
-        }
     }
 
     protected function getTagsFormat(array $attributes): string
@@ -64,14 +52,58 @@ class TagFormatter implements Formatter
         return $str;
     }
 
+    protected function getCurrentStyle(): Style
+    {
+        if (empty($this->stack)) {
+            return $this->getEmptyStyle();
+        }
+        return $this->stack[count($this->stack) - 1];
+    }
+
+    protected function getEmptyStyle(): Style
+    {
+        static $empty;
+        return $empty ??= new Style();
+    }
+
+    protected function push(Style $style): void
+    {
+        $this->stack[] = $style;
+    }
+
+    protected function pop(?Style $style = null): Style
+    {
+
+        if (empty($this->stack)) {
+            return $this->getEmptyStyle();
+        }
+
+        if ( ! $style) {
+            return array_pop($this->stack);
+        }
+
+        foreach (array_reverse($this->stack) as $index => $current) {
+            if ($current->format('', true) === $style->format('', true)) {
+                $this->stack = array_slice($this->stack, 0, $index);
+                return $current;
+            }
+        }
+        throw new InvalidArgumentException(sprintf('Incorrect style tag "%s" found.', $style));
+    }
+
+    protected function applyStyle(string $message, Style $style = null)
+    {
+        if (is_null($style)) {
+            $style = $this->getCurrentStyle();
+        }
+        return $style->format($message, $this->styles->colors);
+    }
+
     public function format(string|Stringable $message): string
     {
 
-        // builtin styles
-        $message = str_replace(array_keys($this->replacements), array_values($this->replacements), (string) $message);
 
         $output = '';
-
         $offset = 0;
 
         if (preg_match_all('#<(([a-z](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
@@ -83,16 +115,15 @@ class TagFormatter implements Formatter
                     continue;
                 }
 
-                $output .= substr($message, $offset, $pos - $offset);
+                $output .= $this->applyStyle(substr($message, $offset, $pos - $offset));
                 $offset = $pos + strlen($text);
-                // text to be added to the output
-                $str = '';
-                $tag = $matches[1][$i][0];
 
+                $tag = $matches[1][$i][0];
                 if ($closing = str_starts_with($tag, '/')) {
                     $tag = $matches[3][$i][0] ?? '';
                 }
-                $style = $this->styles['reset'];
+
+                $style = null;
 
                 if ( ! empty($tag)) {
 
@@ -114,22 +145,24 @@ class TagFormatter implements Formatter
                 }
 
 
-                if ($this->styles->colors) {
-                    $str = $closing ? $style->getSuffix() : $style->getPrefix();
+                if ($closing || ! $style) {
+                    $this->pop($style);
+                    continue;
                 }
 
-                $output .= $str;
+
+                $this->push($style);
             }
         }
 
-        $output .= substr($message, $offset);
+        $output .= $this->applyStyle(substr($message, $offset));
+
         return strtr($output, [
             "\0" => '\\',
             '\\<' => '<',
             '\\>' => '>',
             "\t" => '    ',
             '\t' => '    ',
-            "\s" => ' ',
             '\s' => ' ',
             '\n' => "\n",
             '\r' => "\r",

@@ -13,16 +13,16 @@ class Tab extends Tag
         if ( ! isset($attributes['tab'])) {
             return '';
         }
-        $str = '';
+
 
         $count = 1;
-        if ( ! preg_match('#\d+#', $attributes['tab'][0] ?? $attributes['count'][0] ?? '', $matches)) {
+        if ( ! preg_match('#(\d+)#', $attributes['tab'][0] ?? $attributes['count'][0] ?? '', $matches)) {
             $count = intval($matches[1]);
         }
 
         $count = max(1, $count);
 
-        return str_repeat('\t', $count);
+        return $this->getStyle($attributes)->format(str_repeat('\t', $count), $this->styles->colors);
     }
 
 }

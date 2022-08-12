@@ -9,7 +9,7 @@ use NGSOFT\{
 };
 use Stringable;
 
-class Style
+class Style implements Stringable
 {
 
     /** @var Format|Color|BackgroundColor[] */
@@ -24,9 +24,10 @@ class Style
 
     }
 
-    public function setLabel(string $label): void
+    public function setLabel(string $label): static
     {
         $this->label = $label;
+        return $this;
     }
 
     /**
@@ -84,6 +85,11 @@ class Style
             'styles' => array_map(fn($enum) => $enum->name, $this->styles),
             'format' => $this->format($this->getPrefix() . $this->getLabel() . $this->getSuffix())
         ];
+    }
+
+    public function __toString(): string
+    {
+        return $this->getLabel();
     }
 
 }
