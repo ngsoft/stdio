@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use BackedEnum;
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\Tag, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\Tag, Styles\Style, Styles\Styles
 };
 use Stringable;
 use function preg_exec,
@@ -16,7 +15,7 @@ class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
-    protected const BUILTIN_TAGS = [];
+    protected const BUILTIN_TAGS = [BR::class];
 
     protected array $replacements = [];
     protected array $tags = [];
@@ -46,19 +45,28 @@ class TagFormatter implements Formatter
 
     protected function build(): void
     {
-        $formats = &$this->formats;
+
+
+        $this->replacements['</>'] = $this->styles->colors ? $this->styles['reset']->getSuffix() : '';
 
         /** @var Style $style */
         foreach ($this->styles as $label => $style) {
-            $this->replacements[sprintf('<%s>', $label)] = $style->getPrefix();
-            $this->replacements[sprintf('</%s>', $label)] = $style->getSuffix();
+            $this->replacements[sprintf('<%s>', $label)] = $this->styles->colors ? $style->getPrefix() : '';
+            $this->replacements[sprintf('</%s>', $label)] = $this->styles->colors ? $style->getSuffix() : '';
         }
     }
 
     protected function getTagsFormat(array $attributes): string
     {
-        //special tags
-        return '';
+
+        $str = '';
+
+        foreach ($this->tags as $tag) {
+            $str .= $tag->getFormat($attributes);
+        }
+
+
+        return $str;
     }
 
     public function format(string|Stringable $message): string
@@ -89,6 +97,7 @@ class TagFormatter implements Formatter
                 if ($closing = str_starts_with($tag, '/')) {
                     $tag = $matches[3][$i][0] ?? '';
                 }
+                $style = $this->styles['reset'];
 
                 if ( ! empty($tag)) {
 
@@ -107,13 +116,10 @@ class TagFormatter implements Formatter
                     }
 
                     if ( ! isset($this->styles[$tag])) {
-
                         $this->styles->addStyle($style = $this->tag->getStyle($attributes));
                     } else { $style = $this->styles[$tag]; }
-                } else {
-                    $style = $this->styles['reset'];
                 }
-                var_dump($style);
+
 
                 if ($this->styles->colors) {
                     $str = $closing ? $style->getSuffix() : $style->getPrefix();
@@ -123,9 +129,7 @@ class TagFormatter implements Formatter
             }
         }
 
-
         $output .= substr($message, $offset);
-
         return $output;
     }
 
