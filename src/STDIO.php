@@ -41,9 +41,7 @@ final class STDIO
 
         $this->buffer = new Buffer();
         $this->styles = new Styles($forceColorSupport);
-
         $this->formatter = new TagFormatter($this->styles);
-
         $this->output = new Output($this->formatter);
         $this->errorOutput = new ErrorOutput($this->formatter);
         $this->input = new Input();

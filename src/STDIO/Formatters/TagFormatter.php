@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use NGSOFT\STDIO\Styles\{
-    Style, Styles
+use BackedEnum;
+use NGSOFT\STDIO\{
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Styles\Style, Styles\Styles
 };
 use Stringable;
 
 class TagFormatter implements Formatter
 {
+
+    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected const EMPTY_FORMAT = Format::RESET;
 
     protected array $formats = [];
     protected array $replacements = [];
@@ -32,7 +36,15 @@ class TagFormatter implements Formatter
             $this->replacements[sprintf('</%s>', $label)] = $style->getSuffix();
         }
 
-        var_dump($this);
+        /** @var BackedEnum $enum */
+        /** @var Color $format */
+        foreach (self::FORMATS_ENUMS as $enum) {
+            foreach ($enum::cases() as $format) {
+                $prop = $format->getTagAttribute();
+                $formats[$prop] ??= [];
+                $formats[$prop] [strtolower($format->getName())] = $format;
+            }
+        }
     }
 
     public function format(string|Stringable $message): string

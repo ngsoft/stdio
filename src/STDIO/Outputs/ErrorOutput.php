@@ -13,6 +13,8 @@ class ErrorOutput extends Output
     {
         $this->stream = fopen('php://stderr', 'w+');
         parent::__construct($formatter);
+
+        var_dump($this);
     }
 
 }
