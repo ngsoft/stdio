@@ -23,6 +23,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     /** @var Style[] */
     protected array $styles = [];
+    protected array $formats = [];
 
     public function __construct(
             public readonly ?bool $colors = null
@@ -69,19 +70,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     public function createStyleFromAttributes(array $attributes, string $label = ''): Style
     {
 
-        static $availableFormats = [];
-
-        if (empty($availableFormats)) {
-            /** @var \BackedEnum $enum */
-            /** @var Color $format */
-            foreach (self::FORMATS_ENUMS as $enum) {
-                foreach ($enum::cases() as $format) {
-                    $prop = $format->getTagAttribute();
-                    $availableFormats[$prop] ??= [];
-                    $availableFormats[$prop] [strtolower($format->getName())] = $format;
-                }
-            }
-        }
+        $availableFormats = &$this->formats;
 
         $formats = [];
 
@@ -180,6 +169,9 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             foreach (self::FORMATS_ENUMS as $enum) {
                 foreach ($enum::cases() as $format) {
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
+                    $prop = $format->getTagAttribute();
+                    $this->formats[$prop] ??= [];
+                    $this->formats[$prop][strtolower($format->getName())] = $format;
                 }
             }
             foreach ($custom as $label => $styles) {

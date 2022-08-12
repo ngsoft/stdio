@@ -81,7 +81,7 @@ class TagFormatter implements Formatter
                 return $current;
             }
         }
-        throw new InvalidArgumentException(sprintf('Incorrect style tag "%s" found.', $style));
+        throw new InvalidArgumentException(sprintf('Incorrect style tag "</%s>" found.', $style));
     }
 
     protected function applyStyle(string $message, Style $style = null)
@@ -132,18 +132,20 @@ class TagFormatter implements Formatter
                     }
 
                     if ( ! isset($this->styles[$tag])) {
-                        $this->styles->addStyle($style = $this->styles->createStyleFromAttributes($attributes, $tag));
+                        $this->styles->addStyle(
+                                $style = $this->styles->createStyleFromAttributes($attributes, $tag)
+                        );
                     } else { $style = $this->styles[$tag]; }
                 }
 
 
-                if ($closing || ! $style) {
+                if ($closing) {
                     $this->pop($style);
                     continue;
                 }
 
 
-                $this->push($style);
+                $style && $this->push($style);
             }
         }
 
