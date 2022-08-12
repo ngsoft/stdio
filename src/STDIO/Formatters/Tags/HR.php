@@ -16,7 +16,6 @@ class HR extends Tag
         }
 
 
-        $style = $this->getStyle($attributes);
 
         $str = '';
         $padding = 4;
@@ -34,7 +33,7 @@ class HR extends Tag
 
         $str .= "\n";
 
-        for ($i = 0; $i < $padding; $i ++ ) {
+        for ($i = 0; $i < $padding; $i ++) {
             $str .= ' ';
         }
 
@@ -44,9 +43,9 @@ class HR extends Tag
             $sub .= $char;
         }
 
-        $str .= $style->format($sub, $this->styles->colors);
+        $str .= $this->getStyle($attributes)->format($sub, $this->styles->colors);
 
-        for ($i = 0; $i < $padding; $i ++ ) {
+        for ($i = 0; $i < $padding; $i ++) {
             $str .= ' ';
         }
 
