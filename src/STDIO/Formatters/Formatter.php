@@ -7,5 +7,8 @@ namespace NGSOFT\STDIO\Formatters;
 interface Formatter
 {
 
+    /**
+     * Format the output
+     */
     public function format(string|\Stringable $message): string;
 }
