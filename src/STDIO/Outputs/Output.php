@@ -10,6 +10,7 @@ use NGSOFT\STDIO\Formatters\{
 use RuntimeException,
     Stringable,
     TypeError;
+use function get_debug_type;
 
 class Output
 {
@@ -29,24 +30,23 @@ class Output
     /**
      * Write message to the output
      *
-     * @param string|Stringable|array $message
+     * @param string|Stringable|string[]|Stringable[] $message
      * @return void
      * @throws TypeError
      */
     public function write(string|Stringable|array $message): void
     {
-        $messages = is_array($message) ? $message : [$message];
+        foreach ((array) $message as $line) {
 
-        foreach ($messages as $line) {
-            if ($line instanceof Stringable) $line = $line->__toString();
-
-            if ( ! is_string($line)) {
+            if ( ! is_string($line) && ! ($line instanceof Stringable)) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
 
-            $line = $this->formatter->format($message);
 
-            $this->flushStream($line);
+            if (false === @fwrite($this->stream, $this->formatter->format($line))) {
+                throw new RuntimeException('Unable to write output.');
+            }
+            fflush($this->stream);
         }
     }
 
@@ -60,14 +60,6 @@ class Output
     {
         $this->write($message);
         $this->write("\n");
-    }
-
-    protected function flushStream(string $message)
-    {
-        if (false === fwrite($this->stream, $message)) {
-            throw new RuntimeException('Unable to write output.');
-        }
-        fflush($this->stream);
     }
 
     /**
