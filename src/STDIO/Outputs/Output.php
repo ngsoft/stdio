@@ -17,12 +17,12 @@ class Output
 
     /** @var resource */
     protected $stream;
+    protected Formatter $formatter;
 
-    public function __construct(protected ?Formatter $formatter = null)
+    public function __construct(Formatter $formatter = null)
     {
-
         $this->stream ??= fopen('php://stdout', 'w+');
-        $this->formatter ??= new TagFormatter();
+        $this->formatter = $formatter ?? new TagFormatter();
     }
 
     /**
