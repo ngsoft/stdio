@@ -73,9 +73,7 @@ class Buffer implements Countable, IteratorAggregate
 
     public function getIterator(): Traversable
     {
-        $buffer = $this->buffer;
-        $this->clear();
-        yield from $buffer;
+        yield from $this->buffer;
     }
 
 }

@@ -25,31 +25,25 @@ final class STDIO
     private Buffer $buffer;
     private Cursor $cursor;
     private Styles $styles;
-    private TagFormatter $formatter;
+    private Formatter $formatter;
 
     /**
      * Get STDIO Instance
-     *
-     * @staticvar type $instance
-     * @return static
      */
-    public static function create(): static
+    public static function create(bool $forceColorSupport = null): static
     {
-        static $instance;
-        $instance = $instance ?? new static();
-        return $instance;
+        static $cache = [];
+        return $cache[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
     }
 
-    /**
-     * @param ?bool $forceColorSupport Overrides color support detection
-     */
     public function __construct(bool $forceColorSupport = null)
     {
+
+        $this->buffer = new Buffer();
         $this->styles = new Styles($forceColorSupport);
 
         $this->formatter = new TagFormatter($this->styles);
 
-        $this->buffer = new Buffer();
         $this->output = new Output($this->formatter);
         $this->errorOutput = new ErrorOutput($this->formatter);
         $this->input = new Input();
@@ -86,7 +80,7 @@ final class STDIO
         return $this->styles;
     }
 
-    public function getFormatter(): TagFormatter
+    public function getFormatter(): Formatter
     {
         return $this->formatter;
     }
