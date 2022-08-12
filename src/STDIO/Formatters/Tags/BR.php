@@ -14,9 +14,9 @@ class BR extends Tag
             return '';
         }
 
-        $attr = $attributes['count'][0] ?? $attributes['br'][0] ?? '';
 
-        if (preg_match('#(\d+)#', $attr, $matches)) {
+
+        if (preg_match('#(\d+)#', $attributes['count'][0] ?? $attributes['br'][0] ?? '', $matches)) {
             $count = intval($matches[1]);
         } else { $count = 1; }
 
@@ -24,7 +24,7 @@ class BR extends Tag
 
         $str = '';
 
-        for ($i = 0; $i < $count; $i ++ ) {
+        for ($i = 0; $i < $count; $i ++) {
             $str .= "\n";
         }
 

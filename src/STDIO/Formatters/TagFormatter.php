@@ -17,7 +17,15 @@ class TagFormatter implements Formatter
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
     protected const BUILTIN_TAGS = [BR::class, HR::class];
 
-    protected array $replacements = [];
+    protected array $replacements = [
+        // set tabs to 4 instead of 8
+        "\t" => '    ',
+        '\t' => '    ',
+        "\s" => ' ',
+        '\s' => ' ',
+        '\n' => "\n",
+        '\r' => "\r",
+    ];
     protected array $tags = [];
     protected Tag $tag;
 
@@ -45,10 +53,7 @@ class TagFormatter implements Formatter
 
     protected function build(): void
     {
-
-
         $this->replacements['</>'] = $this->styles->colors ? $this->styles['reset']->getSuffix() : '';
-
         /** @var Style $style */
         foreach ($this->styles as $label => $style) {
             $this->replacements[sprintf('<%s>', $label)] = $this->styles->colors ? $style->getPrefix() : '';
@@ -60,12 +65,9 @@ class TagFormatter implements Formatter
     {
 
         $str = '';
-
         foreach ($this->tags as $tag) {
             $str .= $tag->getFormat($attributes);
         }
-
-
         return $str;
     }
 
@@ -107,8 +109,6 @@ class TagFormatter implements Formatter
                         $key = strtolower(trim($key));
                         $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => strtolower(trim($v)), preg_split('#,+#', $val)) : [];
                     }
-
-
 
                     if ( ! empty($str = $this->getTagsFormat($attributes))) {
                         $output .= $str;
