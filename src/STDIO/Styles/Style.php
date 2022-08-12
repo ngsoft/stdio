@@ -63,8 +63,7 @@ class Style
     public function format(string|Stringable $message, bool $colors = null): string
     {
         $colors ??= Terminal::supportsColors();
-        $message = (string) $message;
-        return $colors ? sprintf("%s%s%s", $this->getPrefix(), $message, $this->getSuffix()) : $message;
+        return $colors ? sprintf("%s%s%s", $this->getPrefix(), (string) $message, $this->getSuffix()) : $message;
     }
 
     public function __debugInfo(): array
