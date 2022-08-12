@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\Tag, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Tag, Styles\Style, Styles\Styles
 };
 use Stringable;
 use function preg_exec,
@@ -15,7 +15,7 @@ class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
-    protected const BUILTIN_TAGS = [BR::class];
+    protected const BUILTIN_TAGS = [BR::class, HR::class];
 
     protected array $replacements = [];
     protected array $tags = [];
