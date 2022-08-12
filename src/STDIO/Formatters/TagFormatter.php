@@ -10,20 +10,21 @@ use NGSOFT\STDIO\Styles\Styles,
 class TagFormatter implements Formatter
 {
 
-    protected array $formats = [
-        'fg' => [],
-        'bg' => [],
-        'options' => []
-    ];
+    protected array $formats = [];
 
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
+        $this->build();
+    }
+
+    protected function build(): void
+    {
+        $formats = &$this->formats;
     }
 
     public function format(string|Stringable $message): string
     {
-
         return (string) $message;
     }
 
