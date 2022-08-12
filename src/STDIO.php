@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Styles, StyleSheet
+    Cursor, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Styles
 };
 use Stringable;
 

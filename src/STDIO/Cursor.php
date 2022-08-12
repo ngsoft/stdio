@@ -19,20 +19,14 @@ use RuntimeException;
 class Cursor
 {
 
-    /** @var Input */
-    private $input;
-
-    /** @var Output */
-    private $output;
-
     public function __construct(
-            Output $output = null,
-            Input $input = null
+            private Output $output = null,
+            private Input $input = null
     )
     {
 
-        $this->output = $output ?? new Output();
-        $this->input = $input ?? new Input();
+        $this->output ??= new Output();
+        $this->input ??= new Input();
     }
 
     /**
@@ -238,7 +232,7 @@ class Cursor
      */
     public function getLeft(): int
     {
-        return $this->getCurrentPosition()[0];
+        return Terminal::getLeft();
     }
 
     /**
@@ -247,7 +241,7 @@ class Cursor
      */
     public function getTop(): int
     {
-        return $this->getCurrentPosition()[1];
+        return Terminal::getTop();
     }
 
     public function __isset(string $name): bool
