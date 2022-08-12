@@ -20,8 +20,9 @@ class Output
 
     public function __construct(protected ?Formatter $formatter = null)
     {
+
+        $this->stream ??= fopen('php://stdout', 'w+');
         $this->formatter ??= new TagFormatter();
-        $this->stream ??= fopen('php://stdout', 'w+'); ;
     }
 
     /**

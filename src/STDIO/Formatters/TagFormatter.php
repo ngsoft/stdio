@@ -45,6 +45,8 @@ class TagFormatter implements Formatter
                 $formats[$prop] [strtolower($format->getName())] = $format;
             }
         }
+
+        var_dump(spl_object_id($this));
     }
 
     public function format(string|Stringable $message): string
