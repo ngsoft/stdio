@@ -46,6 +46,12 @@ class TagFormatter implements Formatter
         }
     }
 
+    protected function readAttributes(array $attributes): string
+    {
+        //special tags
+        return '';
+    }
+
     public function format(string|Stringable $message): string
     {
         // builtin styles
@@ -80,9 +86,16 @@ class TagFormatter implements Formatter
                     foreach (preg_split('#;+#', $tag) as $attribute) {
                         [, $key, $val] = preg_exec('#([^=]+)(?:=+(.+))?#', $attribute);
                         $key = strtolower(trim($key));
-
                         $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => strtolower(trim($v)), preg_split('#,+#', $val)) : [];
                     }
+
+
+
+                    if ( ! empty($str = $this->readAttributes($attributes))) {
+                        $output .= $str;
+                        continue;
+                    }
+
 
                     if ( ! isset($this->styles[$tag])) {
 
@@ -104,11 +117,7 @@ class TagFormatter implements Formatter
                                 }
                             }
                         }
-
-                        $style = $this->styles->createStyle($tag, ...$formats);
-                        if (empty($str)) {
-                            $this->styles->addStyle($style);
-                        }
+                        $this->styles->addStyle($style = $this->styles->createStyle($tag, ...$formats));
                     } else { $style = $this->styles[$tag]; }
                 } else {
                     $style = $this->styles['reset'];
