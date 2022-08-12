@@ -57,6 +57,11 @@ class Style
         return $this->label;
     }
 
+    public function getStyles(): array
+    {
+        return $this->styles;
+    }
+
     /**
      * Format message to include style
      */
@@ -72,7 +77,7 @@ class Style
         return [
             'label' => $this->label,
             'styles' => array_map(fn($enum) => $enum->name, $this->styles),
-            'format' => $this->format($this->label)
+            'format' => $this->format($this->getPrefix() . $this->getLabel() . $this->getSuffix())
         ];
     }
 

@@ -14,7 +14,6 @@ class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
-    protected const EMPTY_FORMAT = Format::RESET;
 
     protected array $formats = [];
     protected array $replacements = [];
@@ -49,7 +48,9 @@ class TagFormatter implements Formatter
 
     public function format(string|Stringable $message): string
     {
-        //$message = str_replace(array_keys($this->replacements), array_values($this->replacements), (string) $message);
+        // builtin styles
+        $message = str_replace(array_keys($this->replacements), array_values($this->replacements), (string) $message);
+
         $output = '';
 
         $offset = 0;
@@ -63,41 +64,56 @@ class TagFormatter implements Formatter
                     continue;
                 }
 
+                $output .= substr($message, $offset, $pos - $offset);
+                $offset = $pos + strlen($text);
+
                 $tag = $matches[1][$i][0];
-                if ($closing = $tag[0] === '/') {
+                if ($closing = str_starts_with($tag, '/')) {
                     $tag = $matches[3][$i][0] ?? '';
                 }
 
-
-                $formats = [];
-                var_dump($tag);
                 if ( ! empty($tag)) {
-                    $params = [];
-                    foreach (preg_split('#;+#', $tag) as $attribute) {
-                        [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
 
-                        $key = strtolower($key);
-                        if (isset($val)) {
-                            foreach (preg_split('#,+#', $val) as $format) {
-                                $format = strtolower($format);
-                                var_dump([$key, $format]);
+                    $formats = [];
+
+                    if ( ! isset($this->styles[$tag])) {
+                        foreach (preg_split('#;+#', $tag) as $attribute) {
+                            [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
+                            $key = strtolower(trim($key));
+                            if ( ! isset($val)) {
+                                if (isset($this->styles[$key])) {
+                                    $formats = array_merge($formats, $this->styles[$key]->getStyles());
+                                }
+                                continue;
                             }
 
-
-
-
-
-                            continue;
+                            foreach (preg_split('#,+#', $val) as $format) {
+                                $format = strtolower(trim($format));
+                                if (isset($this->formats[$key][$format])) {
+                                    $formats[] = $this->formats[$key][$format];
+                                }
+                            }
                         }
 
-                        $style = $this->styles[$key] ?? $this->styles->createStyle($tag);
-                    }
+
+                        $this->styles->addStyle(
+                                $style = $this->styles->createStyle($tag, ...$formats)
+                        );
+                    } else { $style = $this->styles[$tag]; }
                 } else {
-                    $formats[] = self::EMPTY_FORMAT;
+                    $style = $this->styles['reset'];
                 }
+
+                $str = '';
+                if ($this->styles->colors) {
+                    $str = $closing ? $style->getSuffix() : $style->getPrefix();
+                }
+                $output .= $str;
             }
         }
 
+
+        $output .= substr($message, $offset);
 
         return $output;
     }

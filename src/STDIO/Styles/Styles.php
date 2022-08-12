@@ -23,7 +23,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     protected array $styles = [];
 
     public function __construct(
-            protected ?bool $colors = null
+            public readonly ?bool $colors = null
     )
     {
         $this->colors ??= Terminal::supportsColors();
