@@ -58,13 +58,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     public function createStyle(string $label, Format|Color|BackgroundColor ...$styles): Style
     {
         static $cache = [];
-
-        if ( ! empty($label)) {
-            return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
-        }
-
-        $style = (new Style($label));
-        return $style->setStyles(...$styles);
+        return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
     }
 
     /** {@inheritdoc} */
