@@ -15,10 +15,10 @@ class BR extends Tag
         }
 
 
-
+        $count = 1;
         if (preg_match('#(\d+)#', $attributes['count'][0] ?? $attributes['br'][0] ?? '', $matches)) {
             $count = intval($matches[1]);
-        } else { $count = 1; }
+        }
 
         $count = max(1, $count);
 
