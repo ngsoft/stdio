@@ -17,6 +17,7 @@ class TagFormatter implements Formatter
 
     protected array $formats = [];
     protected array $replacements = [];
+    protected array $tags = [];
 
     public function __construct(protected ?Styles $styles = null)
     {
@@ -27,7 +28,6 @@ class TagFormatter implements Formatter
     protected function build(): void
     {
         $formats = &$this->formats;
-        $replacements = &$this->replacements;
 
         /** @var Style $style */
         foreach ($this->styles as $label => $style) {
@@ -66,48 +66,59 @@ class TagFormatter implements Formatter
 
                 $output .= substr($message, $offset, $pos - $offset);
                 $offset = $pos + strlen($text);
-
+                // text to be added to the output
+                $str = '';
                 $tag = $matches[1][$i][0];
+
                 if ($closing = str_starts_with($tag, '/')) {
                     $tag = $matches[3][$i][0] ?? '';
                 }
 
                 if ( ! empty($tag)) {
 
-                    $formats = [];
+                    $attributes = [];
+                    foreach (preg_split('#;+#', $tag) as $attribute) {
+                        [, $key, $val] = preg_exec('#([^=]+)(?:=+(.+))?#', $attribute);
+                        $key = strtolower(trim($key));
+
+                        $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => strtolower(trim($v)), preg_split('#,+#', $val)) : [];
+                    }
 
                     if ( ! isset($this->styles[$tag])) {
-                        foreach (preg_split('#;+#', $tag) as $attribute) {
-                            [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
-                            $key = strtolower(trim($key));
-                            if ( ! isset($val)) {
+
+                        $formats = [];
+
+                        foreach ($attributes as $key => $val) {
+
+                            if (empty($val)) {
                                 if (isset($this->styles[$key])) {
                                     $formats = array_merge($formats, $this->styles[$key]->getStyles());
                                 }
                                 continue;
                             }
 
-                            foreach (preg_split('#,+#', $val) as $format) {
-                                $format = strtolower(trim($format));
+
+                            foreach ($val as $format) {
                                 if (isset($this->formats[$key][$format])) {
                                     $formats[] = $this->formats[$key][$format];
                                 }
                             }
                         }
 
-
-                        $this->styles->addStyle(
-                                $style = $this->styles->createStyle($tag, ...$formats)
-                        );
+                        $style = $this->styles->createStyle($tag, ...$formats);
+                        if (empty($str)) {
+                            $this->styles->addStyle($style);
+                        }
                     } else { $style = $this->styles[$tag]; }
                 } else {
                     $style = $this->styles['reset'];
                 }
 
-                $str = '';
+
                 if ($this->styles->colors) {
                     $str = $closing ? $style->getSuffix() : $style->getPrefix();
                 }
+
                 $output .= $str;
             }
         }
