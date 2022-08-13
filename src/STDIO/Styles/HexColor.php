@@ -59,7 +59,6 @@ class HexColor
         }
 
 
-
         $color = hexdec($color);
 
         if ($mode === '256color') {
