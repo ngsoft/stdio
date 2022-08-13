@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use InvalidArgumentException;
-use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\NoTag, Formatters\Tags\StyleTag, Styles\Style, Styles\Styles
+use NGSOFT\{
+    DataStructure\PrioritySet, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\Tags\NoTag, STDIO\Formatters\Tags\StyleTag,
+    STDIO\Styles\Style, STDIO\Styles\Styles
 };
 use Stringable;
 use function mb_strlen,
@@ -20,22 +21,34 @@ class TagFormatter implements Formatter
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
     protected const BUILTIN_TAGS = [NoTag::class, StyleTag::class];
 
-    protected array $tags = [];
+    protected PrioritySet $tags;
+
+    /** @var Tag[] */
     protected array $stack = [];
 
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
 
-        foreach (self::BUILTIN_TAGS as $class) {
-            $this->addTag(new $class($this->styles));
+        $this->tags = new PrioritySet();
+
+        foreach (self::BUILTIN_TAGS as $priority => $class) {
+            $this->addTag(new $class($this->styles), $priority + 1);
         }
     }
 
-    public function addTag(Tag $tag): void
+    /**
+     * Add a custom tag to be managed
+     */
+    public function addTag(Tag $tag, int $priority = 16): void
     {
 
-        $this->tags[$tag->getName()] = $tag;
+        foreach ($this->tags as $rtag) {
+            if (get_class($rtag) === get_class($tag)) {
+                return;
+            }
+        }
+        $this->tags->add($tag, $priority);
     }
 
     protected function getTagsFormat(array $attributes): string
@@ -84,7 +97,7 @@ class TagFormatter implements Formatter
                 return $current;
             }
         }
-        throw new InvalidArgumentException(sprintf('Incorrect style tag "</%s>" found.', $style));
+        throw new InvalidArgumentException(sprintf('Incorrect style closing tag "</%s>" found.', $style));
     }
 
     protected function applyStyle(string $message, Style $style = null)

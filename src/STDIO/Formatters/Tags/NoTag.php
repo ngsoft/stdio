@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
-use NGSOFT\STDIO\Formatters\Tag;
+use NGSOFT\STDIO\{
+    Formatters\Tag, Styles\Style
+};
 
 /**
  * Fallback Tag
@@ -19,12 +21,19 @@ class NoTag extends Tag
 
     public function isSelfClosing(): bool
     {
-        return false;
+        return true;
     }
 
     public function managesAttributes(array $attributes): bool
     {
         return true;
+    }
+
+    public function getStyle(): Style
+    {
+        static $empty;
+
+        return $empty ??= new Style();
     }
 
 }
