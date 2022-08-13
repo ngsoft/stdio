@@ -33,6 +33,16 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         $this->buildStyles();
     }
 
+    public function getStyles(): array
+    {
+        return $this->styles;
+    }
+
+    public function getFormats(): array
+    {
+        return $this->formats;
+    }
+
     /**
      * Displays current styles to the output
      */

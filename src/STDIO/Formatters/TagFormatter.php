@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Formatters;
 
 use InvalidArgumentException;
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Tab, Formatters\Tags\Tag, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\NoTag, Formatters\Tags\StyleTag, Styles\Style, Styles\Styles
 };
 use Stringable;
 use function mb_strlen,
@@ -18,7 +18,7 @@ class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
-    protected const BUILTIN_TAGS = [BR::class, HR::class, Tab::class];
+    protected const BUILTIN_TAGS = [NoTag::class, StyleTag::class];
 
     protected array $tags = [];
     protected array $stack = [];
@@ -34,6 +34,7 @@ class TagFormatter implements Formatter
 
     public function addTag(Tag $tag): void
     {
+
         $this->tags[$tag->getName()] = $tag;
     }
 
