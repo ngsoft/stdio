@@ -198,7 +198,11 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         }
 
 
+
         $this->styles = $cache;
+
+        var_dump($this->styles);
+        exit;
     }
 
     public function __debugInfo(): array

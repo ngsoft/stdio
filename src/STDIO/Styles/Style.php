@@ -82,7 +82,7 @@ class Style implements Stringable
 
         return [
             'label' => $this->label,
-            'styles' => array_map(fn($enum) => $enum->name, $this->styles),
+            'styles' => array_map(fn($enum) => class_basename(get_class($enum)) . '::' . $enum->name, $this->styles),
             'format' => $this->format($this->getPrefix() . $this->getLabel() . $this->getSuffix())
         ];
     }
