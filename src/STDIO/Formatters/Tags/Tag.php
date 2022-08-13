@@ -13,6 +13,7 @@ abstract class Tag
 {
 
     public readonly string $name;
+    protected string $contents = '';
 
     public function __construct(
             protected ?Styles $styles = null
@@ -32,6 +33,18 @@ abstract class Tag
     public function getStyle(array $attributes): Style
     {
         return $this->styles->createStyleFromAttributes($attributes);
+    }
+
+    public function addContents(string $contents)
+    {
+        $this->contents .= $contents;
+    }
+
+    public function flushContents(): string
+    {
+        $contents = $this->contents;
+        $this->contents = '';
+        return $contents;
     }
 
 }

@@ -6,17 +6,19 @@ namespace NGSOFT\STDIO\Formatters;
 
 use InvalidArgumentException;
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Tag, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\Tags\BR, Formatters\Tags\HR, Formatters\Tags\Tab, Formatters\Tags\Tag, Styles\Style, Styles\Styles
 };
 use Stringable;
-use function preg_exec,
+use function mb_strlen,
+             preg_exec,
+             str_ends_with,
              str_starts_with;
 
 class TagFormatter implements Formatter
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
-    protected const BUILTIN_TAGS = [BR::class, HR::class];
+    protected const BUILTIN_TAGS = [BR::class, HR::class, Tab::class];
 
     protected array $tags = [];
     protected array $stack = [];
@@ -92,6 +94,26 @@ class TagFormatter implements Formatter
         return $style->format($message, $this->styles->colors);
     }
 
+    /**
+     * Escapes < and > special chars in given text.
+     */
+    public static function escape(string $message): string
+    {
+        return static::escapeTrailingBackslash(preg_replace('/([^\\\\]|^)([<>])/', '$1\\\\$2', $message));
+    }
+
+    public static function escapeTrailingBackslash(string $message): string
+    {
+        if (str_ends_with($message, '\\')) {
+            $len = mb_strlen($message);
+            $message = rtrim($message, '\\');
+            $message = str_replace("\0", '', $message);
+            $message .= str_repeat("\0", $len - mb_strlen($message));
+        }
+        return $message;
+    }
+
+    /** {@inheritdoc} */
     public function format(string|Stringable $message): string
     {
 
