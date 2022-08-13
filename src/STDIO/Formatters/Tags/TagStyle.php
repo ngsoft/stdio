@@ -12,4 +12,9 @@ class TagStyle extends Tag
         return '';
     }
 
+    public function getType(): int
+    {
+        return self::HAS_CONTENTS;
+    }
+
 }

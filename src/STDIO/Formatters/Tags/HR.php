@@ -33,7 +33,7 @@ class HR extends Tag
 
         $str .= "\n";
 
-        for ($i = 0; $i < $padding; $i ++) {
+        for ($i = 0; $i < $padding; $i ++ ) {
             $str .= ' ';
         }
 
@@ -50,13 +50,18 @@ class HR extends Tag
 
         $str .= $this->getStyle($attributes)->format($sub, $this->styles->colors);
 
-        for ($i = 0; $i < $padding; $i ++) {
+        for ($i = 0; $i < $padding; $i ++ ) {
             $str .= ' ';
         }
 
         $str .= "\n";
 
         return $str;
+    }
+
+    public function getType(): int
+    {
+        return self::SELF_CLOSING;
     }
 
 }

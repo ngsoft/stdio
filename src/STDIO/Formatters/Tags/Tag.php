@@ -12,6 +12,9 @@ use function class_basename;
 abstract class Tag implements \IteratorAggregate
 {
 
+    public const SELF_CLOSING = 0;
+    public const HAS_CONTENTS = 1;
+
     public readonly string $name;
 
     /** @var array<string, string[]> */
@@ -31,6 +34,24 @@ abstract class Tag implements \IteratorAggregate
     }
 
     abstract public function getFormat(array $attributes): string;
+
+    abstract public function getType(): int;
+
+    public function hasAttribute(string $attribute): bool
+    {
+        return isset($this->attributes[$attribute]);
+    }
+
+    public function getAttribute(string $attribute): ?array
+    {
+        return $this->attributes[$attribute] ?? null;
+    }
+
+    public function getFirstAttribute(string $attribute): ?string
+    {
+
+        return $this->attributes[$attribute][0] ?? $this->hasAttribute($attribute) ? '' : null;
+    }
 
     public function getStyle(array $attributes): Style
     {

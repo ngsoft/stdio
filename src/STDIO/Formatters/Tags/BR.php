@@ -25,4 +25,9 @@ class BR extends Tag
         return str_repeat('\n', $count);
     }
 
+    public function getType(): int
+    {
+        return self::SELF_CLOSING;
+    }
+
 }

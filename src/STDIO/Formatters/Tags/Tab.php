@@ -25,4 +25,9 @@ class Tab extends Tag
         return $this->getStyle($attributes)->format(str_repeat('\t', $count), $this->styles->colors);
     }
 
+    public function getType(): int
+    {
+        return self::SELF_CLOSING;
+    }
+
 }
