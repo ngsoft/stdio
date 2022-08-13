@@ -15,6 +15,7 @@ use NGSOFT\Enums\EnumTrait;
  * @method static static PURPLE()
  * @method static static CYAN()
  * @method static static WHITE()
+ * @method static static DEFAULT()
  */
 enum Color: int
 {
@@ -29,6 +30,7 @@ enum Color: int
     case PURPLE = 35;
     case CYAN = 36;
     case GRAY = 37;
+    case DEFAULT = 39;
 
     public function getUnsetValue(): int
     {

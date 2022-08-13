@@ -167,6 +167,9 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     protected function buildStyles(): void
     {
         static $cache = [], $custom = [
+            'magenta' => [Color::PURPLE],
+            'bg:magenta' => [BackgroundColor::PURPLE],
+            'bg:white' => [BackgroundColor::GRAY],
             'emergency' => [Color::YELLOW, BackgroundColor::RED, Format::BOLD],
             'alert' => [Color::RED, Format::BOLD],
             'critical' => [Color::RED, Format::BOLD],

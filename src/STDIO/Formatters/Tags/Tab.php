@@ -23,7 +23,6 @@ class Tab extends Tag
 
     public function isSelfClosing(): bool
     {
-
         return true;
     }
 
