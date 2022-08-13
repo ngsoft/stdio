@@ -132,7 +132,10 @@ class Utils
 
         if (is_null($result)) {
             $result = 8;
-            if (preg_match('/^(cygwin|xterm|256)/', getenv('TERM') ?: '')) {
+
+            if ('truecolor' === getenv('COLORTERM')) {
+                $result = 16777215;
+            } elseif (preg_match('/^(cygwin|xterm|256)/', getenv('TERM') ?: '')) {
                 $result = 256;
             } elseif ($value = self::executeProcess('tput colors')) {
                 $result = intval($value);

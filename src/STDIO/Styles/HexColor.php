@@ -22,7 +22,7 @@ class HexColor
             public bool $isBackgroundColor = false
     )
     {
-        $this->value = self::convertHexToAnsi($name);
+        $this->value = self::convertHexToAnsi($name, $isBackgroundColor);
         $this->name = '#' . ltrim($name, '#');
     }
 
@@ -45,9 +45,9 @@ class HexColor
 
         if ( ! $mode) {
             $mode = 'ansi';
-            if ('truecolor' === getenv('COLORTERM')) {
+            if (Utils::getNumColorSupport() > 256) {
                 $mode = 'truecolor';
-            } elseif (Utils::getNumColorSupport() >= 256) {
+            } elseif (Utils::getNumColorSupport() == 256) {
                 $mode = '256color';
             }
         }
