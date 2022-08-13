@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
+use NGSOFT\Tools,
+    Throwable;
+
 class Utils
 {
 
@@ -15,28 +18,34 @@ class Utils
         }
 
 
-        $process = @proc_open(
-                        $command,
-                        [
-                            1 => ['pipe', 'w'],
-                            2 => ['pipe', 'w'],
-                        ],
-                        $pipes,
-                        null,
-                        null,
-                        ['suppress_errors' => true]
-        );
+        try {
+            Tools::errors_as_exceptions();
 
-        if ( ! \is_resource($process)) {
+            $process = @proc_open(
+                            $command,
+                            [
+                                1 => ['pipe', 'w'],
+                                2 => ['pipe', 'w'],
+                            ],
+                            $pipes,
+                            null,
+                            null,
+                            ['suppress_errors' => true]
+            );
+
+            if ( ! \is_resource($process)) {
+                return null;
+            }
+
+            $result = stream_get_contents($pipes[1]);
+
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+            return $result;
+        } catch (Throwable) {
             return null;
-        }
-
-        $result = stream_get_contents($pipes[1]);
-
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process);
-        return $result;
+        } finally { restore_error_handler(); }
     }
 
     /**
@@ -89,17 +98,23 @@ class Utils
         if (is_null($supported)) {
             $supported = false;
             if (function_exists('proc_open')) {
-                $supported = (bool) proc_open(
-                                'echo 1 >/dev/null',
-                                [
-                                    ['file', '/dev/tty', 'r'],
-                                    ['file', '/dev/tty', 'w'],
-                                    ['file', '/dev/tty', 'w']
-                                ], $pipes,
-                                null,
-                                null,
-                                ['suppress_errors' => true]
-                );
+
+                try {
+                    Tools::errors_as_exceptions();
+                    $supported = (bool) proc_open(
+                                    'echo 1 >/dev/null',
+                                    [
+                                        ['file', '/dev/tty', 'r'],
+                                        ['file', '/dev/tty', 'w'],
+                                        ['file', '/dev/tty', 'w']
+                                    ], $pipes,
+                                    null,
+                                    null,
+                                    ['suppress_errors' => true]
+                    );
+                } catch (Throwable) {
+                    $supported = false;
+                } finally { restore_error_handler(); }
             }
         }
 

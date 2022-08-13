@@ -21,15 +21,19 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
 
+    public readonly bool $colors;
+
     /** @var Style[] */
     protected array $styles = [];
     protected array $formats = [];
 
     public function __construct(
-            public readonly ?bool $colors = null
+            bool $colors = null
     )
     {
-        $this->colors ??= Terminal::supportsColors();
+        $colors ??= Terminal::supportsColors();
+
+        $this->colors = $colors;
         $this->buildStyles();
     }
 

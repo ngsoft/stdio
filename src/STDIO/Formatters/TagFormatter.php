@@ -18,101 +18,15 @@ class TagFormatter implements Formatter
 {
 
     protected TagManager $manager;
-
-    protected const BUILTIN_TAGS = [NoTag::class, StyleTag::class];
-
-    protected PrioritySet $tags;
-
-    /** @var Tag[] */
-    protected array $stack = [];
-
-    /** @var Tag */
-    protected Tag $defaultTag;
+    protected TagStack $tagStack;
 
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
 
+        $this->tagStack = new TagStack();
+
         $this->manager = new TagManager($this->styles);
-
-        $this->tags = new PrioritySet();
-
-        foreach (self::BUILTIN_TAGS as $class) {
-            $this->addTag(new $class($this->styles));
-        }
-    }
-
-    /**
-     * Add a custom tag to be managed
-     */
-    public function addTag(Tag $tag): void
-    {
-
-        foreach ($this->tags as $rtag) {
-            if (get_class($rtag) === get_class($tag)) {
-                return;
-            }
-        }
-        $this->tags->add($tag, $tag->getPriority());
-    }
-
-    protected function getTagsFormat(array $attributes): string
-    {
-
-        $str = '';
-        foreach ($this->tags as $tag) {
-            $str .= $tag->getFormat($attributes);
-        }
-        return $str;
-    }
-
-    protected function getDefaultTag(): Tag
-    {
-        return $this->defaultTag ??= new NoTag($this->styles);
-    }
-
-    protected function getCurrentTag(): Tag
-    {
-        if (empty($this->stack)) {
-            return $this->getDefaultTag();
-        }
-        return $this->stack[count($this->stack) - 1];
-    }
-
-    protected function push(Tag $tag): void
-    {
-        $this->stack[] = $tag;
-    }
-
-    protected function pop(?Tag $tag = null): Tag
-    {
-
-        if (empty($this->stack)) {
-            return $this->getDefaultTag();
-        }
-
-        if ( ! $tag) {
-            return array_pop($this->stack);
-        }
-
-        foreach (array_reverse($this->stack) as $index => $current) {
-            if ($current->format('') === $tag->format('')) {
-                $this->stack = array_slice($this->stack, 0, $index);
-                return $current;
-            }
-        }
-        throw new InvalidArgumentException(sprintf('Incorrect style closing tag "</%s>" found.', $tag->getStyle()));
-    }
-
-    protected function getTagForAttributes(array $attributes): Tag
-    {
-
-        foreach ($this->tags as $tag) {
-            if ($tag->managesAttributes($attributes)) {
-                return $tag->createFromAttributes($attributes, $this->styles);
-            }
-        }
-        return $this->getDefaultTag();
     }
 
     protected function applyStyle(string $message, Tag $tag = null): string
