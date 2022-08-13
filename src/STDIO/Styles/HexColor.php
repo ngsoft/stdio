@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Styles;
 
 use InvalidArgumentException,
-    NGSOFT\STDIO\Enums\Ansi;
-use function preg_test,
-             str_contains;
+    NGSOFT\STDIO\Utils\Utils;
+use function preg_test;
 
 /**
  * Converts Hex Color to ansi
@@ -48,13 +47,10 @@ class HexColor
             $mode = 'ansi';
             if ('truecolor' === getenv('COLORTERM')) {
                 $mode = 'truecolor';
-            } elseif (str_contains(getenv('TERM') ?: '', '256')) {
+            } elseif (Utils::getNumColorSupport() >= 256) {
                 $mode = '256color';
             }
         }
-
-
-        var_dump($mode);
 
         $color = ltrim($hexColor, '#');
 
@@ -75,7 +71,7 @@ class HexColor
         $green = ($color >> 8) & 255;
         $blue = $color & 255;
 
-        if ($mode === 'truecolor') {
+        if ($mode !== 'truecolor') {
             return sprintf('%d%d', $isBackgroundColor ? 4 : 3, self::degradeToAnsi($red, $green, $blue));
         }
         return sprintf('%d8;2;%d;%d;%d', $isBackgroundColor ? 4 : 3, $red, $green, $blue);
@@ -84,7 +80,7 @@ class HexColor
     /**
      * Find nearest 256 from table
      */
-    protected static function degradeTo256(int $color): int
+    protected static function degradeTo256(int $color, bool $grayscale = false): int
     {
 
         /**
@@ -164,6 +160,9 @@ class HexColor
         foreach ($table as list($truecolor, $id)) {
 
             if ($color >= $truecolor) {
+                if ($id > 231 && ! $grayscale) {
+                    continue;
+                }
                 if ($prev === $truecolor) {
                     continue;
                 }
