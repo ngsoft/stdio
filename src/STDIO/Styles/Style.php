@@ -34,7 +34,7 @@ class Style implements Stringable
     /**
      * Set formats for the style
      */
-    public function setStyles(Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor ...$styles): static
+    public function setStyles(Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor|HexColor ...$styles): static
     {
         $this->styles = $styles;
         $this->prefix = $this->suffix = null;

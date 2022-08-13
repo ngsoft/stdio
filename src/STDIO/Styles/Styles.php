@@ -72,7 +72,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Create a style
      */
-    public function createStyle(string $label, Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor ...$styles): Style
+    public function createStyle(string $label, Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor|HexColor ...$styles): Style
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
@@ -200,9 +200,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
 
         $this->styles = $cache;
-
-        var_dump($this->styles, $this->formats);
-        exit;
     }
 
     public function __debugInfo(): array
