@@ -122,6 +122,25 @@ class Utils
     }
 
     /**
+     * Get Number of colors supported
+     * @return int
+     */
+    public static function getNumColorSupport(): int
+    {
+
+        static $result;
+
+        if (is_null($result)) {
+            $result = 8;
+            if ($value = self::executeProcess('tput colors')) {
+                $result = intval($value);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Run on windows
      */
     public static function isWindows(): bool

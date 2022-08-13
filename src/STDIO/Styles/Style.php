@@ -10,7 +10,7 @@ use NGSOFT\{
 use Stringable;
 use function class_basename;
 
-class Style implements Stringable
+class Style implements Stringable, \Countable
 {
 
     /** @var Format|Color|BackgroundColor[] */
@@ -76,6 +76,11 @@ class Style implements Stringable
     {
         $colors ??= Terminal::supportsColors();
         return $colors ? sprintf("%s%s%s", $this->getPrefix(), (string) $message, $this->getSuffix()) : $message;
+    }
+
+    public function count(): int
+    {
+        return count($this->styles);
     }
 
     public function __debugInfo(): array
