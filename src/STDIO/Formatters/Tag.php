@@ -6,15 +6,14 @@ namespace NGSOFT\STDIO\Formatters;
 
 use InvalidArgumentException,
     IteratorAggregate;
-use NGSOFT\{
-    DataStructure\PrioritySet, STDIO\Styles\Style, STDIO\Styles\Styles
+use NGSOFT\STDIO\Styles\{
+    Style, Styles
 };
 use Stringable,
     Traversable;
 use function class_basename,
              get_debug_type,
              is_stringable,
-             NGSOFT\Filesystem\require_all_once,
              preg_exec;
 
 abstract class Tag implements Stringable, IteratorAggregate
@@ -89,6 +88,17 @@ abstract class Tag implements Stringable, IteratorAggregate
     }
 
     /**
+     * Get a new instance with the specified code
+     */
+    public function createFromCode(string $code): static
+    {
+        $instance = new static($this->styles);
+        $instance->attributes = self::getTagAttributesFromCode($code);
+        $instance->code = $code;
+        return $instance;
+    }
+
+    /**
      * Get a new instance with the specified attributes
      */
     public function createFromAttributes(array $attributes): static
@@ -103,8 +113,15 @@ abstract class Tag implements Stringable, IteratorAggregate
      */
     public function managesCode(string $code): bool
     {
-
         return $this->managesAttributes(self::getTagAttributesFromCode($code));
+    }
+
+    /**
+     * Register Styles instance
+     */
+    public function setStyles(?Styles $styles): void
+    {
+        $this->styles = $styles;
     }
 
     /**
@@ -147,7 +164,7 @@ abstract class Tag implements Stringable, IteratorAggregate
     {
 
         $this->attributes[$attr] ??= [];
-        $this->attributes[] = $this->getValue($value);
+        $this->attributes[$attr][] = $this->getValue($value);
     }
 
     public function hasAttribute(string $attr): bool
@@ -180,10 +197,10 @@ abstract class Tag implements Stringable, IteratorAggregate
         return $this->styles->createStyleFromAttributes($this->attributes, $this->getCode());
     }
 
-    protected function getCode(): string
+    public function getCode(): string
     {
 
-        if (is_null($this->code)) {
+        if ( ! $this->code) {
             $code = &$this->code;
             $code = '';
             foreach ($this->attributes as $attr => $values) {
@@ -205,6 +222,13 @@ abstract class Tag implements Stringable, IteratorAggregate
         yield from $this->attributes;
     }
 
+    public function __clone(): void
+    {
+
+        $this->code = null;
+        $this->attributes = [];
+    }
+
     public function __toString(): string
     {
         return sprintf('<%s>', $this->getCode());
@@ -212,7 +236,6 @@ abstract class Tag implements Stringable, IteratorAggregate
 
     public function __debugInfo(): array
     {
-
         return [
             'name' => $this->getName(),
             'tag' => $this->__toString(),
