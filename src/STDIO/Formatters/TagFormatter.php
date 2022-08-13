@@ -7,11 +7,10 @@ namespace NGSOFT\STDIO\Formatters;
 use InvalidArgumentException;
 use NGSOFT\{
     DataStructure\PrioritySet, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\Tags\NoTag, STDIO\Formatters\Tags\StyleTag,
-    STDIO\Styles\Style, STDIO\Styles\Styles
+    STDIO\Styles\Styles
 };
 use Stringable;
 use function mb_strlen,
-             preg_exec,
              str_ends_with,
              str_starts_with;
 
@@ -26,21 +25,24 @@ class TagFormatter implements Formatter
     /** @var Tag[] */
     protected array $stack = [];
 
+    /** @var Tag */
+    protected Tag $defaultTag;
+
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
 
         $this->tags = new PrioritySet();
 
-        foreach (self::BUILTIN_TAGS as $priority => $class) {
-            $this->addTag(new $class($this->styles), $priority + 1);
+        foreach (self::BUILTIN_TAGS as $class) {
+            $this->addTag(new $class($this->styles));
         }
     }
 
     /**
      * Add a custom tag to be managed
      */
-    public function addTag(Tag $tag, int $priority = 16): void
+    public function addTag(Tag $tag): void
     {
 
         foreach ($this->tags as $rtag) {
@@ -48,7 +50,7 @@ class TagFormatter implements Formatter
                 return;
             }
         }
-        $this->tags->add($tag, $priority);
+        $this->tags->add($tag, $tag->getPriority());
     }
 
     protected function getTagsFormat(array $attributes): string
@@ -61,51 +63,62 @@ class TagFormatter implements Formatter
         return $str;
     }
 
-    protected function getCurrentStyle(): Style
+    protected function getDefaultTag(): Tag
+    {
+        return $this->defaultTag ??= new NoTag($this->styles);
+    }
+
+    protected function getCurrentTag(): Tag
     {
         if (empty($this->stack)) {
-            return $this->getEmptyStyle();
+            return $this->getDefaultTag();
         }
         return $this->stack[count($this->stack) - 1];
     }
 
-    protected function getEmptyStyle(): Style
+    protected function push(Tag $tag): void
     {
-        static $empty;
-        return $empty ??= new Style();
+        $this->stack[] = $tag;
     }
 
-    protected function push(Style $style): void
-    {
-        $this->stack[] = $style;
-    }
-
-    protected function pop(?Style $style = null): Style
+    protected function pop(?Tag $tag = null): Tag
     {
 
         if (empty($this->stack)) {
-            return $this->getEmptyStyle();
+            return $this->getDefaultTag();
         }
 
-        if ( ! $style) {
+        if ( ! $tag) {
             return array_pop($this->stack);
         }
 
         foreach (array_reverse($this->stack) as $index => $current) {
-            if ($current->format('', true) === $style->format('', true)) {
+            if ($current->format('') === $tag->format('')) {
                 $this->stack = array_slice($this->stack, 0, $index);
                 return $current;
             }
         }
-        throw new InvalidArgumentException(sprintf('Incorrect style closing tag "</%s>" found.', $style));
+        throw new InvalidArgumentException(sprintf('Incorrect style closing tag "</%s>" found.', $tag->getStyle()));
     }
 
-    protected function applyStyle(string $message, Style $style = null)
+    protected function getTagForAttributes(array $attributes): Tag
     {
-        if (is_null($style)) {
-            $style = $this->getCurrentStyle();
+
+        foreach ($this->tags as $tag) {
+            if ($tag->managesAttributes($attributes)) {
+                return $tag->createFromAttributes($attributes, $this->styles);
+            }
         }
-        return $style->format($message, $this->styles->colors);
+        return $this->getDefaultTag();
+    }
+
+    protected function applyStyle(string $message, Tag $tag = null): string
+    {
+        if (is_null($tag)) {
+            $tag = $this->getCurrentTag();
+        }
+
+        return $tag->format($message);
     }
 
     /**
@@ -144,6 +157,7 @@ class TagFormatter implements Formatter
                 }
 
                 $output .= $this->applyStyle(substr($message, $offset, $pos - $offset));
+
                 $offset = $pos + strlen($text);
 
                 $tag = $matches[1][$i][0];
@@ -155,33 +169,32 @@ class TagFormatter implements Formatter
 
                 if ( ! empty($tag)) {
 
-                    $attributes = [];
-                    foreach (preg_split('#;+#', $tag) as $attribute) {
-                        [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
-                        $key = strtolower(trim($key));
-                        $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => trim($v), preg_split('#,+#', $val)) : [];
-                    }
+                    $attributes = Tag::getTagAttributesFromCode($tag);
 
-                    if ( ! empty($str = $this->getTagsFormat($attributes))) {
-                        $output .= $str;
+                    $tagStyle = $this->getTagForAttributes($attributes);
+
+                    if ($tagStyle->isSelfClosing()) {
+                        var_dump($tagStyle);
+                        $output .= $tagStyle->format('');
                         continue;
                     }
 
-                    if ( ! isset($this->styles[$tag])) {
+                    // cache style for future use
+                    if ($tagStyle::class === StyleTag::class && ! isset($this->styles[$tag])) {
                         $this->styles->addStyle(
-                                $style = $this->styles->createStyleFromAttributes($attributes, $tag)
+                                $tagStyle->getStyle()
                         );
-                    } else { $style = $this->styles[$tag]; }
+                    }
                 }
 
 
                 if ($closing) {
-                    $this->pop($style);
+                    $this->pop($tagStyle);
                     continue;
                 }
 
 
-                $style && $this->push($style);
+                $tagStyle && $this->push($tagStyle);
             }
         }
 

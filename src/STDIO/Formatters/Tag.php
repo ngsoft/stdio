@@ -4,21 +4,52 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use InvalidArgumentException;
-use NGSOFT\STDIO\Styles\{
-    Style, Styles
+use InvalidArgumentException,
+    IteratorAggregate;
+use NGSOFT\{
+    DataStructure\PrioritySet, STDIO\Styles\Style, STDIO\Styles\Styles
 };
+use Stringable,
+    Traversable;
 use function class_basename,
-             is_stringable;
+             get_debug_type,
+             is_stringable,
+             NGSOFT\Filesystem\require_all_once,
+             preg_exec;
 
-abstract class Tag implements \Stringable, \IteratorAggregate
+abstract class Tag implements Stringable, IteratorAggregate
 {
 
     protected string $name;
 
     /** @var array<string, string[]> */
     protected array $attributes = [];
-    protected ?Style $style = null;
+    protected ?string $code = null;
+
+    ////////////////////////////   Static Methods   ////////////////////////////
+
+    /**
+     * Parse tag Attributes
+     */
+    final public static function getTagAttributesFromCode(string $code): array
+    {
+
+        static $cache = [];
+
+        if ( ! isset($cache[$code])) {
+            $cache[$code] = [];
+            $attributes = &$cache[$code];
+            foreach (preg_split('#;+#', $code) as $attribute) {
+                [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
+                $key = strtolower(trim($key));
+                $attributes[strtolower(trim($key))] = isset($val) ? array_map(fn($v) => trim($v), preg_split('#,+#', $val)) : [];
+            }
+        }
+
+        return $cache[$code];
+    }
+
+    ////////////////////////////   Overrides   ////////////////////////////
 
     /**
      * Checks if tag manages contents
@@ -38,6 +69,17 @@ abstract class Tag implements \Stringable, \IteratorAggregate
         return isset($attributes[$this->getName()]);
     }
 
+    /**
+     * Tag priority over the others
+     */
+    public function getPriority(): int
+    {
+        return 16;
+    }
+
+    ////////////////////////////   Implementation   ////////////////////////////
+
+
     public function __construct(
             protected ?Styles $styles = null
     )
@@ -49,11 +91,20 @@ abstract class Tag implements \Stringable, \IteratorAggregate
     /**
      * Get a new instance with the specified attributes
      */
-    public function createFromAttributes(array $attributes, ?Styles $styles = null): static
+    public function createFromAttributes(array $attributes): static
     {
-        $instance = new static($styles);
+        $instance = new static($this->styles);
         $instance->attributes = $attributes;
         return $instance;
+    }
+
+    /**
+     * Checks if tag manages code
+     */
+    public function managesCode(string $code): bool
+    {
+
+        return $this->managesAttributes(self::getTagAttributesFromCode($code));
     }
 
     /**
@@ -131,16 +182,25 @@ abstract class Tag implements \Stringable, \IteratorAggregate
 
     protected function getCode(): string
     {
-        return implode(
-                ';',
-                array_map(
-                        fn($attr) => implode(',', $attr),
-                        $this->attributes
-                )
-        );
+
+        if (is_null($this->code)) {
+            $code = &$this->code;
+            $code = '';
+            foreach ($this->attributes as $attr => $values) {
+                if ( ! empty($code)) {
+                    $code .= ';';
+                }
+                $code .= $attr;
+                if (count($values)) {
+                    $code .= sprintf('=%s', implode(',', $values));
+                }
+            }
+        }
+
+        return $this->code;
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
         yield from $this->attributes;
     }
@@ -148,6 +208,16 @@ abstract class Tag implements \Stringable, \IteratorAggregate
     public function __toString(): string
     {
         return sprintf('<%s>', $this->getCode());
+    }
+
+    public function __debugInfo(): array
+    {
+
+        return [
+            'name' => $this->getName(),
+            'tag' => $this->__toString(),
+            'attributes' => $this->attributes
+        ];
     }
 
 }

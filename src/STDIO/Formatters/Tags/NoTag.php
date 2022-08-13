@@ -14,6 +14,12 @@ use NGSOFT\STDIO\{
 class NoTag extends Tag
 {
 
+    public function getPriority(): int
+    {
+        // lowest priority
+        return 1;
+    }
+
     public function format(string $message): string
     {
         return $message;
