@@ -9,11 +9,13 @@ use NGSOFT\STDIO\Styles\{
 };
 use function class_basename;
 
-abstract class Tag
+abstract class Tag implements \IteratorAggregate
 {
 
     public readonly string $name;
-    protected string $contents = '';
+
+    /** @var array<string, string[]> */
+    protected array $attributes = [];
 
     public function __construct(
             protected ?Styles $styles = null
@@ -35,16 +37,9 @@ abstract class Tag
         return $this->styles->createStyleFromAttributes($attributes);
     }
 
-    public function addContents(string $contents)
+    public function getIterator(): \Traversable
     {
-        $this->contents .= $contents;
-    }
-
-    public function flushContents(): string
-    {
-        $contents = $this->contents;
-        $this->contents = '';
-        return $contents;
+        yield from $this->attributes;
     }
 
 }
