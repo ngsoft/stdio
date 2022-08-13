@@ -18,9 +18,7 @@ class TagManager
 
     public function push(Tag $tag): void
     {
-
         $index = array_search($tag, $this->storage, true) ?: -1;
-
         $this->storage[] = $tag;
     }
 
