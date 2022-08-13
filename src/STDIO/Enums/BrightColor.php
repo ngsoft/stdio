@@ -35,6 +35,11 @@ enum BrightColor: int
         return 39;
     }
 
+    public function getFormatName(): string
+    {
+        return sprintf('%s:bright', strtolower($this->getName()));
+    }
+
     public function getTag(): string
     {
         return sprintf('%s:bright', strtolower($this->getName()));

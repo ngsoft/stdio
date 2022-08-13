@@ -8,7 +8,7 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output
 };
 use OutOfBoundsException,
     Traversable,
@@ -19,7 +19,7 @@ use function get_debug_type,
 class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
 
-    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class, BrightColor::class, BrightBackgroundColor::class];
 
     public readonly bool $colors;
 
@@ -72,7 +72,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Create a style
      */
-    public function createStyle(string $label, Format|Color|BackgroundColor ...$styles): Style
+    public function createStyle(string $label, Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor ...$styles): Style
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
@@ -189,7 +189,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                     $prop = $format->getTagAttribute();
                     $this->formats[$prop] ??= [];
-                    $this->formats[$prop][strtolower($format->getName())] = $format;
+                    $this->formats[$prop][strtolower($format->getFormatName())] = $format;
                 }
             }
             foreach ($custom as $label => $styles) {
@@ -201,7 +201,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
         $this->styles = $cache;
 
-        var_dump($this->styles);
+        var_dump($this->styles, $this->formats);
         exit;
     }
 

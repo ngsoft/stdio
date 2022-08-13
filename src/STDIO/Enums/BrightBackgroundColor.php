@@ -35,6 +35,11 @@ enum BrightBackgroundColor: int
         return 49;
     }
 
+    public function getFormatName(): string
+    {
+        return sprintf('%s:bright', strtolower($this->getName()));
+    }
+
     public function getTag(): string
     {
         return sprintf('bg:%s:bright', strtolower($this->getName()));

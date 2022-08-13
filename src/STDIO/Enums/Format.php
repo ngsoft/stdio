@@ -41,6 +41,11 @@ enum Format: int
         return $format_unset[$this->value];
     }
 
+    public function getFormatName(): string
+    {
+        return strtolower($this->getName());
+    }
+
     public function getTag(): string
     {
         return strtolower($this->getName());

@@ -42,6 +42,11 @@ enum Color: int
         return strtolower($this->getName());
     }
 
+    public function getFormatName(): string
+    {
+        return strtolower($this->getName());
+    }
+
     public function getTagAttribute(): string
     {
         return 'fg';

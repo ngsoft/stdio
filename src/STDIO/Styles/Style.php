@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Styles;
 
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format
 };
 use Stringable;
+use function class_basename;
 
 class Style implements Stringable
 {
@@ -33,7 +34,7 @@ class Style implements Stringable
     /**
      * Set formats for the style
      */
-    public function setStyles(Format|Color|BackgroundColor ...$styles): static
+    public function setStyles(Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor ...$styles): static
     {
         $this->styles = $styles;
         $this->prefix = $this->suffix = null;
