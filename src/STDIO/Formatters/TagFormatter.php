@@ -32,7 +32,7 @@ class TagFormatter implements Formatter
     protected function applyStyle(string $message, Tag $tag = null): string
     {
         if (is_null($tag)) {
-            $tag = $this->getCurrentTag();
+            $tag = $this->tagStack->current();
         }
 
         return $tag->format($message);
@@ -86,32 +86,23 @@ class TagFormatter implements Formatter
 
                 if ( ! empty($tag)) {
 
-                    $attributes = Tag::getTagAttributesFromCode($tag);
 
-                    $tagStyle = $this->getTagForAttributes($attributes);
+                    $tagStyle = $this->manager->findTagFromCode($tag);
 
                     if ($tagStyle->isSelfClosing()) {
-                        var_dump($tagStyle);
                         $output .= $tagStyle->format('');
                         continue;
-                    }
-
-                    // cache style for future use
-                    if ($tagStyle::class === StyleTag::class && ! isset($this->styles[$tag])) {
-                        $this->styles->addStyle(
-                                $tagStyle->getStyle()
-                        );
                     }
                 }
 
 
                 if ($closing) {
-                    $this->pop($tagStyle);
+                    $this->tagStack->pop($tagStyle);
                     continue;
                 }
 
 
-                $tagStyle && $this->push($tagStyle);
+                $tagStyle && $this->tagStack->push($tagStyle);
             }
         }
 

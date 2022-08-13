@@ -60,7 +60,7 @@ class TagStack
         }
 
         foreach (array_reverse($this->stack) as $index => $current) {
-            if ($current->format('') === $tag->format('')) {
+            if ($current->getCode() === $tag->getCode()) {
                 $this->stack = array_slice($this->stack, 0, $index);
                 return $current;
             }

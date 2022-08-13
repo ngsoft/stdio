@@ -180,12 +180,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 
     public function getFirstAttribute(string $attr): ?string
     {
-
-        if ( ! $this->hasAttribute($attr)) {
-            return null;
-        }
-
-        return $this->attributes[$attr][0] ?? '';
+        return $this->attributes[$attr][0] ?? null;
     }
 
     public function getAttributes(): array
