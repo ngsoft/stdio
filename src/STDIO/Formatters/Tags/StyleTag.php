@@ -11,8 +11,6 @@ use NGSOFT\STDIO\{
 class StyleTag extends Tag
 {
 
-    protected ?Style $style = null;
-
     public function format(string $message): string
     {
         return $this->getStyle()->format($message, $this->styles->colors);
@@ -55,7 +53,10 @@ class StyleTag extends Tag
             if (isset($this->styles[$label])) {
                 return $this->style = $this->styles[$label];
             }
-            return $this->style = $this->styles->createStyleFromAttributes($this->attributes, $label);
+
+            $this->styles->addStyle(
+                    $this->style = $this->styles->createStyleFromAttributes($this->attributes, $label)
+            );
         }
         return $this->style;
     }

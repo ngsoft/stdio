@@ -24,6 +24,7 @@ abstract class Tag implements Stringable, IteratorAggregate
     /** @var array<string, string[]> */
     protected array $attributes = [];
     protected ?string $code = null;
+    protected ?Style $style = null;
 
     ////////////////////////////   Static Methods   ////////////////////////////
 
@@ -194,7 +195,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 
     public function getStyle(): Style
     {
-        return $this->styles->createStyleFromAttributes($this->attributes, $this->getCode());
+        return $this->style ??= $this->styles->createStyleFromAttributes($this->attributes, $this->getCode());
     }
 
     public function getCode(): string
@@ -227,6 +228,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 
         $this->code = null;
         $this->attributes = [];
+        $this->style = null;
     }
 
     public function __toString(): string

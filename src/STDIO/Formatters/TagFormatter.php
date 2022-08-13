@@ -17,7 +17,8 @@ use function mb_strlen,
 class TagFormatter implements Formatter
 {
 
-    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected TagManager $manager;
+
     protected const BUILTIN_TAGS = [NoTag::class, StyleTag::class];
 
     protected PrioritySet $tags;
@@ -31,6 +32,8 @@ class TagFormatter implements Formatter
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
+
+        $this->manager = new TagManager($this->styles);
 
         $this->tags = new PrioritySet();
 
