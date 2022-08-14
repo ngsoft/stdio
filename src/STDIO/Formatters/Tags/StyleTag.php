@@ -29,13 +29,13 @@ class StyleTag extends Tag
     public function managesAttributes(array $attributes): bool
     {
 
-        static $formats;
+        static $formats, $custom = ['gs', 'grayscale'];
 
         $formats ??= $this->styles->getFormats();
 
         foreach (array_keys($attributes) as $attr) {
 
-            if (isset($this->styles[$attr]) || isset($this->styles->getFormats()[$attr])) {
+            if (isset($this->styles[$attr]) || isset($formats[$attr]) || in_array($attr, $custom)) {
                 continue;
             }
 

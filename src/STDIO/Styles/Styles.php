@@ -8,7 +8,8 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output,
+    STDIO\Utils\Utils
 };
 use OutOfBoundsException,
     Traversable,
@@ -105,8 +106,8 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
                     continue;
                 }
 
-                if (HexColor::isHexColor($format) && in_array($key, ['fg', 'bg'])) {
-                    $formats[] = new HexColor($format, $key === 'bg');
+                if (Utils::isHexColor($format) && in_array($key, ['fg', 'bg'])) {
+                    $formats[] = new HexColor($format, $key === 'bg', isset($attributes['grayscale']) || isset($attributes['gs']));
                 }
             }
         }
