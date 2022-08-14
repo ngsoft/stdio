@@ -140,6 +140,7 @@ class Rect implements Renderer, Formatter, Stringable
         $this->buffer->write($message);
     }
 
+    /** {@inheritdoc} */
     public function format(string|Stringable $message): string
     {
         if ($message instanceof self) {
