@@ -197,19 +197,16 @@ class STDIO
      *
      * @param string|\Stringable $message
      * @param Style|null|string $style use rect tag code without <> delimiters to set style
+     * @param Rect &$rect
      * @return static
      */
-    public function rect(string|\Stringable $message, Style|null|string $style = null): static
+    public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
     {
-
-        if (is_string($style)) {
-            $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . $style);
-        } else {
-            $rect = new Rect($this->styles);
-            if ($style) {
-                $rect->setStyle($style);
-            }
+        $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . (is_string($style) ? $style : ''))->getRect();
+        if ($style instanceof Style) {
+            $rect->setStyle($style);
         }
+
         return $this->write($rect->format((string) $message));
     }
 

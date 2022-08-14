@@ -12,6 +12,7 @@ use RuntimeException;
 class Rect extends Tag
 {
 
+    protected ?HelperRect $rect = null;
     protected bool $displayed = false;
 
     public function format(string $message): string
@@ -25,6 +26,16 @@ class Rect extends Tag
 
         try {
 
+            return $this->getRect()->format($message);
+        } finally {
+            $this->displayed = true;
+        }
+    }
+
+    public function getRect(): HelperRect
+    {
+
+        if ( ! $this->rect) {
             $params = [];
             foreach (['length', 'padding', 'margin'] as $attribute) {
 
@@ -54,12 +65,10 @@ class Rect extends Tag
             if (count($style->getStyles())) {
                 $rect->setStyle($style);
             }
-
-
-            return $rect->format($message);
-        } finally {
-            $this->displayed = true;
+            $this->rect = $rect;
         }
+
+        return $this->rect;
     }
 
 }
