@@ -41,7 +41,7 @@ abstract class Tag implements Stringable, IteratorAggregate
             $cache[$code] = [];
             $attributes = &$cache[$code];
             foreach (preg_split('#;+#', $code) as $attribute) {
-                [, $key, $val] = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
+                @list(, $key, $val) = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
                 $key = strtolower(trim($key));
 
                 $attributes[$key] = isset($val) ? [$val] : [];

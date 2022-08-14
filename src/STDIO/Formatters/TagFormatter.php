@@ -61,7 +61,7 @@ class TagFormatter implements Formatter
         if (preg_match_all('#<(([a-z\#](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z\#][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
 
             foreach ($matches[0] as $i => $match) {
-                [$text, $pos] = $match;
+                @list($text, $pos) = $match;
 
                 if (0 != $pos && '\\' == $message[$pos - 1]) {
                     continue;

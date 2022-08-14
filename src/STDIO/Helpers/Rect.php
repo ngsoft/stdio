@@ -93,7 +93,7 @@ class Rect implements Renderer, Formatter, Stringable
 
     public function render(Output $output): void
     {
-        $output->write($this);
+        $output->writeln($this);
     }
 
     /**
@@ -134,11 +134,14 @@ class Rect implements Renderer, Formatter, Stringable
         }
 
         $length -= $this->margin * 2;
+
+        $header = $margin . $style->format(str_repeat(' ', $length), $colors) . $margin;
+
         $length -= $this->padding * 2;
 
         $lineLength = $length;
 
-        $result[] = "\n";
+        $result[] = "\n{$header}\n";
 
         foreach (preg_split('#[\n\r]+#', $message) as $messageLine) {
             $lines = split_string($messageLine, $lineLength);
@@ -152,7 +155,8 @@ class Rect implements Renderer, Formatter, Stringable
             foreach ($lines as $line) {
                 $result[] = $margin;
 
-                $padLength = max(0, mb_strlen($line) - $length);
+                $padLength = max(0, $length - mb_strlen($line));
+
                 $padLength /= 2;
                 $padLeft = (int) ceil($padLength);
                 $padRight = (int) floor($padLength);
@@ -170,7 +174,7 @@ class Rect implements Renderer, Formatter, Stringable
         }
 
 
-        $result[] = "\n";
+        $result[] = "{$header}\n";
 
         $result = implode('', $result);
         if ($colors) {
@@ -181,9 +185,7 @@ class Rect implements Renderer, Formatter, Stringable
 
     public function __toString(): string
     {
-        $message = implode("\n", $this->buffer->pull());
-
-        return $this->format($message);
+        return $this->format(implode("\n", $this->buffer->pull()));
     }
 
 }

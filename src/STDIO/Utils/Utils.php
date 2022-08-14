@@ -183,7 +183,7 @@ class Utils
         static $mode;
 
         if ($matches = preg_exec('#^rgb\((\d+),(\d+),(\d+)\)$#i', $rgbColor)) {
-            [, $red, $green, $blue] = $matches;
+            @list(, $red, $green, $blue) = $matches;
 
             $red = intval($red);
             $green = intval($green);
@@ -244,7 +244,7 @@ class Utils
             $color = $color[0] . $color[0] . $color[1] . $color [1] . $color[2] . $color[2];
         }
 
-        [$red, $green, $blue] = array_map(fn($hex) => intval($hex, 16), str_split($color, 2));
+        @list($red, $green, $blue) = array_map(fn($hex) => intval($hex, 16), str_split($color, 2));
 
         if ($mode !== 'ansi' && $isGrayscale) {
             return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeToGrayscale($red, $green, $blue));
