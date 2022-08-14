@@ -102,4 +102,9 @@ class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable
         return implode('', $this->pull());
     }
 
+    public function __debugInfo(): array
+    {
+        return $this->buffer;
+    }
+
 }

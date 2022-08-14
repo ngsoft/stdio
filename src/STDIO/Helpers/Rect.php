@@ -256,4 +256,15 @@ class Rect implements Renderer, Formatter, Stringable
         return $this->format(implode("\n", $this->buffer->pull()));
     }
 
+    public function __debugInfo(): array
+    {
+        return [
+            'length' => $this->length,
+            'padding' => $this->padding,
+            'margin' => $this->margin,
+            'center' => $this->center,
+            'style' => $this->style->format($this->style->getLabel(), $this->styles->colors),
+        ];
+    }
+
 }
