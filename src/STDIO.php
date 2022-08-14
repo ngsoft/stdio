@@ -197,7 +197,8 @@ class STDIO
     }
 
     /**
-     * Display a rectangle
+     * Adds a rectangle to the buffer
+     * use rect tag code without <> delimiters to set style
      */
     public function rect(string|\Stringable $message, Style|null|string $style = null): static
     {
@@ -211,7 +212,8 @@ class STDIO
             }
         }
 
-        $this->getOutput()->write($rect->format((string) $message));
+
+        $this->getBuffer()->write($rect->format((string) $message));
         return $this;
     }
 

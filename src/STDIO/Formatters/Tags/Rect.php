@@ -25,8 +25,6 @@ class Rect extends Tag
 
         try {
 
-
-
             $params = [];
             foreach (['length', 'padding', 'margin'] as $attribute) {
 
@@ -47,6 +45,10 @@ class Rect extends Tag
             is_int($params['length']) && $rect->setLength($params['length']);
             is_int($params['padding']) && $rect->setPadding($params['padding']);
             is_int($params['margin']) && $rect->setMargin($params['margin']);
+
+            if ($this->getFirstAttribute('length') === 'auto') {
+                $rect->autoSetLength();
+            }
 
             $style = $this->getStyle();
             if (count($style->getStyles())) {

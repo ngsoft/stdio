@@ -63,6 +63,9 @@ class Rect implements Renderer, Formatter, Stringable
         return $this;
     }
 
+    /**
+     * Set length to max
+     */
     public function autoSetLength(): static
     {
         $this->setLength(Terminal::getWidth());
