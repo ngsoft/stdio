@@ -6,12 +6,15 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
+    Facades\Terminal, STDIO, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
     STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\Styles
 };
 use RuntimeException,
     Stringable;
-use function NGSOFT\Tools\split_string;
+use function mb_strlen;
+use function NGSOFT\Tools\{
+    split_string, str_word_size
+};
 
 /**
  * Draws Rectangles
@@ -30,6 +33,12 @@ class Rect implements Renderer, Formatter, Stringable
     protected int $padding = 4;
     protected int $margin = 2;
     protected int $length;
+    protected bool $center = false;
+
+    public function create(?Styles $styles = null)
+    {
+        return new static($styles ?? STDIO::getCurrentInstance()->getStyles());
+    }
 
     public function __construct(
             protected ?Styles $styles = null
@@ -39,6 +48,20 @@ class Rect implements Renderer, Formatter, Stringable
         $this->styles ??= new Styles();
         $this->style = $this->styles->createStyle(...self::DEFAULT_STYLE);
         $this->length = Terminal::getWidth();
+    }
+
+    public function getCenter(): bool
+    {
+        return $this->center;
+    }
+
+    /**
+     * Centers rectangle to the output
+     */
+    public function setCenter(bool $center = true)
+    {
+        $this->center = $center;
+        return $this;
     }
 
     public function getLength(): int
@@ -73,10 +96,15 @@ class Rect implements Renderer, Formatter, Stringable
 
     /**
      * Set rectangle margin
+     * even values in range [ 0 - 10 ]
      */
     public function setMargin(int $margin)
     {
-        $this->margin = max(0, $margin);
+        if ($margin % 2 === 1) {
+            $margin --;
+        }
+
+        $this->margin = max(0, min($margin, 10));
         return $this;
     }
 
@@ -119,47 +147,69 @@ class Rect implements Renderer, Formatter, Stringable
         $colors = $this->styles->colors;
         $style = $this->style;
 
-        $result = [];
+        $maxLength = Terminal::getWidth();
 
-        $pad = $this->padding > 0 ? str_repeat(' ', $this->padding) : '';
+        // max margin 10%
+        $maxMargin = (int) floor($maxLength / 10);
 
-        $margin = $this->margin > 0 ? str_repeat(' ', $this->margin) : '';
-
-        $maxLength = Terminal::getWidth() - ($this->margin * 2);
-
-        $length = $this->length;
-
-        if ($maxLength > $this->length) {
-            $length = $maxLength;
+        if ($maxMargin % 2 === 1) {
+            $maxMargin --;
         }
 
-        $length -= $this->margin * 2;
+        $margin = max(0, min($maxMargin, $this->margin, 10));
+        $maxLength -= $margin * 2;
+
+        $minLength = str_word_size($message);
+
+        if ($minLength === 0) {
+            throw new RuntimeException('Cannot render message that have no words.');
+        }
+
+        $maxPad = max((int) floor(($maxLength - $minLength) / 2), 0);
+
+        $padding = min($maxPad, $this->padding);
+
+        $length = max(min($this->length, $maxLength), $minLength + ($padding * 2));
+
+        $center = '';
+
+        if ($this->center) {
+            $diff = (int) ceil(($maxLength - $length) / 2);
+            $diff > 0 && $center = str_repeat(' ', $diff);
+        }
+
+
+
+        $margin = $margin > 0 ? str_repeat(' ', $margin) : '';
 
         $header = $margin . $style->format(str_repeat(' ', $length), $colors) . $margin;
 
-        $length -= $this->padding * 2;
+        $length -= $padding * 2;
+
+        $pad = $padding > 0 ? str_repeat(' ', $padding) : '';
 
         $lineLength = $length;
 
-        $result[] = "\n{$header}\n";
+        $result = [
+            "\n",
+            $center,
+            $header,
+            "\n"
+        ];
 
-        foreach (preg_split('#[\n\r]+#', $message) as $messageLine) {
+        foreach (preg_split('#\v+#', $message) as $messageLine) {
             $lines = split_string($messageLine, $lineLength);
 
-            if ($lineLength > $length) {
-                throw new RuntimeException(sprintf('Cannot render %s message, a word size %d is greater than the output line size %d.', __CLASS__, $lineLength, $length));
-            }
-
-
-
             foreach ($lines as $line) {
+
                 $result[] = $margin;
+                $result[] = $center;
 
                 $padLength = max(0, $length - mb_strlen($line));
 
                 $padLength /= 2;
-                $padLeft = (int) ceil($padLength);
-                $padRight = (int) floor($padLength);
+                $padLeft = (int) floor($padLength);
+                $padRight = (int) ceil($padLength);
 
                 $contents = sprintf(
                         '%s%s%s',
@@ -169,12 +219,15 @@ class Rect implements Renderer, Formatter, Stringable
                 );
 
                 $result[] = $style->format($pad . $contents . $pad, $colors);
-                $result[] = "{$margin}\n";
+                $result[] = $margin;
+                $result[] = "\n";
             }
         }
 
 
-        $result[] = "{$header}\n\n";
+        $result[] = $center;
+        $result[] = $header;
+        $result[] = "\n\n";
 
         $result = implode('', $result);
         if ($colors) {

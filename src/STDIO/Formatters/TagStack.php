@@ -60,13 +60,13 @@ class TagStack
         }
 
         foreach (array_reverse($this->stack) as $index => $current) {
-            if ($current->getCode() === $tag->getCode()) {
+            if (str_starts_with($current->getCode(), $tag->getCode())) {
                 $this->stack = array_slice($this->stack, 0, $index);
                 return $current;
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Incorrect closing tag "</%s>" found.', $tag->getStyle()));
+        throw new InvalidArgumentException(sprintf('Incorrect closing tag "</%s>" found.', $tag->getCode()));
     }
 
     /**

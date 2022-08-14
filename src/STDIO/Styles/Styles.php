@@ -198,6 +198,8 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             'notice' => [Color::CYAN],
             'bg:notice' => [Color::GRAY, BackgroundColor::CYAN],
             'info' => [Color::GREEN],
+            'success' => [Color::GREEN, Format::BOLD],
+            'bg:success' => [Color::GRAY, BackgroundColor::GREEN, Format::BOLD],
             'bg:info' => [Color::GRAY, BackgroundColor::GREEN],
             'debug' => [Color::PURPLE],
             'bg:debug' => [BackgroundColor::PURPLE, Color::GRAY],

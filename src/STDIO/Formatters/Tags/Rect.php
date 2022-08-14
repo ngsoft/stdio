@@ -17,6 +17,7 @@ class Rect extends Tag
     public function format(string $message): string
     {
 
+
         if ($this->displayed) {
             throw new RuntimeException('<rect> already displayed ! Please close tag in the same instruction it is open and do not open other tags before closing.');
         }
@@ -38,6 +39,10 @@ class Rect extends Tag
 
 
             $rect = new HelperRect($this->styles);
+
+            if ($this->hasAttribute('center')) {
+                $rect->setCenter($this->getFirstAttribute('center') !== 'false');
+            }
 
             is_int($params['length']) && $rect->setLength($params['length']);
             is_int($params['padding']) && $rect->setPadding($params['padding']);
