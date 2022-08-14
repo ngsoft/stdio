@@ -11,7 +11,7 @@ use NGSOFT\STDIO\{
 /**
  * Draws Rectangles
  */
-class Rect implements Renderer
+class Rect implements Renderer, \NGSOFT\STDIO\Formatters\Formatter
 {
 
     protected const DEFAULT_STYLE = [
@@ -43,7 +43,7 @@ class Rect implements Renderer
         return $this;
     }
 
-    public function render(\NGSOFT\Console\Outputs\Output $output): void
+    public function render(Output $output): void
     {
 
     }
