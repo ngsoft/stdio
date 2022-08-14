@@ -78,6 +78,8 @@ class TagFormatter implements Formatter
                     $tag = $matches[3][$i][0] ?? '';
                 }
 
+                $tag = rtrim($tag, ',;');
+
                 $tagStyle = null;
 
                 if ( ! empty($tag)) {
