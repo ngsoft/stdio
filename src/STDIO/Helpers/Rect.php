@@ -6,10 +6,12 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
-    STDIO\Styles\Style, STDIO\Styles\Styles
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
+    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\Styles
 };
-use Stringable;
+use RuntimeException,
+    Stringable;
+use function NGSOFT\Tools\split_string;
 
 /**
  * Draws Rectangles
@@ -26,6 +28,7 @@ class Rect implements Renderer, Formatter, Stringable
     protected Style $style;
     protected Buffer $buffer;
     protected int $padding = 4;
+    protected int $margin = 2;
     protected int $length;
 
     public function __construct(
@@ -49,6 +52,34 @@ class Rect implements Renderer, Formatter, Stringable
         return $this;
     }
 
+    public function getPadding(): int
+    {
+        return $this->padding;
+    }
+
+    public function getMargin(): int
+    {
+        return $this->margin;
+    }
+
+    /**
+     * Set Rectangle inner padding
+     */
+    public function setPadding(int $padding)
+    {
+        $this->padding = max(0, $padding);
+        return $this;
+    }
+
+    /**
+     * Set rectangle margin
+     */
+    public function setMargin(int $margin)
+    {
+        $this->margin = max(0, $margin);
+        return $this;
+    }
+
     public function getStyle(): Style
     {
         return $this->style;
@@ -65,15 +96,68 @@ class Rect implements Renderer, Formatter, Stringable
         $output->writeln($this);
     }
 
+    /**
+     * Add a line to the rectangle
+     */
+    public function write(string|Stringable $message): void
+    {
+        $this->buffer->write($message);
+    }
+
     public function format(string|Stringable $message): string
     {
         if ($message instanceof self) {
             throw new InvalidArgumentException('$message cannot be instance of ' . __CLASS__);
         }
 
+        $message = (string) $message;
+
         if (empty($message)) {
             return '';
         }
+
+        $colors = $this->styles->colors;
+        $style = $this->style;
+
+        $result = [];
+
+        $pad = $this->padding > 0 ? str_repeat(' ', $this->padding) : '';
+
+        $margin = '';
+
+        $margin = $this->margin > 0 ? str_repeat(' ', $this->margin) : '';
+
+        $maxLength = Terminal::getWidth() - ($this->margin * 2);
+
+        $length = $this->length;
+
+        if ($maxLength > $this->length) {
+            $length = $maxLength;
+        }
+
+        $length -= $this->margin * 2;
+        $length -= $this->padding * 2;
+
+        $lineLength = $length;
+
+        $result[] = "\n";
+
+        foreach (preg_split('#[\n\r]+#', $message) as $messageLine) {
+            $lines = split_string($messageLine, $lineLength);
+
+            if ($lineLength > $length) {
+                throw new RuntimeException(sprintf('Cannot render %s message, a word size %d is greater than the output line size %d.', __CLASS__, $lineLength, $length));
+            }
+        }
+
+
+        $result[] = "\n";
+
+        $result = implode('', $result);
+        if ($colors) {
+            $result = Ansi::RESET . $result . Ansi::RESET;
+        }
+        return $result;
     }
 
     public function __toString(): string

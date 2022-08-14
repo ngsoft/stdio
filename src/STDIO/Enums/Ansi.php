@@ -8,6 +8,7 @@ interface Ansi
 {
 
     public const ESCAPE = "\x1b[";
+    public const RESET = self::ESCAPE . '0m';
     public const STYLE_SUFFIX = "m";
     public const CLEAR_END_LINE = self::ESCAPE . 'K';
     public const CLEAR_START_LINE = self::ESCAPE . '1K';
