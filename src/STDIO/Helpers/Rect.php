@@ -93,7 +93,7 @@ class Rect implements Renderer, Formatter, Stringable
 
     public function render(Output $output): void
     {
-        $output->writeln($this);
+        $output->write($this);
     }
 
     /**
@@ -123,8 +123,6 @@ class Rect implements Renderer, Formatter, Stringable
 
         $pad = $this->padding > 0 ? str_repeat(' ', $this->padding) : '';
 
-        $margin = '';
-
         $margin = $this->margin > 0 ? str_repeat(' ', $this->margin) : '';
 
         $maxLength = Terminal::getWidth() - ($this->margin * 2);
@@ -148,6 +146,27 @@ class Rect implements Renderer, Formatter, Stringable
             if ($lineLength > $length) {
                 throw new RuntimeException(sprintf('Cannot render %s message, a word size %d is greater than the output line size %d.', __CLASS__, $lineLength, $length));
             }
+
+
+
+            foreach ($lines as $line) {
+                $result[] = $margin;
+
+                $padLength = max(0, mb_strlen($line) - $length);
+                $padLength /= 2;
+                $padLeft = (int) ceil($padLength);
+                $padRight = (int) floor($padLength);
+
+                $contents = sprintf(
+                        '%s%s%s',
+                        $padLeft ? str_repeat(' ', $padLeft) : '',
+                        $line,
+                        $padRight ? str_repeat(' ', $padRight) : ''
+                );
+
+                $result[] = $style->format($pad . $contents . $pad, $colors);
+                $result[] = "{$margin}\n";
+            }
         }
 
 
@@ -162,7 +181,9 @@ class Rect implements Renderer, Formatter, Stringable
 
     public function __toString(): string
     {
-        return $this->format(implode("\n", $this->buffer->pull()));
+        $message = implode("\n", $this->buffer->pull());
+
+        return $this->format($message);
     }
 
 }

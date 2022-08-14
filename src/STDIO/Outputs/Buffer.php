@@ -32,7 +32,12 @@ class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable
      */
     public function write(string|Stringable|array $message): void
     {
-        foreach ((array) $message as $line) {
+
+        if ( ! is_array($message)) {
+            $message = [$message];
+        }
+
+        foreach ($message as $line) {
             if (( ! is_string($line) && $line instanceof \Stringable === false) || $line instanceof self) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Formatters\Formatter, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Styles
+    Cursor, Formatters\Formatter, Formatters\Tag, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Style, Styles\Styles
 };
 use Stringable;
 
@@ -193,6 +193,25 @@ class STDIO
     {
         $result = $this->getInput()->read($lines, $allowEmptyLines);
         return $lines === 1 ? $result[0] : $result;
+    }
+
+    /**
+     * Display a rectangle
+     */
+    public function rect(string|\Stringable $message, Style|null|string $style = null): static
+    {
+
+        if (is_string($style)) {
+            $style = $this->getStyles()->createStyleFromAttributes(Tag::getTagAttributesFromCode($style), $style);
+        }
+        $rect = new STDIO\Helpers\Rect($this->styles);
+
+        $rect->write($message);
+        if ($style) {
+            $rect->setStyle($style);
+        }
+        $rect->render($this->getOutput());
+        return $this;
     }
 
 }
