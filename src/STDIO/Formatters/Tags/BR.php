@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
+use NGSOFT\STDIO\Formatters\Tag;
+
 /**
  * @phan-file-suppress PhanUnusedPublicMethodParameter
  */
-class BR extends \NGSOFT\STDIO\Formatters\Tag
+class BR extends Tag
 {
 
     protected bool $selfClosing = true;
