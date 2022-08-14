@@ -126,18 +126,18 @@ class STDIO
     /**
      * Write message into the buffer
      *
-     * @param string|Stringable|array $messages
+     * @param string|Stringable|string[]|Stringable[] $messages
      * @return static
      */
     public function write(string|Stringable|array $messages): static
     {
-        $this->buffer->write($messages);
+        $this->getBuffer()->write($messages);
         return $this;
     }
 
     /**
      *  Write message into the buffer and creates a new line
-     * @param string|Stringable|array $messages
+     * @param string|Stringable|string[]|Stringable[] $messages
      * @return static
      */
     public function writeln(string|Stringable|array $messages): static
@@ -147,7 +147,7 @@ class STDIO
     }
 
     /**
-     * Render to the output
+     * Renders to the selected output
      */
     public function render(Output $output, string|Stringable|array $messages = null): static
     {
@@ -173,9 +173,6 @@ class STDIO
 
     /**
      * Prints message or flush buffer to the error output
-     *
-     * @param string|Stringable|string[]|Stringable[]|null $messages flush the buffer if set to null
-     * @return static
      */
     public function err(string|Stringable|array $messages = null): static
     {
@@ -197,7 +194,10 @@ class STDIO
 
     /**
      * Adds a rectangle to the buffer
-     * use rect tag code without <> delimiters to set style
+     *
+     * @param string|\Stringable $message
+     * @param Style|null|string $style use rect tag code without <> delimiters to set style
+     * @return static
      */
     public function rect(string|\Stringable $message, Style|null|string $style = null): static
     {
@@ -210,10 +210,7 @@ class STDIO
                 $rect->setStyle($style);
             }
         }
-
-
-        $this->getBuffer()->write($rect->format((string) $message));
-        return $this;
+        return $this->write($rect->format((string) $message));
     }
 
 }
