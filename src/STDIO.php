@@ -13,7 +13,6 @@ use Stringable;
 /**
  * STDIO Super Object
  * Gives access to all components
- *
  */
 class STDIO
 {
