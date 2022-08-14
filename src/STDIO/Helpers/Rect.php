@@ -135,9 +135,10 @@ class Rect implements Renderer, Formatter, Stringable
     /**
      * Add a line to the rectangle
      */
-    public function write(string|Stringable $message): void
+    public function write(string|Stringable $message): static
     {
         $this->buffer->write($message);
+        return $this;
     }
 
     /** {@inheritdoc} */

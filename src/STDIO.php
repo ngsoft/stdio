@@ -207,7 +207,7 @@ class STDIO
             $rect->setStyle($style);
         }
 
-        return $this->write($rect->format($message));
+        return $this->write($rect->write($message));
     }
 
 }
