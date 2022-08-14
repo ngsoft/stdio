@@ -55,6 +55,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
         /** @var Style $style */
         foreach ($this as $style) {
+            var_dump($style);
             $output->writeln($style->format($style->getLabel(), $this->colors));
         }
     }
@@ -72,7 +73,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Create a style
      */
-    public function createStyle(string $label, Format|Color|BackgroundColor|HexColor ...$styles): Style
+    public function createStyle(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): Style
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
@@ -178,7 +179,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     protected function buildStyles(): void
     {
-        static $cache = [], $custom = [
+        static $cache = [], $formats = [], $custom = [
             'magenta' => [Color::PURPLE],
             'bg:magenta' => [BackgroundColor::PURPLE],
             'bg:white' => [BackgroundColor::GRAY],
@@ -200,8 +201,15 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
                 foreach ($enum::cases() as $format) {
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                     $prop = $format->getTagAttribute();
-                    $this->formats[$prop] ??= [];
-                    $this->formats[$prop][strtolower($format->getFormatName())] = $format;
+                    $formats[$prop] ??= [];
+                    $formats[$prop][$format->getFormatName()] = $format;
+
+                    if ( ! ($format instanceof Format) && $format->getName() !== 'DEFAULT') {
+
+                        $bright = new BrightColor($format);
+                        $cache[$bright->getTag()] = $this->createStyle($bright->getTag(), $bright);
+                        $formats[$prop][$bright->getFormatName()] = $bright;
+                    }
                 }
             }
             foreach ($custom as $label => $styles) {
@@ -210,7 +218,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         }
 
 
-
+        $this->formats = $formats;
         $this->styles = $cache;
     }
 

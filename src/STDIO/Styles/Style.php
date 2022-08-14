@@ -35,7 +35,7 @@ class Style implements Stringable, Countable
     /**
      * Set formats for the style
      */
-    public function setStyles(Format|Color|BackgroundColor|HexColor ...$styles): static
+    public function setStyles(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
     {
         $this->styles = $styles;
         $this->prefix = $this->suffix = null;
@@ -89,7 +89,7 @@ class Style implements Stringable, Countable
 
         return [
             'label' => $this->label,
-            'styles' => array_map(fn($enum) => class_basename(get_class($enum)) . '::' . $enum->name, $this->styles),
+            'styles' => array_map(fn($enum) => class_basename(get_class($enum)) . '::' . $enum->getName(), $this->styles),
             'format' => $this->format($this->getPrefix() . $this->getLabel() . $this->getSuffix())
         ];
     }
