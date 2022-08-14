@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Events;
 
-class Event implements \Psr\EventDispatcher\StoppableEventInterface
+use NGSOFT\Traits\StoppableEventTrait,
+    Psr\EventDispatcher\StoppableEventInterface;
+
+class Event implements StoppableEventInterface
 {
 
-    use \NGSOFT\Traits\StoppableEventTrait;
+    use StoppableEventTrait;
 }
