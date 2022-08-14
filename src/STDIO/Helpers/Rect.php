@@ -93,7 +93,7 @@ class Rect implements Renderer, Formatter, Stringable
 
     public function render(Output $output): void
     {
-        $output->writeln($this);
+        $output->write($this);
     }
 
     /**
@@ -174,7 +174,7 @@ class Rect implements Renderer, Formatter, Stringable
         }
 
 
-        $result[] = "{$header}\n";
+        $result[] = "{$header}\n\n";
 
         $result = implode('', $result);
         if ($colors) {

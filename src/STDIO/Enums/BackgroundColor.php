@@ -14,7 +14,7 @@ use NGSOFT\Enums\EnumTrait;
  * @method static static BLUE()
  * @method static static PURPLE()
  * @method static static CYAN()
- * @method static static WHITE()
+ * @method static static GRAY()
  * @method static static DEFAULT()
  */
 enum BackgroundColor: int
