@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use InvalidArgumentException;
-use NGSOFT\{
-    DataStructure\PrioritySet, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\Tags\NoTag, STDIO\Formatters\Tags\StyleTag,
-    STDIO\Styles\Styles
-};
-use Stringable;
+use NGSOFT\STDIO\Styles\Styles,
+    Stringable;
 use function mb_strlen,
              str_ends_with,
              str_starts_with;
@@ -64,7 +60,7 @@ class TagFormatter implements Formatter
         $output = '';
         $offset = 0;
 
-        if (preg_match_all('#<(([a-z](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
+        if (preg_match_all('#<(([a-z\#](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z\#][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
 
             foreach ($matches[0] as $i => $match) {
                 [$text, $pos] = $match;
@@ -82,7 +78,7 @@ class TagFormatter implements Formatter
                     $tag = $matches[3][$i][0] ?? '';
                 }
 
-                $style = null;
+                $tagStyle = null;
 
                 if ( ! empty($tag)) {
 

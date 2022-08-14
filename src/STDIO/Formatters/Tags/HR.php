@@ -8,6 +8,9 @@ use NGSOFT\{
     Facades\Terminal, STDIO\Formatters\Tag
 };
 
+/**
+ * @phan-file-suppress PhanUnusedPublicMethodParameter
+ */
 class HR extends Tag
 {
 
@@ -30,7 +33,7 @@ class HR extends Tag
         $width -= $padding * 2;
 
         $pad = '';
-        for ($i = 0; $i < $padding; $i ++) {
+        for ($i = 0; $i < $padding; $i ++ ) {
             $pad .= ' ';
         }
 

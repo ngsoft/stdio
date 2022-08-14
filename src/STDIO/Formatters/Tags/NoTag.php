@@ -10,6 +10,7 @@ use NGSOFT\STDIO\{
 
 /**
  * Fallback Tag
+ * @phan-file-suppress PhanUnusedPublicMethodParameter
  */
 class NoTag extends Tag
 {

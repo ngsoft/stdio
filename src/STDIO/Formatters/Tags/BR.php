@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters\Tags;
 
+/**
+ * @phan-file-suppress PhanUnusedPublicMethodParameter
+ */
 class BR extends \NGSOFT\STDIO\Formatters\Tag
 {
 
@@ -16,9 +19,7 @@ class BR extends \NGSOFT\STDIO\Formatters\Tag
         }
 
 
-        $message = str_repeat("\n", max(1, $count ?? 1));
-
-        return $message;
+        return str_repeat("\n", max(1, $count ?? 1));
     }
 
     public function isSelfClosing(): bool

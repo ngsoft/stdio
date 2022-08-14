@@ -6,6 +6,9 @@ namespace NGSOFT\STDIO\Formatters\Tags;
 
 use NGSOFT\STDIO\Formatters\Tag;
 
+/**
+ * @phan-file-suppress PhanUnusedPublicMethodParameter
+ */
 class Tab extends Tag
 {
 
