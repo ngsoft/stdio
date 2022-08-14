@@ -106,7 +106,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
                 }
 
                 if (HexColor::isHexColor($format) && in_array($key, ['fg', 'bg'])) {
-
                     $formats[] = new HexColor($format, $key === 'bg');
                 }
             }

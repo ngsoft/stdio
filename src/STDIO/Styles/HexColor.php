@@ -58,20 +58,40 @@ class HexColor
             $color = $color[0] . $color[0] . $color[1] . $color [1] . $color[2] . $color[2];
         }
 
-
-
-
-        [$red, $green, $blue] = array_map(fn($hex) => intval($hex, 16), str_split($color));
-
-        if ($mode !== 'truecolor') {
-            return sprintf('%d%d', $isBackgroundColor ? 4 : 3, self::degradeToAnsi($red, $green, $blue));
-        }
+        [$red, $green, $blue] = array_map(fn($hex) => intval($hex, 16), str_split($color, 2));
 
         if ($mode === '256color') {
             return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeTo256($red, $green, $blue));
+        } elseif ($mode === 'ansi') {
+            return sprintf('%d%d', $isBackgroundColor ? 4 : 3, self::degradeToAnsi($red, $green, $blue));
         }
 
         return sprintf('%d8;2;%d;%d;%d', $isBackgroundColor ? 4 : 3, $red, $green, $blue);
+    }
+
+    protected static function degradeToGrayscale(int $red, int $green, int $blue): int
+    {
+        static $table = [8, 18, 28, 38, 48, 58, 68, 78, 88, 98, 108, 118, 128, 138, 148, 158, 168, 178, 188, 198, 208, 218, 228, 238];
+
+        $max = max($red, $green, $blue);
+        $min = min($red, $green, $blue);
+        $middle = (int) floor((($max - $min) / 2) + $min);
+
+        if ($middle > 238) {
+            return 231;
+        } elseif ($middle < 8) {
+            return 16;
+        }
+
+
+        foreach ($table as $level => $intensity) {
+
+            if ($middle < $intensity) {
+                break;
+            }
+        }
+
+        return 232 + $level;
     }
 
     /**
@@ -103,26 +123,7 @@ class HexColor
 
     protected static function degradeToAnsi(int $red, int $green, int $blue): int
     {
-
-        if (0 === (int) round(self::getSaturation($red, $green, $blue) / 50)) {
-            return 0;
-        }
-
-        return ((int) round($blue / 255) << 2) | ((int) round($green / 255) << 1) | (int) round($red / 255);
-    }
-
-    protected static function getSaturation(int $red, int $green, int $blue): int
-    {
-        $red = $red / 255;
-        $green = $green / 255;
-        $blue = $blue / 255;
-        $value = max($red, $green, $blue);
-
-        if (0 === $diff = $value - min($red, $green, $blue)) {
-            return 0;
-        }
-
-        return (int) ($diff * 100 / $value);
+        return (int) (floor($red / 128) + (floor($green / 128) * 2) + (floor($blue / 128) * 4));
     }
 
     public function getName(): string
