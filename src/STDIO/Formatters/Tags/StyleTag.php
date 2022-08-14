@@ -38,7 +38,6 @@ class StyleTag extends Tag
             if (isset($this->styles[$attr]) || isset($formats[$attr]) || in_array($attr, $custom)) {
                 continue;
             }
-
             return false;
         }
 

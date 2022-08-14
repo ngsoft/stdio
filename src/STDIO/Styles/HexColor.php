@@ -12,7 +12,7 @@ use NGSOFT\STDIO\Utils\Utils;
 class HexColor
 {
 
-    public readonly string $name;
+    protected string $name;
     protected string $value;
     protected bool $isBackgroundColor = false;
 
@@ -23,8 +23,13 @@ class HexColor
     )
     {
         $this->isBackgroundColor = $isBackgroundColor;
-        $this->value = Utils::convertHexToAnsi($name, $isBackgroundColor, $isGray);
-        $this->name = '#' . ltrim($name, '#');
+        $this->setValue($name, $isBackgroundColor, $isGray);
+    }
+
+    protected function setValue(string $value, bool $isBackgroundColor, bool $isGray): void
+    {
+        $this->name = '#' . ltrim($value, '#');
+        $this->value = Utils::convertHexToAnsi($value, $isBackgroundColor, $isGray);
     }
 
     public function getName(): string

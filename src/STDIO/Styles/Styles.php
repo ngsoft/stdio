@@ -98,6 +98,11 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
                 continue;
             }
 
+
+            if ($key === 'options' && $this->count($val)) {
+                $val = str_split('#,+#', $val[0]);
+            }
+
             foreach ($val as $format) {
                 $format = strtolower($format);
 
@@ -108,6 +113,8 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
                 if (Utils::isHexColor($format) && in_array($key, ['fg', 'bg'])) {
                     $formats[] = new HexColor($format, $key === 'bg', isset($attributes['grayscale']) || isset($attributes['gs']));
+                } elseif (Utils::isRGBColor($format) && in_array($key, ['fg', 'bg'])) {
+                    $formats[] = new RGBColor($format, $key === 'bg', isset($attributes['grayscale']) || isset($attributes['gs']));
                 }
             }
         }
