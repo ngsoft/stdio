@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
+use Countable;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
 };
 use Stringable;
 use function class_basename;
 
-class Style implements Stringable, \Countable
+class Style implements Stringable, Countable
 {
 
     /** @var Format|Color|BackgroundColor[] */
@@ -34,7 +35,7 @@ class Style implements Stringable, \Countable
     /**
      * Set formats for the style
      */
-    public function setStyles(Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor|HexColor ...$styles): static
+    public function setStyles(Format|Color|BackgroundColor|HexColor ...$styles): static
     {
         $this->styles = $styles;
         $this->prefix = $this->suffix = null;

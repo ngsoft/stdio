@@ -8,8 +8,7 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\BrightBackgroundColor, STDIO\Enums\BrightColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output,
-    STDIO\Utils\Utils
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output, STDIO\Utils\Utils
 };
 use OutOfBoundsException,
     Traversable,
@@ -20,7 +19,7 @@ use function get_debug_type,
 class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
 
-    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class, BrightColor::class, BrightBackgroundColor::class];
+    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
 
     public readonly bool $colors;
 
@@ -73,7 +72,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Create a style
      */
-    public function createStyle(string $label, Format|Color|BackgroundColor|BrightColor|BrightBackgroundColor|HexColor ...$styles): Style
+    public function createStyle(string $label, Format|Color|BackgroundColor|HexColor ...$styles): Style
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
@@ -99,8 +98,8 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             }
 
 
-            if ($key === 'options' && $this->count($val)) {
-                $val = str_split('#,+#', $val[0]);
+            if ($key === 'options' && count($val)) {
+                $val = preg_split('#,+#', $val[0]);
             }
 
             foreach ($val as $format) {
