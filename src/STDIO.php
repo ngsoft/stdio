@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Formatters\Formatter, Formatters\Tag, Formatters\TagFormatter, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Style, Styles\Styles
+    Cursor, Formatters\Formatter, Formatters\TagFormatter, Formatters\Tags\Rect as TagRect, Helpers\Rect, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output,
+    Styles\Style, Styles\Styles
 };
 use Stringable;
 
@@ -202,15 +203,15 @@ class STDIO
     {
 
         if (is_string($style)) {
-            $style = $this->getStyles()->createStyleFromAttributes(Tag::getTagAttributesFromCode($style), $style);
+            $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . $style);
+        } else {
+            $rect = new Rect($this->styles);
+            if ($style) {
+                $rect->setStyle($style);
+            }
         }
-        $rect = new STDIO\Helpers\Rect($this->styles);
 
-        $rect->write($message);
-        if ($style) {
-            $rect->setStyle($style);
-        }
-        $rect->render($this->getOutput());
+        $this->getOutput()->write($rect->format((string) $message));
         return $this;
     }
 

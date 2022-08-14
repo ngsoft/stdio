@@ -32,7 +32,7 @@ class Rect implements Renderer, Formatter, Stringable
     protected Buffer $buffer;
     protected int $padding = 4;
     protected int $margin = 2;
-    protected int $length;
+    protected int $length = 0;
     protected bool $center = false;
 
     public function create(?Styles $styles = null)
@@ -47,7 +47,6 @@ class Rect implements Renderer, Formatter, Stringable
         $this->buffer = new Buffer();
         $this->styles ??= new Styles();
         $this->style = $this->styles->createStyle(...self::DEFAULT_STYLE);
-        $this->length = Terminal::getWidth();
     }
 
     public function getCenter(): bool
@@ -64,12 +63,18 @@ class Rect implements Renderer, Formatter, Stringable
         return $this;
     }
 
+    public function autoSetLength(): static
+    {
+        $this->setLength(Terminal::getWidth());
+        return $this;
+    }
+
     public function getLength(): int
     {
         return $this->length;
     }
 
-    public function setLength(int $length)
+    public function setLength(int $length): static
     {
         $this->length = min(max(1, $length), Terminal::getWidth());
         return $this;
@@ -88,7 +93,7 @@ class Rect implements Renderer, Formatter, Stringable
     /**
      * Set Rectangle inner padding
      */
-    public function setPadding(int $padding)
+    public function setPadding(int $padding): static
     {
         $this->padding = max(0, $padding);
         return $this;
@@ -98,7 +103,7 @@ class Rect implements Renderer, Formatter, Stringable
      * Set rectangle margin
      * even values in range [ 0 - 10 ]
      */
-    public function setMargin(int $margin)
+    public function setMargin(int $margin): static
     {
         if ($margin % 2 === 1) {
             $margin --;
@@ -169,7 +174,13 @@ class Rect implements Renderer, Formatter, Stringable
 
         $padding = min($maxPad, $this->padding);
 
-        $length = max(min($this->length, $maxLength), $minLength + ($padding * 2));
+        $length = $this->length;
+
+        if ($length === 0) {
+            $length = mb_strlen(preg_split('#\v+#', $message)[0]) + ($padding * 2);
+        }
+
+        $length = max(min($length, $maxLength), $minLength + ($padding * 2));
 
         $center = '';
 
@@ -177,7 +188,6 @@ class Rect implements Renderer, Formatter, Stringable
             $diff = (int) ceil(($maxLength - $length) / 2);
             $diff > 0 && $center = str_repeat(' ', $diff);
         }
-
 
 
         $margin = $margin > 0 ? str_repeat(' ', $margin) : '';
@@ -191,7 +201,7 @@ class Rect implements Renderer, Formatter, Stringable
         $lineLength = $length;
 
         $result = [
-            "\n",
+            "\n\n",
             $center,
             $header,
             "\n"

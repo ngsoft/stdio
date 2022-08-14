@@ -43,8 +43,10 @@ abstract class Tag implements Stringable, IteratorAggregate
             foreach (preg_split('#;+#', $code) as $attribute) {
                 @list(, $key, $val) = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
                 $key = strtolower(trim($key));
-
-                $attributes[$key] = isset($val) ? [$val] : [];
+                $attributes[$key] ??= [];
+                if (isset($val)) {
+                    $attributes[$key] [] = $val;
+                }
             }
         }
 
