@@ -18,7 +18,7 @@ class Rect extends Tag
     {
 
         if ($this->displayed) {
-            throw new RuntimeException('<rect> already displayed ! Please close tag in the same instruction it is open.');
+            throw new RuntimeException('<rect> already displayed ! Please close tag in the same instruction it is open and do not open other tags before closing.');
         }
 
 
