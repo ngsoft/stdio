@@ -12,6 +12,8 @@ use NGSOFT\STDIO\Formatters\Tag;
 class Tab extends Tag
 {
 
+    protected bool $selfClosing = true;
+
     public function format(string $message): string
     {
 
@@ -22,11 +24,6 @@ class Tab extends Tag
         $message = str_repeat("\t", max(1, $count ?? 1));
 
         return $message;
-    }
-
-    public function isSelfClosing(): bool
-    {
-        return true;
     }
 
 }

@@ -10,6 +10,8 @@ namespace NGSOFT\STDIO\Formatters\Tags;
 class BR extends \NGSOFT\STDIO\Formatters\Tag
 {
 
+    protected bool $selfClosing = true;
+
     public function format(string $message): string
     {
 
@@ -20,11 +22,6 @@ class BR extends \NGSOFT\STDIO\Formatters\Tag
 
 
         return str_repeat("\n", max(1, $count ?? 1));
-    }
-
-    public function isSelfClosing(): bool
-    {
-        return true;
     }
 
 }

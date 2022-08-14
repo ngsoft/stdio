@@ -15,6 +15,8 @@ use NGSOFT\STDIO\{
 class NoTag extends Tag
 {
 
+    protected bool $selfClosing = true;
+
     public function getPriority(): int
     {
         // lowest priority
@@ -24,11 +26,6 @@ class NoTag extends Tag
     public function format(string $message): string
     {
         return $message;
-    }
-
-    public function isSelfClosing(): bool
-    {
-        return true;
     }
 
     public function managesAttributes(array $attributes): bool

@@ -20,6 +20,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 {
 
     protected string $name;
+    protected bool $selfClosing = false;
 
     /** @var array<string, string[]> */
     protected array $attributes = [];
@@ -55,7 +56,10 @@ abstract class Tag implements Stringable, IteratorAggregate
     /**
      * Checks if tag manages contents
      */
-    abstract public function isSelfClosing(): bool;
+    public function isSelfClosing(): bool
+    {
+        return $this->selfClosing;
+    }
 
     /**
      * Get Formated string

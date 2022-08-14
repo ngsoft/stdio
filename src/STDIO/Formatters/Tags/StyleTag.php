@@ -21,11 +21,6 @@ class StyleTag extends Tag
         return 2;
     }
 
-    public function isSelfClosing(): bool
-    {
-        return false;
-    }
-
     public function managesAttributes(array $attributes): bool
     {
 
