@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters\Tags;
 
 use NGSOFT\STDIO\{
-    Formatters\Tag, Styles\Style
+    Formatters\Tag, Styles\Style, Utils\Utils
 };
 
 class StyleTag extends Tag
@@ -29,6 +29,11 @@ class StyleTag extends Tag
         $formats ??= $this->styles->getFormats();
 
         foreach (array_keys($attributes) as $attr) {
+
+
+            if (Utils::isHexColor($attr) || Utils::isRGBColor($attr)) {
+                continue;
+            }
 
             if (isset($this->styles[$attr]) || isset($formats[$attr]) || in_array($attr, $custom)) {
                 continue;

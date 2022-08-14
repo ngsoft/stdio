@@ -175,7 +175,7 @@ class Utils
 
     public static function isHexColor(string $color): bool
     {
-        return preg_test('/^#?(?:[0-9A-F]{3}){1,2}$/i', $color);
+        return preg_test('/^#?[0-9A-F]{3,6}$/i', $color);
     }
 
     public static function convertRgbToAnsi(string $rgbColor, bool $isBackgroundColor = false, bool $isGrayscale = false)
@@ -225,7 +225,7 @@ class Utils
     {
         static $mode;
 
-        if ( ! self::isHexColor($hexColor)) {
+        if ( ! preg_test('/^#?(?:[0-9A-F]{3}){1,2}$/i', $hexColor)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" color.', $hexColor));
         }
 

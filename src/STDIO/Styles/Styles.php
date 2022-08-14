@@ -55,7 +55,6 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
         /** @var Style $style */
         foreach ($this as $style) {
-            var_dump($style);
             $output->writeln($style->format($style->getLabel(), $this->colors));
         }
     }
@@ -94,6 +93,10 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
             if (empty($val)) {
                 if (isset($this[$key])) {
                     $formats = array_merge($formats, $this[$key]->getStyles());
+                } elseif (Utils::isHexColor($key)) {
+                    $formats[] = new HexColor($key, false, isset($attributes['grayscale']) || isset($attributes['gs']));
+                } elseif (Utils::isRGBColor($key)) {
+                    $formats[] = new RGBColor($key, false, isset($attributes['grayscale']) || isset($attributes['gs']));
                 }
                 continue;
             }
