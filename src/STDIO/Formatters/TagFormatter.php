@@ -19,9 +19,7 @@ class TagFormatter implements Formatter
     public function __construct(protected ?Styles $styles = null)
     {
         $this->styles ??= new Styles();
-
         $this->tagStack = new TagStack();
-
         $this->manager = new TagManager($this->styles);
     }
 

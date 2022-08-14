@@ -10,12 +10,18 @@ use Countable,
     Stringable,
     Traversable,
     TypeError;
+use function get_debug_type;
 
-class Buffer implements Countable, IteratorAggregate
+class Buffer implements Countable, IteratorAggregate, Renderer
 {
 
     /** @var string[] */
     private $buffer = [];
+
+    public function render(Output $output): void
+    {
+        $this->flush($output);
+    }
 
     /**
      * Adds Message to the buffer
@@ -52,6 +58,19 @@ class Buffer implements Countable, IteratorAggregate
     }
 
     /**
+     * Pull and erase the buffer
+     * @return array
+     */
+    public function pull(): array
+    {
+        try {
+            return $this->buffer;
+        } finally {
+            $this->clear();
+        }
+    }
+
+    /**
      * Flush buffer into Output
      *
      * @param Output $output
@@ -59,10 +78,7 @@ class Buffer implements Countable, IteratorAggregate
      */
     public function flush(Output $output): void
     {
-        foreach ($this as $line) {
-            $output->write($line);
-        }
-        $this->clear();
+        $output->write($this->pull());
     }
 
     /** {@inheritdoc} */

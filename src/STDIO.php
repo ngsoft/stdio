@@ -14,29 +14,38 @@ use Stringable;
  * Gives access to all components
  *
  */
-final class STDIO
+class STDIO
 {
 
     public const VERSION = '3.0';
 
-    private Output $output;
-    private ErrorOutput $errorOutput;
-    private Input $input;
-    private Buffer $buffer;
-    private Cursor $cursor;
-    private Styles $styles;
-    private Formatter $formatter;
+    protected static self $_instance;
+    protected Output $output;
+    protected ErrorOutput $errorOutput;
+    protected Input $input;
+    protected Buffer $buffer;
+    protected Cursor $cursor;
+    protected Styles $styles;
+    protected Formatter $formatter;
 
     /**
      * Get STDIO Instance
      */
-    public static function create(bool $forceColorSupport = null): static
+    final public static function create(bool $forceColorSupport = null): static
     {
         static $cache = [];
         return $cache[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
     }
 
-    public function __construct(bool $forceColorSupport = null)
+    /**
+     * Get last used STDIO Instance
+     */
+    final public static function getCurrentInstance(): static
+    {
+        return static::$_instance ??= static::create();
+    }
+
+    final public function __construct(bool $forceColorSupport = null)
     {
 
         $this->buffer = new Buffer();
@@ -46,41 +55,70 @@ final class STDIO
         $this->output = $output = new Output($formatter);
         $this->errorOutput = new ErrorOutput($formatter);
         $this->cursor = new Cursor($output);
+        static::$_instance = $this;
     }
 
     public function getOutput(): Output
     {
-        return $this->output;
+        try {
+            return $this->output;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getErrorOutput(): ErrorOutput
     {
-        return $this->errorOutput;
+        try {
+            return $this->errorOutput;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getInput(): Input
     {
-        return $this->input;
+        try {
+            return $this->input;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getBuffer(): Buffer
     {
-        return $this->buffer;
+        try {
+            return $this->buffer;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getCursor(): Cursor
     {
-        return $this->cursor;
+        try {
+            return $this->cursor;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getStyles(): Styles
     {
-        return $this->styles;
+        try {
+            return $this->styles;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     public function getFormatter(): Formatter
     {
-        return $this->formatter;
+        try {
+            return $this->formatter;
+        } finally {
+            static::$_instance = $this;
+        }
     }
 
     ////////////////////////////   Helpers   ////////////////////////////
@@ -104,24 +142,33 @@ final class STDIO
      */
     public function writeln(string|Stringable|array $messages): static
     {
-        $this->buffer->writeln($messages);
+        $this->getBuffer()->writeln($messages);
+        return $this;
+    }
+
+    /**
+     * Render to the output
+     */
+    public function render(Output $output, string|Stringable|array $messages = null): static
+    {
+
+        try {
+            if (is_null($messages)) {
+                $this->getBuffer()->render($output);
+            } else { $output->write($messages); }
+        } finally {
+            $this->getBuffer()->clear();
+        }
+
         return $this;
     }
 
     /**
      * Prints message or flush buffer to the output
-     *
-     * @param string|Stringable|array|null $messages flush the buffer if set to null
-     * @return static
      */
     public function out(string|Stringable|array $messages = null): static
     {
-
-        if ( ! is_null($messages)) {
-            $this->buffer->clear();
-            $this->output->write($messages);
-        } else $this->buffer->flush($this->output);
-        return $this;
+        return $this->render($this->getOutput(), $messages);
     }
 
     /**
@@ -132,11 +179,7 @@ final class STDIO
      */
     public function err(string|Stringable|array $messages = null): static
     {
-        if ( ! is_null($messages)) {
-            $this->buffer->clear();
-            $this->errorOutput->write($messages);
-        } else $this->buffer->flush($this->errorOutput);
-        return $this;
+        return $this->render($this->getErrorOutput(), $messages);
     }
 
     /**
@@ -148,7 +191,7 @@ final class STDIO
      */
     public function read(int $lines = 1, bool $allowEmptyLines = true): array|string
     {
-        $result = $this->input->read($lines, $allowEmptyLines);
+        $result = $this->getInput()->read($lines, $allowEmptyLines);
         return $lines === 1 ? $result[0] : $result;
     }
 
