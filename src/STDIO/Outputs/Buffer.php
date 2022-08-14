@@ -12,7 +12,7 @@ use Countable,
     TypeError;
 use function get_debug_type;
 
-class Buffer implements Countable, IteratorAggregate, Renderer
+class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable
 {
 
     /** @var string[] */
@@ -33,7 +33,7 @@ class Buffer implements Countable, IteratorAggregate, Renderer
     public function write(string|Stringable|array $message): void
     {
         foreach ((array) $message as $line) {
-            if ( ! is_string($line) && $line instanceof \Stringable === false) {
+            if (( ! is_string($line) && $line instanceof \Stringable === false) || $line instanceof self) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
             $this->buffer[] = (string) $line;
@@ -90,6 +90,11 @@ class Buffer implements Countable, IteratorAggregate, Renderer
     public function getIterator(): Traversable
     {
         yield from $this->buffer;
+    }
+
+    public function __toString(): string
+    {
+        return implode('', $this->pull());
     }
 
 }

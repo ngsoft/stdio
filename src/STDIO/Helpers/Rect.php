@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Helpers;
 
 use NGSOFT\STDIO\{
-    Enums\BackgroundColor, Enums\Color, Outputs\Buffer, Outputs\Renderer, Styles\Style, Styles\Styles
+    Enums\BackgroundColor, Enums\Color, Formatters\Formatter, Outputs\Buffer, Outputs\Output, Outputs\Renderer, Styles\Style, Styles\Styles
 };
 
 /**
  * Draws Rectangles
  */
-class Rect implements Renderer, \NGSOFT\STDIO\Formatters\Formatter
+class Rect implements Renderer, Formatter, \Stringable
 {
 
     protected const DEFAULT_STYLE = [
@@ -22,6 +22,8 @@ class Rect implements Renderer, \NGSOFT\STDIO\Formatters\Formatter
 
     protected Style $style;
     protected Buffer $buffer;
+    protected string $text = '';
+    protected int $padding = 4;
 
     public function __construct(
             protected ?Styles $styles = null
@@ -45,7 +47,19 @@ class Rect implements Renderer, \NGSOFT\STDIO\Formatters\Formatter
 
     public function render(Output $output): void
     {
+        $output->writeln($this);
+    }
 
+    public function format(string|\Stringable $message): string
+    {
+        if ($message instanceof self) {
+            throw new InvalidArgumentException('$message cannot be instance of ' . __CLASS__);
+        }
+    }
+
+    public function __toString(): string
+    {
+        return $this->format($this->text);
     }
 
 }
