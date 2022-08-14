@@ -168,9 +168,54 @@ class Utils
         return $result ??= ! self::isWindows() && ! empty(self::executeProcess('stty'));
     }
 
+    public static function isRGBColor(string $color): bool
+    {
+        return preg_test('#^rgb\(\d+,\d+,\d+\)$#i', $color);
+    }
+
     public static function isHexColor(string $color): bool
     {
         return preg_test('/^#?(?:[0-9A-F]{3}){1,2}$/i', $color);
+    }
+
+    public static function convertRgbToAnsi(string $rgbColor, bool $isBackgroundColor = false, bool $isGrayscale = false)
+    {
+        static $mode;
+
+        if ($matches = preg_exec('#^rgb\((\d+),(\d+),(\d+)\)$#i', $rgbColor)) {
+            [, $red, $green, $blue] = $matches;
+
+            $red = intval($red);
+            $green = intval($green);
+            $blue = intval($blue);
+
+            if (in_range($red, 0, 255) && in_range($green, 0, 255) && in_range($blue, 0, 255)) {
+
+                if ( ! $mode) {
+                    $mode = 'ansi';
+                    if (self::getNumColorSupport() > 256) {
+                        $mode = 'truecolor';
+                    } elseif (self::getNumColorSupport() >= 256) {
+                        $mode = '256color';
+                    }
+                }
+
+                if ($mode !== 'ansi' && $isGrayscale) {
+                    return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeToGrayscale($red, $green, $blue));
+                }
+
+                if ($mode === '256color') {
+                    return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeTo256($red, $green, $blue));
+                }
+
+                if ($mode === 'ansi') {
+                    return sprintf('%d%d', $isBackgroundColor ? 4 : 3, self::degradeToAnsi($red, $green, $blue));
+                }
+
+                return sprintf('%d8;2;%d;%d;%d', $isBackgroundColor ? 4 : 3, $red, $green, $blue);
+            }
+        }
+        throw new InvalidArgumentException(sprintf('Invalid "%s" color.', $rgbColor));
     }
 
     /**
@@ -178,7 +223,6 @@ class Utils
      */
     public static function convertHexToAnsi(string $hexColor, bool $isBackgroundColor = false, bool $isGrayscale = false): string
     {
-
         static $mode;
 
         if ( ! self::isHexColor($hexColor)) {
@@ -187,9 +231,7 @@ class Utils
 
         if ( ! $mode) {
             $mode = 'ansi';
-            if ($isGrayscale && self::getNumColorSupport() >= 256) {
-                $mode = 'gray';
-            } elseif (self::getNumColorSupport() > 256) {
+            if (self::getNumColorSupport() > 256) {
                 $mode = 'truecolor';
             } elseif (self::getNumColorSupport() >= 256) {
                 $mode = '256color';
@@ -204,11 +246,15 @@ class Utils
 
         [$red, $green, $blue] = array_map(fn($hex) => intval($hex, 16), str_split($color, 2));
 
-        if ($mode === 'gray') {
+        if ($mode !== 'ansi' && $isGrayscale) {
             return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeToGrayscale($red, $green, $blue));
-        } elseif ($mode === '256color') {
+        }
+
+        if ($mode === '256color') {
             return sprintf('%d8;5;%d', $isBackgroundColor ? 4 : 3, self::degradeTo256($red, $green, $blue));
-        } elseif ($mode === 'ansi') {
+        }
+
+        if ($mode === 'ansi') {
             return sprintf('%d%d', $isBackgroundColor ? 4 : 3, self::degradeToAnsi($red, $green, $blue));
         }
 

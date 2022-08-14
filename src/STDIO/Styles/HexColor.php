@@ -14,13 +14,15 @@ class HexColor
 
     public readonly string $name;
     protected string $value;
+    protected bool $isBackgroundColor = false;
 
     public function __construct(
             string $name,
-            public bool $isBackgroundColor = false,
+            bool $isBackgroundColor = false,
             bool $isGray = false
     )
     {
+        $this->isBackgroundColor = $isBackgroundColor;
         $this->value = Utils::convertHexToAnsi($name, $isBackgroundColor, $isGray);
         $this->name = '#' . ltrim($name, '#');
     }
