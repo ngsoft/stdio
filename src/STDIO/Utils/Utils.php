@@ -35,7 +35,7 @@ class Utils
                             ['suppress_errors' => true]
             );
 
-            if ( ! \is_resource($process)) {
+            if ( ! $process) {
                 return null;
             }
 
