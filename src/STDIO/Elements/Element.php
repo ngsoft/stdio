@@ -69,6 +69,11 @@ class Element
         return $this->isStandalone;
     }
 
+    public function getTag(): string
+    {
+        return $this->tag;
+    }
+
     public function getAttributes(): array
     {
         return $this->attributes;
