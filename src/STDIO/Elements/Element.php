@@ -21,7 +21,7 @@ class Element
     /** @var self[] */
     protected array $children = [];
 
-    /** @var array<string, string> */
+    /** @var array<string, ?string> */
     protected array $attributes = [];
     protected string $text = '';
     protected bool $isStandalone = false;
@@ -97,6 +97,10 @@ class Element
 
     public function setAttribute(string $attr, mixed $value): void
     {
+        if (is_null($value)) {
+            $this->removeAttribute($attr);
+            return;
+        }
         $this->attributes[$attr] = $this->getValue($value);
     }
 
