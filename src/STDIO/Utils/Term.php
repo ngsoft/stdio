@@ -56,7 +56,7 @@ final class Term
     /**
      * Get cursor position
      * @param bool &$enabled true if position can be read
-     * @return int[] list($top,$left,$enabled)
+     * @return int[] list($top,$left)
      */
     public function getCursorPosition(&$enabled = null): array
     {

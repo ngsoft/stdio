@@ -10,6 +10,9 @@ class Bar extends Element
     protected const BAR_PROGRESS = ['━', '█', '░'];
     protected const BAR_LEFT = ['╺', '░', '🟠'];
     protected const BAR_RIGHT = ['╸', '▓', '▌'];
+    protected const BEGIN_BLOCK_ELEMENTS = ["█", "█", "█", "▐", "▐", "▐", "▕", "▕"];
+    protected const END_BLOCK_ELEMENTS = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"];
+    protected const FULL_BLOCK = "█";
 
     public function getLength(): int
     {
