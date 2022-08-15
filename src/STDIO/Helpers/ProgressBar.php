@@ -87,6 +87,11 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         $this->isCompleted = false;
     }
 
+    public function addElement(Element $element): void
+    {
+        $this->elements[$element->getName()] = $element;
+    }
+
     public function getElements(): array
     {
         return $this->elements;
