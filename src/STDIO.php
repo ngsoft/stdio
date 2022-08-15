@@ -60,65 +60,47 @@ class STDIO
 
     public function getOutput(): Output
     {
-        try {
-            return $this->output;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+        return $this->output;
     }
 
     public function getErrorOutput(): ErrorOutput
     {
-        try {
-            return $this->errorOutput;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+        return $this->errorOutput;
     }
 
     public function getInput(): Input
     {
-        try {
-            return $this->input;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+
+        return $this->input;
     }
 
     public function getBuffer(): Buffer
     {
-        try {
-            return $this->buffer;
-        } finally {
-            static::$_instance = $this;
-        }
+
+        static::$_instance = $this;
+
+        return $this->buffer;
     }
 
     public function getCursor(): Cursor
     {
-        try {
-            return $this->cursor;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+        return $this->cursor;
     }
 
     public function getStyles(): Styles
     {
-        try {
-            return $this->styles;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+        return $this->styles;
     }
 
     public function getFormatter(): Formatter
     {
-        try {
-            return $this->formatter;
-        } finally {
-            static::$_instance = $this;
-        }
+        static::$_instance = $this;
+        return $this->formatter;
     }
 
     ////////////////////////////   Helpers   ////////////////////////////
