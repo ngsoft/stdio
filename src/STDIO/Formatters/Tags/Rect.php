@@ -62,7 +62,7 @@ class Rect extends Tag
             }
 
             $style = $this->getStyle();
-            if (count($style->getStyles())) {
+            if ( ! $style->isEmpty()) {
                 $rect->setStyle($style);
             }
             $this->rect = $rect;

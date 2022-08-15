@@ -120,7 +120,7 @@ class STDIO
     public function print(string|Stringable|array $messages, string $style = null): static
     {
         if (is_string($style)) {
-            $style = $this->getStyles()->createStyleFromString($style);
+            $style = $this->getStyles()->createFromStyleString($style);
             $messages = $style->format($messages);
         }
         return $this->render($this->getOutput(), $messages);
@@ -209,9 +209,9 @@ class STDIO
 
         $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . (is_string($style) ? $style : ''))->getRect();
         if (is_string($style) && ! str_contains($style, ';')) {
-            $rstyle = $this->getStyles()->createStyleFromString($style);
+            $rstyle = $this->getStyles()->createFromStyleString($style);
 
-            if (count($rstyle->getStyles())) {
+            if ( ! $rstyle->isEmpty()) {
                 $rect->setStyle($rstyle);
             }
         }

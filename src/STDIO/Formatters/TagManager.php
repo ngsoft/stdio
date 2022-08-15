@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use NGSOFT\{
-    DataStructure\PrioritySet, STDIO, STDIO\Styles\Styles
+    DataStructure\PrioritySet, STDIO, STDIO\Styles\StyleList
 };
 use function implements_class,
              NGSOFT\Filesystem\require_all_once;
@@ -16,7 +16,7 @@ class TagManager
     protected PrioritySet $tags;
 
     public function __construct(
-            protected ?Styles $styles = null
+            protected ?StyleList $styles = null
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();

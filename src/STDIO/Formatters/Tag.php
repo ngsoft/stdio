@@ -7,7 +7,7 @@ namespace NGSOFT\STDIO\Formatters;
 use InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Styles\Style, STDIO\Styles\Styles
+    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList, STDIO\Styles\Styles
 };
 use Stringable,
     Traversable;
@@ -26,37 +26,6 @@ abstract class Tag implements Stringable, IteratorAggregate
     protected array $attributes = [];
     protected ?string $code = null;
     protected ?Style $style = null;
-
-    ////////////////////////////   Static Methods   ////////////////////////////
-
-    /**
-     * Parse tag Attributes
-     */
-    final public static function getTagAttributesFromCode(string $code): array
-    {
-
-        static $cache = [];
-
-        $code = rtrim($code, ',;');
-
-        if ( ! isset($cache[$code])) {
-            $cache[$code] = [];
-            $attributes = &$cache[$code];
-            foreach (preg_split('#;+#', $code) as $attribute) {
-                @list(, $key, $val) = preg_exec('#([^=]+)(?:=(.+))?#', $attribute);
-                if ( ! isset($key)) {
-                    continue;
-                }
-                $key = strtolower(trim($key));
-                $attributes[$key] ??= [];
-                if (isset($val)) {
-                    $attributes[$key] [] = $val;
-                }
-            }
-        }
-
-        return $cache[$code];
-    }
 
     ////////////////////////////   Overrides   ////////////////////////////
 
@@ -93,7 +62,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 
 
     public function __construct(
-            protected ?Styles $styles = null
+            protected ?StyleList $styles = null
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
@@ -106,7 +75,7 @@ abstract class Tag implements Stringable, IteratorAggregate
     public function createFromCode(string $code): static
     {
         $instance = new static($this->styles);
-        $instance->attributes = self::getTagAttributesFromCode($code);
+        $instance->attributes = $this->styles->getParamsFromStyleString($code);
         $instance->code = $code;
         return $instance;
     }
@@ -126,13 +95,13 @@ abstract class Tag implements Stringable, IteratorAggregate
      */
     public function managesCode(string $code): bool
     {
-        return $this->managesAttributes(self::getTagAttributesFromCode($code));
+        return $this->managesAttributes($this->styles->getParamsFromStyleString($code));
     }
 
     /**
      * Register Styles instance
      */
-    public function setStyles(?Styles $styles): void
+    public function setStyles(?StyleList $styles): void
     {
         $this->styles = $styles;
     }
@@ -202,7 +171,7 @@ abstract class Tag implements Stringable, IteratorAggregate
 
     public function getStyle(): Style
     {
-        return $this->style ??= $this->styles->createStyleFromAttributes($this->attributes, $this->getCode());
+        return $this->style ??= $this->styles->createStyleFromParams($this->attributes, $this->getCode());
     }
 
     public function getCode(): string

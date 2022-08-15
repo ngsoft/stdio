@@ -60,8 +60,13 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
             bool $forceColorSupport = null
     )
     {
-        $this->colors = $forceColorSupport ??= Terminal::supportsColors();
+        $this->colors = $forceColorSupport ?? Terminal::supportsColors();
         self::createDefaultStyles();
+    }
+
+    public function getFormats(): array
+    {
+        return self::$_formats;
     }
 
     /**
@@ -117,10 +122,14 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
             return $this[$string];
         }
 
+        return $this->createStyleFromParams($this->getParamsFromStyleString($string), $string);
+    }
 
-        $style = Style::createEmpty()->withLabel($string)->withColorSupport($this->colors);
+    public function createStyleFromParams(array $params, string $label = ''): Style
+    {
+        $style = Style::createEmpty()->withLabel($label)->withColorSupport($this->colors);
 
-        if ($params = $this->getParamsFromStyleString($string)) {
+        if ($params) {
 
             $isGray = isset($params['grayscale']) || isset($params['gs']);
 

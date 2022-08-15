@@ -7,7 +7,7 @@ namespace NGSOFT\STDIO\Helpers;
 use InvalidArgumentException;
 use NGSOFT\{
     Facades\Terminal, STDIO, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
-    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\Styles
+    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -35,18 +35,18 @@ class Rect implements Renderer, Formatter, Stringable
     protected int $length = 0;
     protected bool $center = false;
 
-    public function create(?Styles $styles = null)
+    public function create(?STDIO\Styles\StyleList $styles = null)
     {
         return new static($styles ?? STDIO::getCurrentInstance()->getStyles());
     }
 
     public function __construct(
-            protected ?Styles $styles = null
+            protected ?StyleList $styles = null
     )
     {
         $this->buffer = new Buffer();
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
-        $this->style = $this->styles->createStyle(...self::DEFAULT_STYLE);
+        $this->style = $this->styles->create(...self::DEFAULT_STYLE);
     }
 
     public function getCenter(): bool
@@ -154,7 +154,7 @@ class Rect implements Renderer, Formatter, Stringable
             return '';
         }
 
-        $colors = $this->styles->colors;
+
         $style = $this->style;
 
         $maxLength = Terminal::getWidth();
@@ -245,9 +245,9 @@ class Rect implements Renderer, Formatter, Stringable
         $result[] = "\n\n";
 
         $result = implode('', $result);
-        if ($colors) {
-            $result = Ansi::RESET . $result . Ansi::RESET;
-        }
+
+        $result = $this->styles['reset']->format($result);
+
         return $result;
     }
 

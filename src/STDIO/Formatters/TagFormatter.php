@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use NGSOFT\{
-    STDIO, STDIO\Styles\Styles
-};
-use Stringable;
+use NGSOFT\STDIO,
+    Stringable;
 use function mb_strlen,
              str_ends_with,
              str_starts_with;
@@ -18,7 +16,7 @@ class TagFormatter implements Formatter
     protected TagManager $manager;
     protected TagStack $tagStack;
 
-    public function __construct(protected ?Styles $styles = null)
+    public function __construct(protected ?STDIO\Styles\StyleList $styles = null)
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
         $this->tagStack = new TagStack();

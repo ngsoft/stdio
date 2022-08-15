@@ -53,9 +53,7 @@ class StyleTag extends Tag
                 return $this->style = $this->styles[$label];
             }
 
-            $this->styles->addStyle(
-                    $this->style = $this->styles->createStyleFromAttributes($this->attributes, $label)
-            );
+            $this->style = $this->styles->createStyleFromParams($this->attributes, $label);
         }
         return $this->style;
     }
