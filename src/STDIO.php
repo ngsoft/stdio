@@ -138,7 +138,7 @@ class STDIO
     {
         if (is_string($style)) {
             $style = $this->getStyles()->createStyleFromString($style);
-            $messages = $style->format($messages, $this->getStyles()->colors);
+            $messages = $style->format($messages);
         }
         return $this->render($this->getOutput(), $messages);
     }

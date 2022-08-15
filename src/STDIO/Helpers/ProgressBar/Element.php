@@ -120,7 +120,7 @@ abstract class Element implements Stringable, Countable
         $result = $this->getValue();
 
         if ($this->style) {
-            $result = $this->style->format($result, $this->styles->colors);
+            $result = $this->style->format($result);
         }
 
         return $result;

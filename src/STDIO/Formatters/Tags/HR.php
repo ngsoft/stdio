@@ -35,7 +35,7 @@ class HR extends Tag
         $width -= $padding * 2;
 
         $pad = '';
-        for ($i = 0; $i < $padding; $i ++) {
+        for ($i = 0; $i < $padding; $i ++ ) {
             $pad .= ' ';
         }
 
@@ -52,7 +52,7 @@ class HR extends Tag
 
 
         $message = "\n";
-        $message .= $pad . $this->getStyle()->format($sub, $this->styles->colors) . $pad;
+        $message .= $pad . $this->getStyle()->format($sub) . $pad;
         $message .= "\n";
         return $message;
     }

@@ -16,7 +16,7 @@ class Style implements Stringable, Countable
 
     protected static ?bool $terminalSupportsColor = null;
 
-    /** @var Format|Color|BackgroundColor[] */
+    /** @var Format[]|Color[]|BackgroundColor[]|HexColor[]|BrightColor[] */
     protected array $styles = [];
     protected ?string $prefix = null;
     protected ?string $suffix = null;

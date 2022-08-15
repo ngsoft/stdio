@@ -197,7 +197,7 @@ class Rect implements Renderer, Formatter, Stringable
 
         $margin = $margin > 0 ? str_repeat(' ', $margin) : '';
 
-        $header = $margin . $style->format(str_repeat(' ', $length), $colors) . $margin;
+        $header = $margin . $style->format(str_repeat(' ', $length)) . $margin;
 
         $length -= $padding * 2;
 
@@ -233,7 +233,7 @@ class Rect implements Renderer, Formatter, Stringable
                         $padRight ? str_repeat(' ', $padRight) : ''
                 );
 
-                $result[] = $style->format($pad . $contents . $pad, $colors);
+                $result[] = $style->format($pad . $contents . $pad);
                 $result[] = $margin;
                 $result[] = "\n";
             }
@@ -263,7 +263,7 @@ class Rect implements Renderer, Formatter, Stringable
             'padding' => $this->padding,
             'margin' => $this->margin,
             'center' => $this->center,
-            'style' => $this->style->format($this->style->getLabel(), $this->styles->colors),
+            'style' => $this->style->format($this->style->getLabel()),
         ];
     }
 

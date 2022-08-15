@@ -13,7 +13,7 @@ class StyleTag extends Tag
 
     public function format(string $message): string
     {
-        return $this->getStyle()->format($message, $this->styles->colors);
+        return $this->getStyle()->format($message);
     }
 
     public function getPriority(): int

@@ -56,7 +56,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
         /** @var Style $style */
         foreach ($this as $style) {
-            $output->writeln($style->format($style->getLabel(), $this->colors));
+            $output->writeln($style->format($style->getLabel()));
         }
     }
 
@@ -282,7 +282,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
 
     public function __debugInfo(): array
     {
-        return map(fn($style, $label) => $style->format($label, $this->colors), $this->styles);
+        return map(fn($style, $label) => $style->format($label), $this->styles);
     }
 
 }
