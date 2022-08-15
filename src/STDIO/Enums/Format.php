@@ -26,19 +26,34 @@ enum Format: int
     case DIM = 2;
     case ITALIC = 3;
     case UNDERLINE = 4;
+    case UNDERLINE2 = 21;
+    case BLINK = 5;
+    case BLINK_ALT = 6;
     case INVERSE = 7;
     case HIDDEN = 8;
     case STRIKETROUGH = 9;
 
     public function getUnsetValue(): int
     {
+        $value = $this->getValue();
+        switch ($value) {
+            case 0:
+                break;
+            case 1:
+            case 2:
+                $value = 22;
+                break;
+            case 6:
+                $value = 25;
+                break;
+            case 21:
+                $value = 24;
+                break;
+            default:
+                $value += 20;
+        }
 
-        static $format_unset = [
-            0 => 0, 1 => 22, 2 => 22, 3 => 23,
-            4 => 24, 7 => 27, 8 => 28, 9 => 29
-        ];
-
-        return $format_unset[$this->value];
+        return $value;
     }
 
     public function getFormatName(): string

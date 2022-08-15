@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Enums;
 
+/**
+ * @link https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+ */
 interface Ansi
 {
 

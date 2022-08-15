@@ -8,9 +8,10 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Utils\Utils
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\NullFormatter, STDIO\Outputs\Output, STDIO\Utils\Utils
 };
 use OutOfBoundsException,
+    Stringable,
     Traversable,
     ValueError;
 use function get_debug_type,
@@ -19,6 +20,33 @@ use function get_debug_type,
 
 class StyleList implements ArrayAccess, IteratorAggregate, Countable
 {
+
+    protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected const FORMATS_CUSTOM = [
+        ['magenta', Color::PURPLE],
+        ['bg:magenta', BackgroundColor::PURPLE],
+        ['bg:white', BackgroundColor::GRAY],
+        ['emergency', Color::YELLOW, BackgroundColor::RED, Format::BOLD],
+        ['alert', Color::RED, Format::BOLD],
+        ['bg:alert', Color::GRAY, BackgroundColor::RED, Format::BOLD],
+        ['critical', Color::RED, Format::BOLD],
+        ['bg:critical', Color::GRAY, BackgroundColor::RED, Format::BOLD],
+        ['error', Color::RED],
+        ['bg:error', Color::GRAY, BackgroundColor::RED],
+        ['warning', Color::YELLOW],
+        ['bg:warning', Color::BLACK, BackgroundColor::YELLOW],
+        ['notice', Color::CYAN],
+        ['bg:notice', Color::GRAY, BackgroundColor::CYAN],
+        ['info', Color::GREEN],
+        ['success', Color::GREEN, Format::BOLD],
+        ['bg:success', Color::GRAY, BackgroundColor::GREEN, Format::BOLD],
+        ['bg:info', Color::GRAY, BackgroundColor::GREEN],
+        ['debug', Color::PURPLE],
+        ['bg:debug', BackgroundColor::PURPLE, Color::GRAY],
+        ['comment', Color::YELLOW],
+        ['whisper', Color::GRAY, Format::DIM],
+        ['shout', Color::RED, Format::BOLD],
+    ];
 
     /** @var Style[] */
     protected static $_styles = [];
@@ -33,6 +61,28 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
     )
     {
         $this->colors = $forceColorSupport ??= Terminal::supportsColors();
+        self::createDefaultStyles();
+    }
+
+    /**
+     * Format style using the style string
+     */
+    public function format(string|Stringable|array $messages, string $styleString = ''): string
+    {
+        return $this->createFromStyleString($styleString)->format($messages);
+    }
+
+    /**
+     * Display Styles to the output
+     */
+    public function dumpStyles(Output $output = null)
+    {
+
+        $output ??= new Output(new NullFormatter());
+
+        foreach ($this as $style) {
+            $output->writeln($style->format($style->getLabel()));
+        }
     }
 
     /**
@@ -57,7 +107,7 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
      */
     public function create(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): Style
     {
-        $this->register($style = Style::createFrom($label, ...$styles));
+        $this->register($style = Style::createFrom($label, ...$styles)->withColorSupport($this->colors));
         return $style;
     }
 
@@ -68,14 +118,16 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         }
 
 
-        $style = Style::createEmpty()->withLabel($string);
+        $style = Style::createEmpty()->withLabel($string)->withColorSupport($this->colors);
 
         if ($params = $this->getParamsFromStyleString($string)) {
 
             $isGray = isset($params['grayscale']) || isset($params['gs']);
-            $isBG = $key = 'bg';
 
             foreach ($params as $key => $value) {
+
+                $isBG = $key === 'bg';
+
                 if (empty($value)) {
                     if (isset($this[$key])) {
                         $style = $style->withAddedStyle($this[$key]);
@@ -195,6 +247,49 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
 
         foreach ($labels as $label) {
             yield $label => $this->offsetGet($label);
+        }
+    }
+
+    public function __debugInfo(): array
+    {
+
+        $result = [];
+        foreach ($this as $label => $style) {
+
+            $result[$label] = $style->format($label);
+        }
+
+        return $result;
+    }
+
+    protected static function createDefaultStyles(): void
+    {
+
+        if (empty(self::$_styles)) {
+            $styles = &self::$_styles;
+            $formats = self::$_formats;
+
+            /** @var Color $format */
+            foreach (self::FORMATS_ENUMS as $enum) {
+                foreach ($enum::cases() as $format) {
+                    $prop = $format->getTagAttribute();
+                    $formats[$prop] ??= [];
+                    $formats[$prop][$format->getFormatName()] = $format;
+
+                    $styles[$format->getTag()] = Style::createFrom($format->getTag(), $format);
+
+                    if ( ! $format->is(Color::DEFAULT, BackgroundColor::DEFAULT, ...Format::cases())) {
+                        $bright = new BrightColor($format);
+                        $formats[$prop][$bright->getFormatName()] = $bright;
+                        $styles[$bright->getTag()] = Style::createFrom($bright->getTag(), $bright);
+                    }
+                }
+            }
+
+
+            foreach (self::FORMATS_CUSTOM as $args) {
+                $styles[$args[0]] = Style::createFrom(...$args);
+            }
         }
     }
 
