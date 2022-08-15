@@ -11,12 +11,12 @@ class Bar extends Element
     protected const BAR_LEFT = ['╺', ' '];
     protected const BAR_RIGHT = ['╸', ''];
 
-    protected function update(): string
+    public function getLength(): int
     {
-
+        return 28;
     }
 
-    protected function getLength(): int
+    public function update(): void
     {
 
     }

@@ -16,19 +16,18 @@ abstract class Element implements Stringable, Countable
 
     protected string $name;
     protected bool $show = true;
-    protected ?string $value = null;
+    protected string $value = '';
     protected ?Style $style = null;
-    protected float $percent = 0.0;
 
     /**
      * Update the display when progress is changed
      */
-    abstract protected function update(): string;
+    abstract public function update(): void;
 
     /**
      * Get the reserved length without style
      */
-    abstract protected function getLength(): int;
+    abstract public function getLength(): int;
 
     public function __construct(
             protected ProgressBar $parent,
@@ -36,14 +35,8 @@ abstract class Element implements Stringable, Countable
     )
     {
         $this->name = strtolower(class_basename(static::class));
-        $this->update();
-    }
 
-    protected function reset(): void
-    {
-        $this->current = 0;
-        $this->percent = 0.0;
-        $this->value = null;
+        $this->update();
     }
 
     protected function getSibling(bool $visible = true): \Traversable
@@ -67,19 +60,6 @@ abstract class Element implements Stringable, Countable
         $this->style = $style;
     }
 
-    public function setTotal(int $total): void
-    {
-        $this->total = max(1, $total);
-        $this->reset();
-    }
-
-    public function setCurrent(int $current): void
-    {
-        $this->current = min($current, $this->total);
-        $this->percent = round($this->current / $this->total, 2);
-        $this->value = null;
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -92,22 +72,22 @@ abstract class Element implements Stringable, Countable
 
     public function getPercent(): float
     {
-        return $this->percent;
+        return $this->parent->getPercent();
     }
 
     public function getTotal(): int
     {
-        return $this->total;
+        return $this->parent->getTotal();
     }
 
     public function getCurrent(): int
     {
-        return $this->current;
+        return $this->parent->getCurrent();
     }
 
     protected function getValue()
     {
-        return $this->value ??= $this->update();
+        return $this->value;
     }
 
     public function isVisible(): bool
@@ -127,7 +107,7 @@ abstract class Element implements Stringable, Countable
 
     public function isComplete(): bool
     {
-        return $this->current >= $this->total;
+        return $this->getCurrent() >= $this->getTotal();
     }
 
     public function count(): int

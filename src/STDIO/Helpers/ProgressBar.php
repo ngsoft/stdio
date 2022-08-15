@@ -6,12 +6,11 @@ namespace NGSOFT\STDIO\Helpers;
 
 use IteratorAggregate;
 use NGSOFT\{
-    DataStructure\ClassIterator, STDIO, STDIO\Events\ProgressComplete, STDIO\Events\ProgressStarted, STDIO\Events\ProgressStep, STDIO\Helpers\ProgressBar\Element,
-    STDIO\Outputs\Output, STDIO\Outputs\Renderer, STDIO\Styles\Styles, Traits\DispatcherAware
+    STDIO, STDIO\Events\ProgressComplete, STDIO\Events\ProgressStarted, STDIO\Events\ProgressStep, STDIO\Helpers\ProgressBar\Element, STDIO\Outputs\Output,
+    STDIO\Outputs\Renderer, STDIO\Styles\Styles, Traits\DispatcherAware
 };
 use Stringable,
     Traversable;
-use function NGSOFT\Tools\iterate_all;
 
 class ProgressBar implements Stringable, IteratorAggregate, Renderer
 {
@@ -21,7 +20,6 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
     protected bool $isCompleted = false;
     protected bool $started = false;
     protected float $percent = 0.0;
-    protected ?ClassIterator $iterator = null;
     protected ?Output $output = null;
 
     /** @var Element[] */
@@ -46,9 +44,14 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         $this->increment($value * -1);
     }
 
-    protected function all(): ClassIterator
+    /**
+     * Call method in all elements
+     */
+    protected function call(string $method, mixed ...$arguments): void
     {
-        return $this->iterator ??= new ClassIterator(Element::class, $this->elements);
+        foreach ($this->getElements() as $element) {
+            call_user_func_array([$element, $method], $arguments);
+        }
     }
 
     public function start(): void
@@ -110,7 +113,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         $this->total = max(1, $total);
         $this->reset();
 
-        iterate_all($this->all()->setTotal($total));
+        $this->call('update');
     }
 
     public function setCurrent(int $current): void
@@ -118,7 +121,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
 
         $this->current = min($current, $this->total);
         $this->percent = round($this->current / $this->total, 2);
-        iterate_all($this->all()->setCurrent($current));
+        $this->call('update');
         $this->dispatchEvent(new ProgressStep($this))->onEvent();
 
         if ($current >= $this->total && ! $this->isCompleted) {
@@ -159,7 +162,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
     {
         /** @var Element $element */
         $result = '';
-        foreach ($this->all() as $element) {
+        foreach ($this->elements as $element) {
 
             if ($element->isVisible()) {
                 $result .= (string) $element;
