@@ -7,14 +7,13 @@ namespace NGSOFT\STDIO\Formatters;
 use InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\{
-    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList, STDIO\Styles\Styles
+    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use Stringable,
     Traversable;
 use function class_basename,
              get_debug_type,
-             is_stringable,
-             preg_exec;
+             is_stringable;
 
 abstract class Tag implements Stringable, IteratorAggregate
 {
@@ -22,7 +21,7 @@ abstract class Tag implements Stringable, IteratorAggregate
     protected string $name;
     protected bool $selfClosing = false;
 
-    /** @var array<string, string[]> */
+    /** @var array<string, string> */
     protected array $attributes = [];
     protected ?string $code = null;
     protected ?Style $style = null;
