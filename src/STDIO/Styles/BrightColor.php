@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
-use NGSOFT\STDIO\Enums\{
-    BackgroundColor, Color
+use NGSOFT\STDIO\{
+    Enums\BackgroundColor, Enums\Color, Utils\Utils
 };
 
 /**
@@ -38,14 +38,25 @@ class BrightColor
         return $this->color->getName();
     }
 
-    public function getValue(): int
+    public function getValue(): int|string
     {
+
+        if (Utils::getNumColorSupport() === 8) {
+            return sprintf('1;%d', $this->color->getValue());
+        }
+
         return $this->color->getValue() + 60;
     }
 
-    public function getUnsetValue(): int
+    public function getUnsetValue(): int|string
     {
-        return $this->isBackgroundColor ? 49 : 39;
+        $value = $this->isBackgroundColor ? 49 : 39;
+
+        if (Utils::getNumColorSupport() === 8) {
+            return sprintf('22;%d', $value);
+        }
+
+        return $value;
     }
 
 }
