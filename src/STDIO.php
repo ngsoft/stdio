@@ -124,6 +124,26 @@ class STDIO
     ////////////////////////////   Helpers   ////////////////////////////
 
     /**
+     * Write message into the buffer using printf
+     */
+    public function printf(string $pattern, mixed ...$arguments): static
+    {
+        return $this->write(sprintf($pattern, ...$arguments));
+    }
+
+    /**
+     * Writes message directly to the output
+     */
+    public function print(string|Stringable|array $messages, string $style = null): static
+    {
+        if (is_string($style)) {
+            $style = $this->getStyles()->createStyleFromString($style);
+            $messages = $style->format($messages, $this->getStyles()->colors);
+        }
+        return $this->render($this->getOutput(), $messages);
+    }
+
+    /**
      * Write message into the buffer
      *
      * @param string|Stringable|string[]|Stringable[] $messages
