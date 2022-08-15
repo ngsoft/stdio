@@ -35,10 +35,10 @@ class Style
 
     public static function createFrom(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
     {
-        return self::createEmpty()->withLabel($label)->withStyles(...$styles);
+        return self::createEmpty()->withLabel($label)->withFormats(...$styles);
     }
 
-    public function withStyles(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
+    public function withFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
     {
         $clone = clone $this;
 
@@ -52,6 +52,14 @@ class Style
         $clone->set = array_unique($set);
         $clone->unset = array_unique($unset);
 
+        return $clone;
+    }
+
+    public function withAddedStyle(Style $style): static
+    {
+        $clone = clone $this;
+        $clone->set = array_unique(array_merge($clone->set, $style->set));
+        $clone->unset = array_unique(array_merge($clone->unset, $style->unset));
         return $clone;
     }
 
@@ -86,12 +94,24 @@ class Style
 
     public function getPrefix(): string
     {
-        return $this->prefix ??= Ansi::ESCAPE . implode(';', $this->set) . Ansi::STYLE_SUFFIX;
+        if (empty($this->prefix)) {
+            foreach ($this->set as $set) {
+                $this->prefix .= Ansi::ESCAPE . $set . Ansi::STYLE_SUFFIX;
+            }
+        }
+        return $this->prefix;
     }
 
     public function getSuffix(): string
     {
-        return $this->suffix ??= Ansi::ESCAPE . implode(';', $this->unset) . Ansi::STYLE_SUFFIX;
+
+        if (empty($this->suffix)) {
+            foreach ($this->unset as $unset) {
+                $this->suffix .= Ansi::ESCAPE . $unset . Ansi::STYLE_SUFFIX;
+            }
+        }
+
+        return $this->suffix;
     }
 
     public function format(string|Stringable|array $messages): string

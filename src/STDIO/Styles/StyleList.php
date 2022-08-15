@@ -55,14 +55,62 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
      */
     public function create(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): Style
     {
-
         $this->register($style = Style::createFrom($label, ...$styles));
         return $style;
     }
 
-    public function getAttributesFromStyleString(string $string): array
+    public function createFromStyleString(string $string): Style
     {
 
+        if ($params = $this->getParamsFromStyleString($string)) {
+
+            $formats = [];
+            foreach ($params as $key => $value) {
+                if ($this->offsetExists($key)) {
+
+
+
+
+                    continue;
+                }
+            }
+        }
+
+        return Style::createEmpty()->withLabel($string);
+    }
+
+    /**
+     * Parse Style Param string
+     *
+     * @param string $string
+     * @return array<string, string>
+     */
+    public function getParamsFromStyleString(string $string): array
+    {
+        $string = trim(trim($string), ',;');
+
+        if (empty($string)) {
+            return [];
+        }
+        $params = [];
+
+        foreach (preg_split('#[;\h\v]+#', $string) as $param) {
+
+            @list(, $key, $val) = preg_exec('#([^=]+)(?:=(.+))?#', $param);
+
+            if (isset($key)) {
+                $key = mb_strtolower(trim($key));
+                if (empty($key)) {
+                    continue;
+                }
+                $params[$key] ??= '';
+                if (isset($val)) {
+                    $params[$key] .= ';' . trim($val);
+                    $params[$key] = ltrim($params[$key], ';');
+                }
+            }
+        }
+        return $params;
     }
 
     public function offsetExists(mixed $offset): bool
