@@ -8,13 +8,14 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Outputs\Output, STDIO\Utils\Utils
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\Tag, STDIO\Outputs\Output, STDIO\Utils\Utils
 };
 use OutOfBoundsException,
     Traversable,
     ValueError;
 use function get_debug_type,
-             NGSOFT\Tools\map;
+             NGSOFT\Tools\map,
+             preg_test;
 
 class Styles implements ArrayAccess, IteratorAggregate, Countable
 {
@@ -76,6 +77,50 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     {
         static $cache = [];
         return $cache[$label] ??= (new Style($label))->setStyles(...$styles);
+    }
+
+    /**
+     * Create a style using formats delimited by whitespaces
+     */
+    public function createStyleFromString(string $label): Style
+    {
+
+
+        if (isset($this[$label])) {
+            return $this[$label];
+        }
+
+
+        if ( ! preg_test('#[\h\v]+#', $label) && str_contains($label, ';')) {
+            $style = $this->createStyleFromAttributes(Tag::getTagAttributesFromCode($label), $label);
+            if (count($style->getStyles())) {
+                $this->addStyle($style);
+            }
+            return $style;
+        }
+
+        $formats = [];
+        foreach (preg_split('#[\h\v]+#', $label) as $name) {
+
+            if (isset($this[$name])) {
+                $formats = array_merge($formats, $this[$name]->getStyles());
+            } elseif (Utils::isHexColor($name)) {
+                $formats[] = new HexColor($name);
+            } elseif (Utils::isRGBColor($name)) {
+                $formats[] = new RGBColor($name);
+            }
+        }
+
+        if (count($formats)) {
+
+            $this->addStyle(
+                    $style = $this->createStyle($label, ...$formats)
+            );
+
+            return $style;
+        }
+
+        return new Style($label);
     }
 
     /**
@@ -209,7 +254,7 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
         ];
 
         if (empty($cache)) {
-            foreach (self::FORMATS_ENUMS as $enum) {
+            foreach (static::FORMATS_ENUMS as $enum) {
                 foreach ($enum::cases() as $format) {
                     $cache[$format->getTag()] = $this->createStyle($format->getTag(), $format);
                     $prop = $format->getTagAttribute();
