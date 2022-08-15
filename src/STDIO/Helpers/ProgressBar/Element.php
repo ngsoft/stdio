@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Helpers\ProgressBar;
 
-use NGSOFT\STDIO\Styles\{
-    Style, Styles
+use Countable;
+use NGSOFT\STDIO\{
+    Helpers\ProgressBar, Styles\Style, Styles\Styles
 };
 use Stringable;
 use function class_basename;
 
-abstract class Element implements Stringable
+abstract class Element implements Stringable, Countable
 {
 
     protected string $name;
@@ -24,10 +25,14 @@ abstract class Element implements Stringable
      */
     abstract protected function update(): string;
 
+    /**
+     * Get the reserved length without style
+     */
+    abstract protected function getLength(): int;
+
     public function __construct(
-            protected Styles $styles,
-            protected int $total,
-            protected int $current = 0
+            protected ProgressBar $parent,
+            protected Styles $styles
     )
     {
         $this->name = strtolower(class_basename(static::class));
@@ -39,6 +44,22 @@ abstract class Element implements Stringable
         $this->current = 0;
         $this->percent = 0.0;
         $this->value = null;
+    }
+
+    protected function getSibling(bool $visible = true): \Traversable
+    {
+
+        /** @var self $element */
+        foreach ($this->parent->getElements() as $element) {
+            if ($element === $this) {
+                continue;
+            }
+
+            if ( ! $element->isVisible() && $visible) {
+                continue;
+            }
+            yield $element;
+        }
     }
 
     public function setStyle(Style $style): void
@@ -107,6 +128,11 @@ abstract class Element implements Stringable
     public function isComplete(): bool
     {
         return $this->current >= $this->total;
+    }
+
+    public function count(): int
+    {
+        return $this->getLength();
     }
 
     public function __toString(): string

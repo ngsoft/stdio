@@ -84,6 +84,11 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         $this->isCompleted = false;
     }
 
+    public function getElements(): array
+    {
+        return $this->elements;
+    }
+
     public function getPercent(): float
     {
         return $this->percent;
