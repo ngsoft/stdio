@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-use InvalidArgumentException;
+use InvalidArgumentException,
+    JsonException;
 use NGSOFT\{
-    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList
+    STDIO, STDIO\Styles\StyleList
 };
 use RuntimeException;
 use function get_debug_type,
@@ -81,7 +82,7 @@ class Element
 
             try {
                 $value = json_decode($value, flags: JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
+            } catch (JsonException) {
 
             }
         }
@@ -104,7 +105,7 @@ class Element
         unset($this->attributes[$attr]);
     }
 
-    public function setContents(string $text)
+    public function setContents(string $text): void
     {
         if ( ! $this->isStandalone) {
             $this->text = $text;
