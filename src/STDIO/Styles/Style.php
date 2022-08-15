@@ -4,62 +4,74 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
-use Countable;
-use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
+use NGSOFT\STDIO\Enums\{
+    Ansi, BackgroundColor, Color, Format
 };
 use Stringable;
-use function class_basename;
 
-class Style implements Stringable, Countable
+class Style
 {
 
-    protected static ?bool $terminalSupportsColor = null;
+    protected string $label = '';
+    protected string $prefix = '';
+    protected string $suffix = '';
+    protected bool $colors = '';
 
-    /** @var Format[]|Color[]|BackgroundColor[]|HexColor[]|BrightColor[] */
-    protected array $styles = [];
-    protected ?string $prefix = null;
-    protected ?string $suffix = null;
+    /** @var string[]|int[] */
+    protected array $set = [];
 
-    public function __construct(
-            protected string $label = '',
-            protected ?bool $colors = null
-    )
+    /** @var int[] */
+    protected array $unset = [];
+
+    public static function createEmpty(): static
     {
-        $this->colors ??= self::$terminalSupportsColor ??= Terminal::supportsColors();
+        return new static();
     }
 
-    public function setLabel(string $label): static
+    public static function createFromFormats(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles)
     {
-        $this->label = $label;
-        return $this;
-    }
 
-    /**
-     * Set formats for the style
-     */
-    public function setStyles(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
-    {
-        $this->styles = $styles;
-        $this->prefix = $this->suffix = null;
-        return $this;
-    }
+        $instance = new static();
 
-    public function getPrefix(): string
-    {
-        if ( ! $this->prefix && $this->colors) {
-            $this->prefix = Ansi::ESCAPE . implode(';', array_map(fn($enum) => $enum->getValue(), $this->styles)) . Ansi::STYLE_SUFFIX;
+        $instance->label = $label;
+
+        if (empty($styles)) {
+            return $instance;
         }
 
-        return $this->prefix ??= '';
+        $set = $unset = [];
+
+        foreach ($styles as $style) {
+
+            $set[] = $style->getValue();
+            $unset[] = $style->getUnsetValue();
+        }
+        $instance->set = array_unique($set);
+        $instance->unset = array_unique($unset);
     }
 
-    public function getSuffix(): string
+    public function withLabel(string $label)
     {
-        if ( ! $this->suffix && $this->colors) {
-            $this->suffix = Ansi::ESCAPE . implode(';', array_map(fn($enum) => $enum->getUnsetValue(), $this->styles)) . Ansi::STYLE_SUFFIX;
-        }
-        return $this->suffix ??= '';
+        $clone = clone $this;
+        $clone->label = $label;
+        return $clone;
+    }
+
+    public function withColorSupport(bool $colors = true): static
+    {
+        $clone = clone $this;
+        $clone->colors = $colors;
+        return $clone;
+    }
+
+    public function withoutColorSupport(): static
+    {
+        return $this->withColorSupport(false);
+    }
+
+    public function isEmpty(): bool
+    {
+        return ! count($this->set);
     }
 
     public function getLabel(): string
@@ -67,42 +79,28 @@ class Style implements Stringable, Countable
         return $this->label;
     }
 
-    public function getStyles(): array
+    public function getPrefix(): string
     {
-        return $this->styles;
+        return $this->prefix ??= Ansi::ESCAPE . implode(';', $this->set) . Ansi::STYLE_SUFFIX;
     }
 
-    /**
-     * Format message to include style
-     */
-    public function format(string|Stringable $message): string
+    public function getSuffix(): string
     {
-        return $this->getPrefix() . (string) $message . $this->getSuffix();
+        return $this->suffix ??= Ansi::ESCAPE . implode(';', $this->unset) . Ansi::STYLE_SUFFIX;
     }
 
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
-    }
-
-    public function count(): int
-    {
-        return count($this->styles);
-    }
-
-    public function __debugInfo(): array
+    public function format(string|Stringable|array $message): string
     {
 
-        return [
-            'label' => $this->getLabel(),
-            'styles' => array_map(fn($enum) => class_basename(get_class($enum)) . '::' . $enum->getName(), $this->styles),
-            'format' => $this->getPrefix() . $this->getLabel() . $this->getSuffix()
-        ];
-    }
+        if ( ! is_array($message)) {
+            $message = [$message];
+        }
 
-    public function __toString(): string
-    {
-        return $this->getLabel();
+        $prefix = $suffix = '';
+        if ($this->colors) {
+            $prefix = $this->getPrefix();
+            $suffix = $this->getSuffix();
+        }
     }
 
 }
