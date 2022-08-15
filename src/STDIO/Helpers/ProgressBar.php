@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Helpers;
 
 use IteratorAggregate;
 use NGSOFT\{
-    DataStructure\ClassIterator, STDIO\Events\ProgressComplete, STDIO\Events\ProgressStep, STDIO\Helpers\ProgressBar\Element, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
-    STDIO\Styles\Styles, Traits\DispatcherAware
+    DataStructure\ClassIterator, STDIO, STDIO\Events\ProgressComplete, STDIO\Events\ProgressStep, STDIO\Helpers\ProgressBar\Element, STDIO\Outputs\Output,
+    STDIO\Outputs\Renderer, STDIO\Styles\Styles, Traits\DispatcherAware
 };
 use Stringable,
     Traversable;
@@ -21,6 +21,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
     protected bool $isCompleted = false;
     protected float $percent = 0.0;
     protected ?ClassIterator $iterator = null;
+    protected ?Output $output = null;
 
     /** @var Element[] */
     protected array $elements = [];
@@ -31,7 +32,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
             protected int $current = 0
     )
     {
-        $this->styles ??= new Styles();
+        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
     }
 
     public function increment(int $value = 1): void
@@ -98,6 +99,16 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         iterate_all($this->all()->setCurrent($current));
 
         $this->dispatchEvent(new ProgressStep($this))->onEvent();
+    }
+
+    public function getOutput(): Output
+    {
+        return $this->output ??= STDIO::getCurrentInstance()->getErrorOutput();
+    }
+
+    public function setOutput(Output $output): void
+    {
+        $this->output = $output;
     }
 
     public function render(Output $output): void

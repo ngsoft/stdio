@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Formatters;
 
 use InvalidArgumentException,
     IteratorAggregate;
-use NGSOFT\STDIO\Styles\{
-    Style, Styles
+use NGSOFT\{
+    STDIO, STDIO\Styles\Style, STDIO\Styles\Styles
 };
 use Stringable,
     Traversable;
@@ -96,7 +96,7 @@ abstract class Tag implements Stringable, IteratorAggregate
             protected ?Styles $styles = null
     )
     {
-        $this->styles ??= new Styles();
+        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
         $this->name = strtolower(class_basename(static::class));
     }
 

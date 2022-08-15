@@ -45,7 +45,7 @@ class Rect implements Renderer, Formatter, Stringable
     )
     {
         $this->buffer = new Buffer();
-        $this->styles ??= new Styles();
+        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
         $this->style = $this->styles->createStyle(...self::DEFAULT_STYLE);
     }
 
