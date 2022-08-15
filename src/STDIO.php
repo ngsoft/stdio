@@ -35,7 +35,7 @@ class STDIO
      */
     final public static function create(bool $forceColorSupport = null): static
     {
-        return self::$_instance = static::$_instances[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
+        return static::$_instance = static::$_instances[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
     }
 
     /**
@@ -48,7 +48,7 @@ class STDIO
 
     final public function __construct(bool $forceColorSupport = null)
     {
-        static::$_instance = self::$_instance[json_encode($forceColorSupport)] = $this;
+        static::$_instance = static::$_instances[json_encode($forceColorSupport)] = $this;
 
         $this->buffer = new Buffer();
         $this->input = new Input();
