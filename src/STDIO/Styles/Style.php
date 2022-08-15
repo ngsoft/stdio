@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
-use NGSOFT\STDIO\Enums\{
-    Ansi, BackgroundColor, Color, Format
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
 };
 use Stringable;
 
@@ -15,7 +15,7 @@ class Style
     protected string $label = '';
     protected string $prefix = '';
     protected string $suffix = '';
-    protected bool $colors = '';
+    protected bool $colors;
 
     /** @var string[]|int[] */
     protected array $set = [];
@@ -23,34 +23,45 @@ class Style
     /** @var int[] */
     protected array $unset = [];
 
+    public function __construct(
+            string $label = '',
+            ?bool $colors = null
+    )
+    {
+        $this->label = $label;
+        $this->colors = $colors ?? Terminal::supportsColors();
+    }
+
     public static function createEmpty(): static
     {
         return new static();
     }
 
-    public static function createFromFormats(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles)
+    public static function createFrom(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles)
     {
 
-        $instance = new static();
+        return self::createEmpty()->withLabel($label)->withStyles(...$styles);
+    }
 
-        $instance->label = $label;
-
-        if (empty($styles)) {
-            return $instance;
-        }
+    public function withStyles(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
+    {
+        $clone = clone $this;
 
         $set = $unset = [];
+        $clone->prefix = $clone->suffix = '';
 
         foreach ($styles as $style) {
-
             $set[] = $style->getValue();
             $unset[] = $style->getUnsetValue();
         }
-        $instance->set = array_unique($set);
-        $instance->unset = array_unique($unset);
+
+        $clone->set = array_unique($set);
+        $clone->unset = array_unique($unset);
+
+        return $clone;
     }
 
-    public function withLabel(string $label)
+    public function withLabel(string $label): static
     {
         $clone = clone $this;
         $clone->label = $label;
@@ -89,18 +100,27 @@ class Style
         return $this->suffix ??= Ansi::ESCAPE . implode(';', $this->unset) . Ansi::STYLE_SUFFIX;
     }
 
-    public function format(string|Stringable|array $message): string
+    public function format(string|Stringable|array $messages): string
     {
 
-        if ( ! is_array($message)) {
-            $message = [$message];
+        if ( ! is_array($messages)) {
+            $messages = [$messages];
         }
 
-        $prefix = $suffix = '';
-        if ($this->colors) {
-            $prefix = $this->getPrefix();
-            $suffix = $this->getSuffix();
+        if (empty($messages)) {
+            return '';
         }
+
+        $result = '';
+        foreach ($messages as $message) {
+            $result .= $message;
+        }
+
+        if ($this->colors) {
+            return $this->getPrefix() . $result . $this->getSuffix();
+        }
+
+        return $result;
     }
 
 }
