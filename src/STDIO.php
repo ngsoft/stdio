@@ -6,9 +6,10 @@ namespace NGSOFT;
 
 use NGSOFT\STDIO\{
     Cursor, Formatters\Formatter, Formatters\TagFormatter, Formatters\Tags\Rect as TagRect, Helpers\Rect, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output,
-    Styles\Style, Styles\Styles
+    Styles\Style, Styles\StyleList, Styles\Styles
 };
 use Stringable;
+use function str_contains;
 
 /**
  * STDIO Super Object
@@ -25,7 +26,7 @@ class STDIO
     protected Input $input;
     protected Buffer $buffer;
     protected Cursor $cursor;
-    protected Styles $styles;
+    protected StyleList $styles;
     protected Formatter $formatter;
 
     /**
@@ -51,7 +52,7 @@ class STDIO
 
         $this->buffer = new Buffer();
         $this->input = new Input();
-        $this->styles = $styles = new Styles($forceColorSupport);
+        $this->styles = $styles = new StyleList($forceColorSupport);
         $this->formatter = $formatter = new TagFormatter($styles);
         $this->output = $output = new Output($formatter);
         $this->errorOutput = new ErrorOutput($formatter);
@@ -91,7 +92,7 @@ class STDIO
         return $this->cursor;
     }
 
-    public function getStyles(): Styles
+    public function getStyles(): StyleList
     {
         static::$_instance = $this;
         return $this->styles;
