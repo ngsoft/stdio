@@ -19,6 +19,23 @@ class Bar extends Element
     public function update(): void
     {
 
+        $result = &$this->value;
+        $result = '';
+
+        $halves = (int) ($this->getPercent() * 2 * $this->getLength());
+
+        $bar_count = (int) floor($halves / 2);
+        $half_count = $halves % 2;
+
+        if ($bar_count) {
+            str_repeat(self::BAR_PROGRESS[0], $bar_count);
+        }
+        if ($half_count) {
+            str_repeat(self::BAR_RIGHT[0], $half_count);
+        }
+
+
+        $remain = $this->getLength() - $bar_count - $half_count;
     }
 
 }
