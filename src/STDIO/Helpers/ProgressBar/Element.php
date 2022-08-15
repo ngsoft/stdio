@@ -117,7 +117,13 @@ abstract class Element implements Stringable, Countable
 
     public function __toString(): string
     {
-        return $this->getValue();
+        $result = $this->getValue();
+
+        if ($this->style) {
+            $result = $this->style->format($result, $this->styles->colors);
+        }
+
+        return $result;
     }
 
 }

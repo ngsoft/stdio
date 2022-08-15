@@ -85,13 +85,14 @@ class Styles implements ArrayAccess, IteratorAggregate, Countable
     public function createStyleFromString(string $label): Style
     {
 
+        $label = strtolower($label);
 
         if (isset($this[$label])) {
             return $this[$label];
         }
 
 
-        if ( ! preg_test('#[\h\v]+#', $label) && str_contains($label, ';')) {
+        if ( ! preg_test('#[\h\v]+#', $label) && preg_test('#[;=]#', $label)) {
             $style = $this->createStyleFromAttributes(Tag::getTagAttributesFromCode($label), $label);
             if (count($style->getStyles())) {
                 $this->addStyle($style);

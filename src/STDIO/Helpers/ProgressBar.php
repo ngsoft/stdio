@@ -32,6 +32,8 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+
+        $this->addElement(new ProgressBar\Bar($this, $this->styles));
     }
 
     public function increment(int $value = 1): void
@@ -168,6 +170,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
         /** @var Element $element */
         $result = '';
         foreach ($this->elements as $element) {
+
 
             if ($element->isVisible()) {
                 $result .= (string) $element;

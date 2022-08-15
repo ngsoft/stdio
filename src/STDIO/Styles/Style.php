@@ -14,16 +14,19 @@ use function class_basename;
 class Style implements Stringable, Countable
 {
 
+    protected static ?bool $terminalSupportsColor = null;
+
     /** @var Format|Color|BackgroundColor[] */
     protected array $styles = [];
     protected ?string $prefix = null;
     protected ?string $suffix = null;
 
     public function __construct(
-            protected string $label = ''
+            protected string $label = '',
+            protected ?bool $colors = null
     )
     {
-
+        $this->colors ??= self::$terminalSupportsColor ??= Terminal::supportsColors();
     }
 
     public function setLabel(string $label): static
@@ -44,7 +47,7 @@ class Style implements Stringable, Countable
 
     public function getPrefix(): string
     {
-        if ( ! $this->prefix && count($this->styles)) {
+        if ( ! $this->prefix && $this->colors) {
             $this->prefix = Ansi::ESCAPE . implode(';', array_map(fn($enum) => $enum->getValue(), $this->styles)) . Ansi::STYLE_SUFFIX;
         }
 
@@ -53,10 +56,9 @@ class Style implements Stringable, Countable
 
     public function getSuffix(): string
     {
-        if ( ! $this->suffix && count($this->styles)) {
+        if ( ! $this->suffix && $this->colors) {
             $this->suffix = Ansi::ESCAPE . implode(';', array_map(fn($enum) => $enum->getUnsetValue(), $this->styles)) . Ansi::STYLE_SUFFIX;
         }
-
         return $this->suffix ??= '';
     }
 
@@ -73,10 +75,14 @@ class Style implements Stringable, Countable
     /**
      * Format message to include style
      */
-    public function format(string|Stringable $message, bool $colors = null): string
+    public function format(string|Stringable $message): string
     {
-        $colors ??= Terminal::supportsColors();
-        return $colors ? sprintf("%s%s%s", $this->getPrefix(), (string) $message, $this->getSuffix()) : $message;
+        return $this->getPrefix() . (string) $message . $this->getSuffix();
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
     }
 
     public function count(): int
@@ -88,9 +94,9 @@ class Style implements Stringable, Countable
     {
 
         return [
-            'label' => $this->label,
+            'label' => $this->getLabel(),
             'styles' => array_map(fn($enum) => class_basename(get_class($enum)) . '::' . $enum->getName(), $this->styles),
-            'format' => $this->format($this->getPrefix() . $this->getLabel() . $this->getSuffix())
+            'format' => $this->getPrefix() . $this->getLabel() . $this->getSuffix()
         ];
     }
 
