@@ -202,7 +202,17 @@ class STDIO
      */
     public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
     {
+
+
         $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . (is_string($style) ? $style : ''))->getRect();
+        if (is_string($style) && ! str_contains($style, ';')) {
+            $rstyle = $this->getStyles()->createStyleFromString($style);
+
+            if (count($rstyle->getStyles())) {
+                $rect->setStyle($rstyle);
+            }
+        }
+
         if ($style instanceof Style) {
             $rect->setStyle($style);
         }
