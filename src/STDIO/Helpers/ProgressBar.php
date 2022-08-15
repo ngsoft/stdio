@@ -6,12 +6,14 @@ namespace NGSOFT\STDIO\Helpers;
 
 use IteratorAggregate;
 use NGSOFT\{
-    DataStructure\ClassIterator, STDIO\Helpers\ProgressBar\Element, STDIO\Styles\Styles, Traits\DispatcherAware
+    DataStructure\ClassIterator, STDIO\Events\ProgressComplete, STDIO\Events\ProgressStep, STDIO\Helpers\ProgressBar\Element, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
+    STDIO\Styles\Styles, Traits\DispatcherAware
 };
 use Stringable,
     Traversable;
+use function NGSOFT\Tools\iterate_all;
 
-class ProgressBar implements Stringable, IteratorAggregate
+class ProgressBar implements Stringable, IteratorAggregate, Renderer
 {
 
     use DispatcherAware;
@@ -32,27 +34,75 @@ class ProgressBar implements Stringable, IteratorAggregate
         $this->styles ??= new Styles();
     }
 
+    public function increment(int $value = 1): void
+    {
+        $this->setCurrent($this->current + $value);
+    }
+
+    public function decrement(int $value = 1): void
+    {
+        $this->increment($value * -1);
+    }
+
     protected function all(): ClassIterator
     {
         return $this->iterator ??= new ClassIterator(Element::class, $this->elements);
     }
 
+    /**
+     * Completes the progress bar
+     */
+    public function end(): void
+    {
+        $this->setCurrent($this->total);
+        if ( ! $this->isCompleted) {
+            $this->dispatchEvent(new ProgressComplete($this))->onEvent();
+            $this->isCompleted = true;
+        }
+    }
+
+    public function reset(): void
+    {
+        $this->current = 0;
+        $this->percent = 0.0;
+    }
+
+    public function getPercent(): float
+    {
+        return $this->percent;
+    }
+
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    public function getCurrent(): int
+    {
+        return $this->current;
+    }
+
     public function setTotal(int $total): void
     {
+
         $this->total = max(1, $total);
         $this->reset();
+
+        iterate_all($this->all()->setTotal($total));
     }
 
     public function setCurrent(int $current): void
     {
         $this->current = min($current, $this->total);
         $this->percent = round($this->current / $this->total, 2);
-        $this->all()->setCurrent($current);
+        iterate_all($this->all()->setCurrent($current));
+
+        $this->dispatchEvent(new ProgressStep($this))->onEvent();
     }
 
-    public function reset(): void
+    public function render(Output $output): void
     {
-        $this->setCurrent(0);
+        $output->write($this);
     }
 
     public function getIterator(): Traversable
