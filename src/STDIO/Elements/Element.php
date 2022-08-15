@@ -24,7 +24,6 @@ class Element
     protected array $attributes = [];
     protected string $text = '';
     protected bool $isStandalone = false;
-    protected ?Style $style = null;
 
     public function __construct(
             protected string $tag,
@@ -32,6 +31,8 @@ class Element
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+
+        $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 
     /**
@@ -55,6 +56,11 @@ class Element
         }
 
         return $value;
+    }
+
+    public function setStandalone(bool $standalone = true): void
+    {
+        $this->isStandalone = $standalone;
     }
 
     public function isStandalone(): bool
@@ -129,7 +135,7 @@ class Element
         $this->parent = null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $text = '';
 
