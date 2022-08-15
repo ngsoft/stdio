@@ -47,6 +47,7 @@ class STDIO
 
     final public function __construct(bool $forceColorSupport = null)
     {
+        static::$_instance = $this;
 
         $this->buffer = new Buffer();
         $this->input = new Input();
@@ -55,7 +56,6 @@ class STDIO
         $this->output = $output = new Output($formatter);
         $this->errorOutput = new ErrorOutput($formatter);
         $this->cursor = new Cursor($output);
-        static::$_instance = $this;
     }
 
     public function getOutput(): Output
