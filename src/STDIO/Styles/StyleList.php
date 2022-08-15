@@ -61,22 +61,30 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
 
     public function createFromStyleString(string $string): Style
     {
+        if (isset($this[$string])) {
+            return $this[$string];
+        }
+
+
+        $style = Style::createEmpty()->withLabel($string);
 
         if ($params = $this->getParamsFromStyleString($string)) {
 
-            $formats = [];
+
             foreach ($params as $key => $value) {
-                if ($this->offsetExists($key)) {
-
-
-
-
-                    continue;
+                if (empty($val)) {
+                    if (isset($this[$key])) {
+                        $style = $style->withAddedStyle($this[$key]);
+                    } elseif (\NGSOFT\STDIO\Utils\Utils::isHexColor($key)) {
+                        $format = new HexColor($key);
+                    }
                 }
             }
         }
 
-        return Style::createEmpty()->withLabel($string);
+        $this->register($style);
+
+        return $style;
     }
 
     /**

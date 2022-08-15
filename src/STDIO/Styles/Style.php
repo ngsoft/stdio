@@ -38,16 +38,25 @@ class Style
         return self::createEmpty()->withLabel($label)->withFormats(...$styles);
     }
 
-    public function withFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
+    public function withFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$formats): static
+    {
+        $clone = clone $this;
+        $clone->set = $clone->unset = [];
+        return $this->withAddedFormats(...$formats);
+    }
+
+    public function withAddedFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$formats)
     {
         $clone = clone $this;
 
-        $set = $unset = [];
+        $set = $clone->set;
+        $unset = $clone->unset;
 
-        foreach ($styles as $style) {
-            $set[] = $style->getValue();
-            $unset[] = $style->getUnsetValue();
+        foreach ($formats as $format) {
+            $set[] = $format->getValue();
+            $unset[] = $format->getUnsetValue();
         }
+
 
         $clone->set = array_unique($set);
         $clone->unset = array_unique($unset);
