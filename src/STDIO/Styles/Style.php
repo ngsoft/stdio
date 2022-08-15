@@ -23,13 +23,9 @@ class Style
     /** @var int[] */
     protected array $unset = [];
 
-    public function __construct(
-            string $label = '',
-            ?bool $colors = null
-    )
+    public function __construct()
     {
-        $this->label = $label;
-        $this->colors = $colors ?? Terminal::supportsColors();
+        $this->colors = Terminal::supportsColors();
     }
 
     public static function createEmpty(): static
@@ -37,9 +33,8 @@ class Style
         return new static();
     }
 
-    public static function createFrom(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles)
+    public static function createFrom(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
     {
-
         return self::createEmpty()->withLabel($label)->withStyles(...$styles);
     }
 
@@ -48,7 +43,6 @@ class Style
         $clone = clone $this;
 
         $set = $unset = [];
-        $clone->prefix = $clone->suffix = '';
 
         foreach ($styles as $style) {
             $set[] = $style->getValue();
@@ -121,6 +115,22 @@ class Style
         }
 
         return $result;
+    }
+
+    public function __clone()
+    {
+        $this->prefix = $this->suffix = '';
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->label, $this->set, $this->unset];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->colors = Terminal::supportsColors();
+        @list($this->label, $this->set, $this->unset) = $data;
     }
 
 }

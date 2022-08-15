@@ -6,9 +6,11 @@ namespace NGSOFT\STDIO\Styles;
 
 use ArrayAccess,
     Countable,
-    IteratorAggregate,
-    NGSOFT\Facades\Terminal,
-    OutOfBoundsException,
+    IteratorAggregate;
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
+};
+use OutOfBoundsException,
     Traversable,
     ValueError;
 use function get_debug_type;
@@ -29,6 +31,38 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
     )
     {
         $this->colors = $forceColorSupport ??= Terminal::supportsColors();
+    }
+
+    /**
+     * Add style if not exists
+     */
+    public function register(Style $style, string $label = null): void
+    {
+
+        $label ??= $style->getLabel();
+
+        if (empty($label) || $style->isEmpty()) {
+            return;
+        }
+
+        if ( ! $this->offsetExists($style->getLabel())) {
+            $this->offsetSet($style->getLabel(), $style);
+        }
+    }
+
+    /**
+     * Creates a style
+     */
+    public function create(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): Style
+    {
+
+        $this->register($style = Style::createFrom($label, ...$styles));
+        return $style;
+    }
+
+    public function getAttributesFromStyleString(string $string): array
+    {
+
     }
 
     public function offsetExists(mixed $offset): bool
