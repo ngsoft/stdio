@@ -181,12 +181,21 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
      */
     public function getParamsFromStyleString(string $string): array
     {
+        static $cache = [];
+
         $string = trim(trim($string), ',;');
 
         if (empty($string)) {
             return [];
         }
-        $params = [];
+
+        if (isset($cache[$string])) {
+            return $cache[$string];
+        }
+
+        $cache[$string] = [];
+
+        $params = &$cache[$string];
 
         foreach (preg_split('#[;\h\v]+#', $string) as $param) {
 

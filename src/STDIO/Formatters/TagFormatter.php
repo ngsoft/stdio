@@ -63,7 +63,7 @@ class TagFormatter implements Formatter
             foreach ($matches[0] as $i => $match) {
                 @list($text, $pos) = $match;
 
-                if (0 != $pos && '\\' == $message[$pos - 1]) {
+                if (0 !== $pos && '\\' == $message[$pos - 1]) {
                     continue;
                 }
 
