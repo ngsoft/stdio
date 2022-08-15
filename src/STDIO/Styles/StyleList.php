@@ -8,12 +8,14 @@ use ArrayAccess,
     Countable,
     IteratorAggregate;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
+    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Utils\Utils
 };
 use OutOfBoundsException,
     Traversable,
     ValueError;
-use function get_debug_type;
+use function get_debug_type,
+             mb_strtolower,
+             preg_exec;
 
 class StyleList implements ArrayAccess, IteratorAggregate, Countable
 {
@@ -70,13 +72,34 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
 
         if ($params = $this->getParamsFromStyleString($string)) {
 
+            $isGray = isset($params['grayscale']) || isset($params['gs']);
+            $isBG = $key = 'bg';
 
             foreach ($params as $key => $value) {
-                if (empty($val)) {
+                if (empty($value)) {
                     if (isset($this[$key])) {
                         $style = $style->withAddedStyle($this[$key]);
-                    } elseif (\NGSOFT\STDIO\Utils\Utils::isHexColor($key)) {
-                        $format = new HexColor($key);
+                    } elseif (Utils::isHexColor($key)) {
+                        $style = $style->withAddedFormats(new HexColor($key, $isBG, $isGray));
+                    } elseif (Utils::isRGBColor($key)) {
+                        $style = $style->withAddedFormats(new RGBColor($key, $isBG, $isGray));
+                    }
+                    continue;
+                }
+
+                if ($key === 'options') {
+                    $value = preg_split('#[;,]+#', $value);
+                } else { $value = preg_split('#;+#', $value); }
+
+                foreach ($value as $val) {
+                    $val = mb_strtolower($val);
+
+                    if (isset(self::$_formats[$key][$val])) {
+                        $style = $style->withAddedFormats($_formats[$key][$val]);
+                    } elseif (Utils::isHexColor($val)) {
+                        $style = $style->withAddedFormats(new HexColor($val, $isBG, $isGray));
+                    } elseif (Utils::isRGBColor($val)) {
+                        $style = $style->withAddedFormats(new RGBColor($val, $isBG, $isGray));
                     }
                 }
             }
