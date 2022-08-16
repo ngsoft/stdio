@@ -78,13 +78,10 @@ class Document
 
         $params = $this->styles->getParamsFromStyleString($tag);
 
-        var_dump($params);
-
         /** @var Element $class */
         foreach (self::$types as $class) {
             if ($class::managesAttributes($params)) {
 
-                var_dump($class);
                 return new $class($tag, $this->styles);
             }
         }
