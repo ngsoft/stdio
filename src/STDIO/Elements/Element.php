@@ -29,7 +29,9 @@ class Element implements Stringable, Countable
     /** @var array<string, ?string> */
     protected array $attributes = [];
     protected string $text = '';
+    protected string $formated = '';
     protected bool $isStandalone = false;
+    protected bool $isClone = false;
     protected ?Style $style = null;
     protected bool $pulled = false;
 
@@ -64,6 +66,7 @@ class Element implements Stringable, Countable
     {
         $this->pulled = false;
         $this->text .= $contents;
+        $this->formated = $this->getStyle()->format($contents);
     }
 
     /**
@@ -173,15 +176,28 @@ class Element implements Stringable, Countable
         $element->parent = $this;
     }
 
+    public function removeChild(self $elem): void
+    {
+        $index = array_search($elem, $this->children);
+
+        if (false !== $index) {
+
+            $this->children = array_splice($this->children, $index, 1);
+        }
+
+        $elem->parent = null;
+    }
+
     public function __clone(): void
     {
         $this->children = [];
         $this->parent = null;
+        $this->isClone = true;
     }
 
     public function reset(): void
     {
-        $this->text = '';
+        $this->text = $this->formated = '';
     }
 
     public function pull(): string
@@ -198,8 +214,10 @@ class Element implements Stringable, Countable
         }
 
         $text .= (string) $this;
-        $this->reset();
-
+        $this->text = $this->formated = '';
+        if ($this->isClone) {
+            $this->parent?->removeChild($this);
+        }
         return $text;
     }
 
@@ -216,7 +234,7 @@ class Element implements Stringable, Countable
 
     public function __toString(): string
     {
-        return $this->getStyle()->format($this->text);
+        return $this->formated;
     }
 
     public function __debugInfo(): array
@@ -225,7 +243,10 @@ class Element implements Stringable, Countable
         return [
             'tag' => $this->tag,
             'isStandalone' => $this->isStandalone,
+            'isClone' => $this->isClone,
+            'pulled' => $this->pulled,
             'text' => $this->text,
+            'formated' => $this->formated,
             'attributes' => $this->attributes,
             'parent' => $this->parent,
             'children' => $this->children,
