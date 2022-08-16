@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Elements;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    STDIO, STDIO\Formatters\Tag, STDIO\Styles\StyleList
+    STDIO, STDIO\Styles\StyleList
 };
 use function str_starts_with;
 
@@ -14,29 +14,35 @@ class Document
 {
 
     protected array $elements = [];
+    protected ?Element $root;
 
     public function __construct(
             protected ?StyleList $styles = null
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->reset();
     }
 
     public function reset()
     {
         $this->elements = [];
+        $this->root = new Element('', $this->styles);
     }
 
     public function push(Element $elem)
     {
+
+        $this->root->appendChild($elem);
+
         $this->elements[] = $elem;
     }
 
-    public function pop(?Element $elem = null): Tag
+    public function pop(?Element $elem = null): Element
     {
 
         if (empty($this->elements)) {
-            return new Element('', $this->styles);
+            return $this->root;
         }
 
         if ( ! $elem) {
@@ -53,10 +59,10 @@ class Document
         throw new InvalidArgumentException(sprintf('Incorrect closing tag "</%s>" found.', $elem->getTag()));
     }
 
-    public function current(): Tag
+    public function current(): Element
     {
         if (empty($this->elements)) {
-            return new Element('', $this->styles);
+            return $this->root;
         }
         return $this->elements[count($this->elements) - 1];
     }
