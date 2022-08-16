@@ -14,7 +14,6 @@ final class Term
 
     public readonly bool $tty;
     public readonly bool $colors;
-    protected ?Output $output = null;
 
     public function __construct()
     {
@@ -89,6 +88,7 @@ final class Term
     }
 
     /**
+     *
      * @internal
      */
     public function readCursorPosition(): array
@@ -101,7 +101,6 @@ final class Term
             $top = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.Y') ?? '0')) + 1;
             $left = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.X') ?? '0')) + 1;
         } elseif ($this->tty && Utils::supportsSTTY() && is_string($mode = shell_exec('stty -g'))) {
-
             shell_exec('stty -icanon -echo');
             @fwrite($input, "\x1b[6n");
             $code = fread($input, 1024);

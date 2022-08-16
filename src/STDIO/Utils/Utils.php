@@ -151,6 +151,9 @@ class Utils
         return $result;
     }
 
+    /**
+     * Check if Cursor position can be read
+     */
     public static function isCursorPosEnabled(): bool
     {
 
@@ -159,35 +162,12 @@ class Utils
         if (is_null($result)) {
             $term = new Term();
             $cursor = new Cursor();
-
             $col = random_int(5, $term->getWidth());
-
-            try {
-                $cursor->save()->hide()->col($col);
-
-                @list($current) = $term->readCursorPosition();
-
-                var_dump($col, $current);
-            } finally {
-                $cursor->show()->load();
-            }
-
-
-
-
-
-            var_dump($col);
-
-            exit;
-            $cursor->hide();
+            $cursor->save()->col($col);
+            @list($current) = $term->readCursorPosition();
+            $cursor->load();
+            $result = $current === $col;
         }
-
-
-
-
-
-
-
         return $result;
     }
 
