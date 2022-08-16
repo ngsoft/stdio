@@ -34,6 +34,7 @@ class Element implements Stringable, Countable
     protected bool $isClone = false;
     protected ?Style $style = null;
     protected bool $pulled = false;
+    protected bool $active = false;
 
     public static function create(
             string $tag = '',
@@ -110,6 +111,18 @@ class Element implements Stringable, Countable
     public function isStandalone(): bool
     {
         return $this->isStandalone;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active = true): static
+    {
+        $this->active = $active;
+
+        return $this;
     }
 
     public function getTag(): string
@@ -254,7 +267,6 @@ class Element implements Stringable, Countable
         foreach ($this->children as $elem) {
             $text .= $elem->pull();
         }
-
 
         $text .= $this->message->getFormated();
 

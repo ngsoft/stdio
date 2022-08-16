@@ -21,29 +21,15 @@ class Rect extends CustomElement
     public function onPull(): void
     {
 
+        $raw = $this->getRaw();
+
+        $formated = $this->getFormated();
     }
 
     public function write(string $contents): void
     {
+        $this->pulled = false;
         $this->message->format($contents, $contents);
-    }
-
-    public function pull(): string
-    {
-
-        $raw = '';
-        foreach ($this->children as $elem) {
-            $raw .= $elem->text;
-        }
-        $raw .= $this->text;
-
-        $text = parent::pull();
-
-        if (empty($text) || $this->isClone) {
-            return $text;
-        }
-
-        return $this->getRect()->format($text, $raw);
     }
 
 }
