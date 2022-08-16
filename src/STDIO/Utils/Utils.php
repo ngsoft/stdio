@@ -139,7 +139,7 @@ class Utils
         if (is_null($result)) {
             $result = 8;
 
-            if ('truecolor' === getenv('COLORTERM')) {
+            if ('truecolor' === getenv('COLORTERM') || self::supportsColors()) {
                 $result = 16777215;
             } elseif (preg_match('/(cygwin|xterm|256)/', getenv('TERM') ?: '')) {
                 $result = 256;
@@ -163,9 +163,9 @@ class Utils
             $term = new Term();
             $cursor = new Cursor();
             $col = random_int(5, $term->getWidth());
-            $cursor->save()->col($col);
+            $cursor->save()->hide()->col($col);
             @list($current) = $term->readCursorPosition();
-            $cursor->load();
+            $cursor->load()->show();
             $result = $current === $col;
         }
         return $result;
