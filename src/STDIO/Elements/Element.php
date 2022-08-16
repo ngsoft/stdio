@@ -7,7 +7,7 @@ namespace NGSOFT\STDIO\Elements;
 use InvalidArgumentException,
     JsonException;
 use NGSOFT\{
-    STDIO, STDIO\Styles\StyleList
+    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException;
 use function get_debug_type,
@@ -28,6 +28,7 @@ class Element
     protected array $attributes = [];
     protected string $text = '';
     protected bool $isStandalone = false;
+    protected ?Style $style = null;
 
     public function __construct(
             protected string $tag = '',
@@ -50,7 +51,9 @@ class Element
 
     public function write(string $contents): void
     {
-        $this->text .= $contents;
+
+
+        $this->text .= $this->getStyle()->format($contents);
     }
 
     /**
@@ -126,6 +129,11 @@ class Element
         unset($this->attributes[$attr]);
     }
 
+    public function getStyle(): Style
+    {
+        return $this->style ??= $this->styles->createStyleFromParams($this->attributes, $this->tag);
+    }
+
     public function getParent(): ?self
     {
         return $this->parent;
@@ -155,12 +163,17 @@ class Element
         $this->parent = null;
     }
 
-    public function pull(): string
+    public function reset(): void
     {
-        $text = (string) $this;
-
         $this->children = [];
         $this->text = '';
+    }
+
+    public function pull(): string
+    {
+
+        $text .= (string) $this;
+        $this->reset();
 
         return $text;
     }
@@ -173,9 +186,9 @@ class Element
             $text .= (string) $element;
         }
 
-        if ( ! empty($this->text)) {
-            $text .= $this->styles->createStyleFromParams($this->attributes)->format($this->text);
-        }
+
+        $text .= $this->text;
+
         return $text;
     }
 

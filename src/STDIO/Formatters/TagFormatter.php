@@ -100,9 +100,9 @@ class TagFormatter implements Formatter
 
         $this->document->write(substr($message, $offset));
 
-        var_dump($this->document);
-
         $output = $this->document->pullContents();
+        $this->document->write("\nfollowed by something else");
+        $output .= $this->document->pullContents();
 
         return strtr($output, [
             "\0" => '\\',

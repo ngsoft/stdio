@@ -97,7 +97,13 @@ class Document
 
     public function pullContents(): string
     {
-        return $this->current()->pull();
+
+        $current = $this->current();
+        while ($current->getParent()) {
+            $current = $current->getParent();
+        }
+
+        return $current->pull();
     }
 
     public function register(string|Element $class)
