@@ -24,6 +24,8 @@ class Rect extends CustomElement
 
         $raw = '';
         foreach ($this->children as $elem) {
+
+            var_dump($elem->text);
             $raw .= $elem->text;
         }
         $raw .= $this->text;
@@ -33,6 +35,8 @@ class Rect extends CustomElement
         if (empty($text) || $this->isClone) {
             return $text;
         }
+
+        var_dump($text, $raw);
 
         return $this->getRect()->format($text, $raw);
     }

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-use NGSOFT\Facades\Terminal;
+use NGSOFT\{
+    Facades\Terminal, STDIO\Styles\StyleList
+};
+use function mb_strlen,
+             mb_substr;
 
 /**
  * @phan-file-suppress PhanUnusedPublicMethodParameter
@@ -13,7 +17,14 @@ class StandaloneElement extends Element
 {
 
     protected bool $isStandalone = true;
-    protected bool $rendered = false;
+    protected ?string $rendered = null;
+
+    public function __construct(string $tag = '', ?StyleList $styles = null)
+    {
+        parent::__construct($tag, $styles);
+
+        $this->rendered = $this->render();
+    }
 
     public static function getPriority(): int
     {
@@ -34,7 +45,6 @@ class StandaloneElement extends Element
 
     protected function renderThematicChange(): string
     {
-
 
         if (empty($char = $this->getAttribute('char') ?? $this->getAttribute('hr'))) {
             $char = '─';
@@ -69,7 +79,11 @@ class StandaloneElement extends Element
 
         $repeats = (int) ceil($width / $len);
 
-        $line = "\n{$pad}" . $this->getStyle()->format(mb_substr(str_repeat($char, $repeats), 0, $width)) . "{$pad}\n";
+        $sep = mb_substr(str_repeat($char, $repeats), 0, $width);
+
+        $this->text = "\n{$pad}" . $sep . "{$pad}\n";
+
+        $line = "\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n";
 
         return $this->styles['reset']->format($line);
     }
@@ -84,17 +98,11 @@ class StandaloneElement extends Element
         }
 
         $count = max(1, $count);
-        return str_repeat($str, $count);
+        return $this->text = str_repeat($str, $count);
     }
 
     protected function render(): string
     {
-
-        if ($this->rendered) {
-            return '';
-        }
-
-        $this->rendered = true;
 
         if ($this->hasAttribute('hr')) {
             return $this->renderThematicChange();
@@ -107,11 +115,7 @@ class StandaloneElement extends Element
 
     public function __toString(): string
     {
-        if ( ! $this->rendered) {
-            $this->text = $this->render();
-        }
-
-        return $this->text;
+        return $this->rendered;
     }
 
 }
