@@ -19,7 +19,7 @@ use function NGSOFT\Tools\{
 /**
  * Draws Rectangles
  */
-class Rect implements Renderer, Stringable
+class Rectangle implements Renderer, Stringable
 {
 
     protected const DEFAULT_STYLE = [

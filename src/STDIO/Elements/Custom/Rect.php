@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Elements\Custom;
 
 use NGSOFT\STDIO\{
-    Elements\CustomElement, Helpers\Rect as HelperRect
+    Elements\CustomElement, Helpers\Rectangle as HelperRect
 };
 
 class Rect extends CustomElement

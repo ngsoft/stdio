@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rect, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput,
+    Cursor, Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rectangle, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput,
     Outputs\Output, Styles\Style, Styles\StyleList
 };
 use Stringable;
@@ -191,14 +191,14 @@ class STDIO
      *
      * @param string|\Stringable $message
      * @param Style|null|string $style use rect tag code without <> delimiters to set style
-     * @param Rect &$rect
+     * @param Rectangle &$rect
      * @return static
      */
     public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
     {
 
         if ( ! is_string($style)) {
-            $rect = Rect::create($this->getStyles());
+            $rect = Rectangle::create($this->getStyles());
             if ( ! is_null($style)) {
                 $rect->setStyle($style);
             }
