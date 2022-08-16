@@ -30,7 +30,7 @@ class Element
     protected bool $isStandalone = false;
 
     public function __construct(
-            protected string $tag,
+            protected string $tag = '',
             protected ?StyleList $styles = null
     )
     {
@@ -40,7 +40,7 @@ class Element
 
     public static function getPriority(): int
     {
-        return 16;
+        return 2;
     }
 
     public static function managesAttributes(array $attribute): bool
@@ -160,6 +160,7 @@ class Element
         $text = (string) $this;
 
         $this->children = [];
+        $this->text = '';
 
         return $text;
     }

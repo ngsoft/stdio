@@ -103,7 +103,7 @@ class Style
 
     public function getPrefix(): string
     {
-        if (empty($this->prefix)) {
+        if (empty($this->prefix) && count($this->set)) {
             foreach ($this->set as $set) {
                 $this->prefix .= Ansi::ESCAPE . $set . Ansi::STYLE_SUFFIX;
             }
@@ -114,7 +114,7 @@ class Style
     public function getSuffix(): string
     {
 
-        if (empty($this->suffix)) {
+        if (empty($this->suffix) && count($this->unset)) {
             foreach ($this->unset as $unset) {
                 $this->suffix .= Ansi::ESCAPE . $unset . Ansi::STYLE_SUFFIX;
             }
