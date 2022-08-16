@@ -60,9 +60,10 @@ class TagFormatter implements Formatter
                     continue;
                 }
 
-                $output .= $this->applyStyle(substr($message, $offset, $pos - $offset));
 
-                $offset = $pos + strlen($text);
+                $this->document->write(mb_substr($message, $offset, $pos - $offset));
+
+                $offset = $pos + mb_strlen($text);
 
                 $tag = $matches[1][$i][0];
                 if ($closing = str_starts_with($tag, '/')) {
@@ -71,32 +72,35 @@ class TagFormatter implements Formatter
 
                 $tag = rtrim($tag, ',;');
 
-                $tagStyle = null;
+                $element = null;
 
                 if ( ! empty($tag)) {
 
+                    $element = $this->document->createElement($tag);
 
-                    $tagStyle = $this->manager->findTagFromCode($tag);
+                    if ($element->isStandalone()) {
 
-                    if ($tagStyle->isSelfClosing()) {
-                        $output .= $tagStyle->format('');
                         continue;
                     }
                 }
 
 
+
+
                 if ($closing) {
-                    $this->tagStack->pop($tagStyle);
+                    $this->document->pop($element);
                     continue;
                 }
 
 
-                $tagStyle && $this->tagStack->push($tagStyle);
+                $element && $this->document->push($element);
             }
         }
 
 
         $this->document->write(substr($message, $offset));
+
+        var_dump($this->document);
 
         $output = $this->document->pullContents();
 

@@ -179,4 +179,17 @@ class Element
         return $text;
     }
 
+    public function __debugInfo(): array
+    {
+
+        return [
+            'tag' => $this->tag,
+            'isStandalone' => $this->isStandalone,
+            'text' => $this->text,
+            'attributes' => $this->attributes,
+            'parent' => $this->parent,
+            'children' => $this->children,
+        ];
+    }
+
 }

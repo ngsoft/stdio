@@ -73,6 +73,23 @@ class Document
         return $this->elements[count($this->elements) - 1];
     }
 
+    public function createElement(string $tag): Element
+    {
+
+        $params = $this->styles->getParamsFromStyleString($tag);
+
+        /** @var Element $class */
+        foreach (self::$types as $class) {
+            if ($class::managesAttributes($params)) {
+
+                return new $class($tag, $this->styles);
+            }
+        }
+
+
+        return new Element($tag, $this->styles);
+    }
+
     public function write(string $contents): void
     {
         $this->current()->write($contents);
@@ -85,8 +102,13 @@ class Document
 
     public function register(string|Element $class)
     {
-        if (is_a($class, Element::class, is_string($class))) {
-            self::$types->add(is_object($class) ? get_class($class) : $class, $class::getPriority());
+
+        if ( ! is_string($class)) {
+            $class = get_class($class);
+        }
+
+        if (is_a($class, Element::class, true)) {
+            self::$types->add($class, $class::getPriority());
         }
     }
 
@@ -100,6 +122,15 @@ class Document
                 $this->register($class);
             }
         }
+    }
+
+    public function __debugInfo(): array
+    {
+
+        return [
+            'root' => $this->root,
+            'elements' => $this->elements,
+        ];
     }
 
 }

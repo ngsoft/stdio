@@ -18,8 +18,7 @@ class StandaloneElement extends Element
     {
 
         static $managed = ['br', 'hr', 'tab'];
-
-        return count($managed) !== array_diff($managed, array_keys($attributes));
+        return count($managed) !== count(array_diff($managed, array_keys($attributes)));
     }
 
     public function write(string $contents): void
