@@ -159,6 +159,27 @@ class Utils
         if (is_null($result)) {
             $term = new Term();
             $cursor = new Cursor();
+
+            $col = random_int(5, $term->getWidth());
+
+            try {
+                $cursor->save()->hide()->col($col);
+
+                @list($current) = $term->readCursorPosition();
+
+                var_dump($col, $current);
+            } finally {
+                $cursor->show()->load();
+            }
+
+
+
+
+
+            var_dump($col);
+
+            exit;
+            $cursor->hide();
         }
 
 

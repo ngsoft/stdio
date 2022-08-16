@@ -81,7 +81,7 @@ class Output
                 $clone = clone $this;
                 $clone->formatter = new NullFormatter();
             }
-            $this->cursor = $clone->cursor = new Cursor($clone);
+            $this->cursor = new Cursor($clone);
         }
 
         return $this->cursor;

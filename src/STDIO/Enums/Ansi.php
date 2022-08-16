@@ -64,8 +64,8 @@ interface Ansi
     /**
      * Visible
      */
-    public const CURSOR_HIDE = self::ESC . '?25l';
-    public const CURSOR_SHOW = self::ESC . '?25h';
+    public const CURSOR_HIDE = self::CSI . '?25l';
+    public const CURSOR_SHOW = self::CSI . '?25h';
 
     /**
      * Read
