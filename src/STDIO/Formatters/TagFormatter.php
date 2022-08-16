@@ -79,7 +79,7 @@ class TagFormatter implements Formatter
                     $element = $this->document->createElement($tag);
 
                     if ($element->isStandalone()) {
-
+                        $this->document->push($element);
                         continue;
                     }
                 }
