@@ -37,6 +37,8 @@ class Document
     public function push(Element $elem)
     {
 
+        $elem->onPush();
+
         $this->current()->appendChild($elem);
 
         if ( ! $elem->isStandalone()) {
@@ -58,6 +60,7 @@ class Document
         foreach (array_reverse($this->elements) as $index => $current) {
             if (str_starts_with($current->getTag(), $elem->getTag())) {
                 $this->elements = array_slice($this->elements, 0, $index);
+                $elem->onPop();
                 return $current;
             }
         }

@@ -12,7 +12,6 @@ class Rect extends CustomElement
 {
 
     protected ?HelperRect $rect = null;
-    protected $isClone = false;
 
     public function getRect(): HelperRect
     {
@@ -35,12 +34,6 @@ class Rect extends CustomElement
         }
 
         return $this->getRect()->format($text, $raw);
-    }
-
-    public function __clone(): void
-    {
-        parent::__clone();
-        $this->isClone = true;
     }
 
 }

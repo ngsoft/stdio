@@ -13,7 +13,8 @@ use NGSOFT\{
 use RuntimeException,
     Stringable;
 use function get_debug_type,
-             is_stringable;
+             is_stringable,
+             mb_strlen;
 
 /**
  * @phan-file-suppress PhanUnusedPublicNoOverrideMethodParameter
@@ -52,6 +53,21 @@ class Element implements Stringable, Countable
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 
+    public function onPop(): void
+    {
+
+    }
+
+    public function onPush(): void
+    {
+
+    }
+
+    public function onPull(): void
+    {
+
+    }
+
     public static function getPriority(): int
     {
         return 2;
@@ -65,8 +81,7 @@ class Element implements Stringable, Countable
     public function write(string $contents): void
     {
         $this->pulled = false;
-        $this->text .= $contents;
-        $this->formated = $this->getStyle()->format($contents);
+        $this->message->format($this->getStyle()->format($contents), $contents);
     }
 
     /**
@@ -144,12 +159,28 @@ class Element implements Stringable, Countable
 
     public function getFormated(): string
     {
-        return $this->message->getFormated();
+        $result = '';
+
+        foreach ($this->children as $elem) {
+            $result .= $elem->getFormated();
+        }
+
+        $result .= $this->message->getFormated();
+
+        return $result;
     }
 
     public function getRaw(): string
     {
-        return $this->message->getText();
+        $result = '';
+
+        foreach ($this->children as $elem) {
+            $result .= $elem->getRaw();
+        }
+
+        $result .= $this->message->getText();
+
+        return $result;
     }
 
     public function getStyles(): StyleList
@@ -217,13 +248,9 @@ class Element implements Stringable, Countable
         }
         $this->pulled = true;
 
-        $text = '';
+        $this->onPull();
 
-        foreach ($this->children as $elem) {
-            $text .= $elem->pull();
-        }
-
-        $text .= $this->getFormated();
+        $text = $this->getFormated();
 
         $this->reset();
 
@@ -235,13 +262,7 @@ class Element implements Stringable, Countable
 
     public function count(): int
     {
-        $len = $this->message->count();
-
-        foreach ($this->children as $elem) {
-            $len += $elem->count();
-        }
-
-        return $len;
+        return mb_strlen($this->getRaw());
     }
 
     public function __toString(): string
