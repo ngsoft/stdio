@@ -93,7 +93,10 @@ class TagFormatter implements Formatter
             }
         }
 
-        $output .= $this->applyStyle(substr($message, $offset));
+
+        $this->document->write(substr($message, $offset));
+
+        $output = $this->document->pullContents();
 
         return strtr($output, [
             "\0" => '\\',

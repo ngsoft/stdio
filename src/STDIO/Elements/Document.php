@@ -76,7 +76,7 @@ class Document
 
     public function pullContents(): string
     {
-        return '';
+        return $this->current()->pull();
     }
 
 }

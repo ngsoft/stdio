@@ -43,7 +43,7 @@ class Element
         return 2;
     }
 
-    public static function managesAttributes(array $attribute): bool
+    public static function managesAttributes(array $attributes): bool
     {
         return true;
     }

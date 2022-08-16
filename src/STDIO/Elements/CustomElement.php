@@ -14,7 +14,7 @@ abstract class CustomElement extends Element
         return 16;
     }
 
-    public static function managesAttributes(array $attribute): bool
+    public static function managesAttributes(array $attributes): bool
     {
         if (static::class === __CLASS__) {
             return false;
