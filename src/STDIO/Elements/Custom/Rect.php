@@ -21,14 +21,20 @@ class Rect extends CustomElement
 
     public function pull(): string
     {
+
+        $raw = '';
+        foreach ($this->children as $elem) {
+            $raw .= $elem->text;
+        }
+        $raw .= $this->text;
+
         $text = parent::pull();
 
         if (empty($text) || $this->isClone) {
             return $text;
         }
 
-        var_dump($text);
-        return $this->getRect()->format($text);
+        return $this->getRect()->format($text, $raw);
     }
 
     public function __clone(): void

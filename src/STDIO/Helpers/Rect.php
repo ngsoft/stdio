@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
-    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\StyleList
+    Facades\Terminal, STDIO, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
+    STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -19,7 +19,7 @@ use function NGSOFT\Tools\{
 /**
  * Draws Rectangles
  */
-class Rect implements Renderer, Formatter, Stringable
+class Rect implements Renderer, Stringable
 {
 
     protected const DEFAULT_STYLE = [
@@ -170,8 +170,12 @@ class Rect implements Renderer, Formatter, Stringable
         return $this;
     }
 
-    /** {@inheritdoc} */
-    public function format(string|Stringable $message): string
+    /**
+     * Format a message to be displayes as a rectangle
+     * @param string|Stringable $message The formatted message to be displayed
+     * @param ?string $raw the raw message without styles \x1b[...m
+     */
+    public function format(string|Stringable $message, string $raw = null): string
     {
         if ($message instanceof self) {
             throw new InvalidArgumentException('$message cannot be instance of ' . __CLASS__);
@@ -183,6 +187,7 @@ class Rect implements Renderer, Formatter, Stringable
             return '';
         }
 
+        $raw ??= $message;
 
         $style = $this->style;
 
@@ -198,7 +203,7 @@ class Rect implements Renderer, Formatter, Stringable
         $margin = max(0, min($maxMargin, $this->margin, 10));
         $maxLength -= $margin * 2;
 
-        $minLength = str_word_size($message);
+        $minLength = str_word_size($raw);
 
         if ($minLength === 0) {
             throw new RuntimeException('Cannot render message that have no words.');
@@ -241,7 +246,10 @@ class Rect implements Renderer, Formatter, Stringable
             "\n"
         ];
 
-        foreach (preg_split('#\v+#', $message) as $messageLine) {
+        $messages = preg_split('#\v+#', $message);
+        $raws = preg_split('#\v+#', $raw);
+
+        foreach ($raws as $index => $messageLine) {
             $lines = split_string($messageLine, $lineLength);
 
             foreach ($lines as $line) {
@@ -258,7 +266,7 @@ class Rect implements Renderer, Formatter, Stringable
                 $contents = sprintf(
                         '%s%s%s',
                         $padLeft ? str_repeat(' ', $padLeft) : '',
-                        $line,
+                        $messages[$index],
                         $padRight ? str_repeat(' ', $padRight) : ''
                 );
 

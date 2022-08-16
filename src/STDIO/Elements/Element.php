@@ -63,7 +63,7 @@ class Element implements Stringable, Countable
     public function write(string $contents): void
     {
         $this->pulled = false;
-        $this->text .= $this->getStyle()->format($contents);
+        $this->text .= $contents;
     }
 
     /**
@@ -205,12 +205,18 @@ class Element implements Stringable, Countable
 
     public function count(): int
     {
-        return mb_strlen($this->text);
+        $len = mb_strlen($this->text);
+
+        foreach ($this->children as $elem) {
+            $len += $elem->count();
+        }
+
+        return $len;
     }
 
     public function __toString(): string
     {
-        return $this->text;
+        return $this->getStyle()->format($this->text);
     }
 
     public function __debugInfo(): array
