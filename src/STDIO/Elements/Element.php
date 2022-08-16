@@ -13,6 +13,9 @@ use RuntimeException;
 use function get_debug_type,
              is_stringable;
 
+/**
+ * @phan-file-suppress PhanUnusedPublicNoOverrideMethodParameter
+ */
 class Element
 {
 
@@ -32,8 +35,22 @@ class Element
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
-
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
+    }
+
+    public static function getPriority(): int
+    {
+        return 16;
+    }
+
+    public static function managesAttributes(array $attribute): bool
+    {
+        return true;
+    }
+
+    public function write(string $contents): void
+    {
+        $this->text .= $contents;
     }
 
     /**
@@ -57,11 +74,6 @@ class Element
         }
 
         return $value;
-    }
-
-    public function setStandalone(bool $standalone = true): void
-    {
-        $this->isStandalone = $standalone;
     }
 
     public function isStandalone(): bool
@@ -114,11 +126,9 @@ class Element
         unset($this->attributes[$attr]);
     }
 
-    public function setContents(string $text): void
+    public function getParent(): ?self
     {
-        if ( ! $this->isStandalone) {
-            $this->text = $text;
-        }
+        return $this->parent;
     }
 
     public function appendChild(self $element): void
@@ -143,6 +153,15 @@ class Element
     {
         $this->children = [];
         $this->parent = null;
+    }
+
+    public function pull(): string
+    {
+        $text = (string) $this;
+
+        $this->children = [];
+
+        return $text;
     }
 
     public function __toString(): string

@@ -67,4 +67,14 @@ class Document
         return $this->elements[count($this->elements) - 1];
     }
 
+    public function write(string $contents): void
+    {
+        $this->current()->write($contents);
+    }
+
+    public function pullContents(): string
+    {
+        return '';
+    }
+
 }

@@ -15,25 +15,12 @@ use function mb_strlen,
 class TagFormatter implements Formatter
 {
 
-    protected TagManager $manager;
-    protected TagStack $tagStack;
     protected Document $document;
 
     public function __construct(protected ?StyleList $styles = null)
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
         $this->document = new Document($this->styles);
-        $this->tagStack = new TagStack();
-        $this->manager = new TagManager($this->styles);
-    }
-
-    protected function applyStyle(string $message, Tag $tag = null): string
-    {
-        if (is_null($tag)) {
-            $tag = $this->tagStack->current();
-        }
-
-        return $tag->format($message);
     }
 
     /**
