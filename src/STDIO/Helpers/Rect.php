@@ -216,7 +216,13 @@ class Rect implements Renderer, Stringable
         $length = $this->length;
 
         if ($length === 0) {
-            $length = mb_strlen(preg_split('#\v+#', $message)[0]) + ($padding * 2);
+
+            foreach (preg_split('#\v+#', $raw) as $line) {
+                $strLen = mb_strlen($line) + ($padding * 2);
+                if ($strLen > $length) {
+                    $length = $strLen;
+                }
+            }
         }
 
         $length = max(min($length, $maxLength), $minLength + ($padding * 2));
@@ -252,7 +258,13 @@ class Rect implements Renderer, Stringable
         foreach ($raws as $index => $messageLine) {
             $lines = split_string($messageLine, $lineLength);
 
-            foreach ($lines as $line) {
+            $max = $lineLength;
+
+            $formatted = split_string($messages[$index], $max);
+
+            foreach ($lines as $i => $line) {
+
+
 
                 $result[] = $margin;
                 $result[] = $center;
@@ -266,7 +278,7 @@ class Rect implements Renderer, Stringable
                 $contents = sprintf(
                         '%s%s%s',
                         $padLeft ? str_repeat(' ', $padLeft) : '',
-                        $messages[$index],
+                        $formatted[$i],
                         $padRight ? str_repeat(' ', $padRight) : ''
                 );
 

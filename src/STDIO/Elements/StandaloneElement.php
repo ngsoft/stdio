@@ -83,9 +83,7 @@ class StandaloneElement extends Element
 
         $this->text = "\n{$pad}" . $sep . "{$pad}\n";
 
-        $line = "\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n";
-
-        return $this->styles['reset']->format($line);
+        return ("\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n");
     }
 
     protected function renderRepeatString(string $str, string $param): string
