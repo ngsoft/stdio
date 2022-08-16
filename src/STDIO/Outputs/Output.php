@@ -73,7 +73,14 @@ class Output
      */
     public function getCursor(): Cursor
     {
-        return $this->cursor ??= new Cursor($this);
+
+        if ( ! $this->cursor) {
+            $clone = clone $this;
+            $clone->formatter = new NullFormatter();
+            $this->cursor = new Cursor($clone);
+        }
+
+        return $this->cursor;
     }
 
     /**
