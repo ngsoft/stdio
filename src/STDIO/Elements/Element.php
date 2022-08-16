@@ -250,7 +250,13 @@ class Element implements Stringable, Countable
 
         $this->onPull();
 
-        $text = $this->getFormated();
+        $text = '';
+        foreach ($this->children as $elem) {
+            $text .= $elem->pull();
+        }
+
+
+        $text .= $this->message->getFormated();
 
         $this->reset();
 

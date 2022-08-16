@@ -18,6 +18,16 @@ class Rect extends CustomElement
         return $this->rect ??= HelperRect::createFromElement($this);
     }
 
+    public function onPull(): void
+    {
+
+    }
+
+    public function write(string $contents): void
+    {
+        $this->message->format($contents, $contents);
+    }
+
     public function pull(): string
     {
 

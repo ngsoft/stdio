@@ -105,7 +105,9 @@ class StandaloneElement extends Element
             $this->renderThematicChange();
         } elseif ($this->hasAttribute('tab')) {
             $this->renderRepeatString("\t", 'tab');
-        } elseif ($this->hasAttribute('br')) { $this->renderRepeatString("\n", 'br'); }
+        } elseif ($this->hasAttribute('br')) {
+            $this->renderRepeatString("\n", 'br');
+        }
     }
 
 }
