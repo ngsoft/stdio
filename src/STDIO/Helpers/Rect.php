@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
-    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\StyleList
+    Facades\Terminal, STDIO, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
+    STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -35,9 +35,9 @@ class Rect implements Renderer, Formatter, Stringable
     protected int $length = 0;
     protected bool $center = false;
 
-    public function create(?STDIO\Styles\StyleList $styles = null)
+    public static function create(?StyleList $styles = null)
     {
-        return new static($styles ?? STDIO::getCurrentInstance()->getStyles());
+        return new static($styles);
     }
 
     public function __construct(

@@ -34,10 +34,12 @@ class StandaloneElement extends Element
     protected function renderThematicChange(): string
     {
 
-        $char = $this->getAttribute('char') ?? $this->getAttribute('hr');
-        if (empty($char)) {
+
+        if (empty($char = $this->getAttribute('char') ?? $this->getAttribute('hr'))) {
             $char = '─';
         }
+
+        $char = $this->getValue($char);
 
         if ( ! is_int($padding = $this->getAttribute('padding'))) {
             $padding = 4;
@@ -48,17 +50,27 @@ class StandaloneElement extends Element
             $padding --;
         }
 
-        $width = Terminal::getWidth() - ($padding * 2);
+
+        $width = $max = Terminal::getWidth() - ($padding * 2);
+
+        if (is_int($this->getAttribute('length'))) {
+            $width = $this->getAttribute('length');
+        }
+
+        $width = max(16, min($max, $width));
+
         $pad = '';
         if ($padding > 0) {
             $pad = str_repeat(' ', $padding);
         }
 
-        $length = mb_strlen($char);
+        $len = mb_strlen($char);
 
-        $repeats = (int) ceil($width / $length);
-        $line = $this->getStyle()->format(mb_substr(str_repeat($char, $repeats), 0, $length));
-        return $this->styles['reset']->format(sprintf("\n%s\n", $line));
+        $repeats = (int) ceil($width / $len);
+
+        $line = "\n{$pad}" . $this->getStyle()->format(mb_substr(str_repeat($char, $repeats), 0, $width)) . "{$pad}\n";
+
+        return $this->styles['reset']->format($line);
     }
 
     protected function renderRepeatString(string $str, string $param): string

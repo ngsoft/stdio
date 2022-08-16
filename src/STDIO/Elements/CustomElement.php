@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
+use function class_basename;
+
 abstract class CustomElement extends Element
 {
 
-    abstract protected static function getTagName(): string;
+    protected static function getTagName(): string
+    {
+        return strtolower(class_basename(static::class));
+    }
 
     public static function getPriority(): int
     {
