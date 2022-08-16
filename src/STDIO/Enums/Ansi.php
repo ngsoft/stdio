@@ -13,9 +13,9 @@ interface Ansi
     /**
      * Sequences
      */
-    public const ESC = '\x1b';
-    public const CSI = '\x1b[';
-    public const OSC = '\x1b]';
+    public const ESC = "\x1b";
+    public const CSI = "\x1b[";
+    public const OSC = "\x1b]";
 
     /**
      * Styles
