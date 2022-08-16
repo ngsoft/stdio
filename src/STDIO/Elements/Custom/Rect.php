@@ -15,7 +15,7 @@ class Rect extends CustomElement
 
     public function write(string $contents): void
     {
-        parent::write($this->rect->format($contents));
+        parent::write($this->getRect()->format($contents));
     }
 
     protected function getRect(): HelperRect
@@ -27,7 +27,23 @@ class Rect extends CustomElement
             $padding = $this->getAttribute('padding');
             $margin = $this->getAttribute('margin');
 
-            $rect = HelperRect::create($this->styles);
+            $this->rect = $rect = HelperRect::create($this->styles);
+
+            if ($this->hasAttribute('center')) {
+                $rect->setCenter($this->getAttribute('center') !== false);
+            }
+
+            is_int($length) && $rect->setLength($length);
+            is_int($padding) && $rect->setPadding($padding);
+            is_int($margin) && $rect->setMargin($margin);
+            if ($length === 'auto') {
+                $rect->autoSetLength();
+            }
+
+            $style = $this->getStyle();
+            if ( ! $style->isEmpty()) {
+                $rect->setStyle($style);
+            }
         }
         return $this->rect;
     }
