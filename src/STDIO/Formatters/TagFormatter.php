@@ -48,7 +48,7 @@ class TagFormatter implements Formatter
     public function format(string|Stringable $message): string
     {
 
-        $output = '';
+
         $offset = 0;
 
         if (preg_match_all('#<(([a-z\#](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z\#][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
@@ -75,12 +75,8 @@ class TagFormatter implements Formatter
                 $element = null;
 
                 if ( ! empty($tag)) {
-
                     $element = $this->document->createElement($tag);
                 }
-
-
-
 
                 if ($closing) {
                     $this->document->pop($element);

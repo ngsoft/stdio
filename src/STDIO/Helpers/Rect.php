@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
-    STDIO\Styles\Style, STDIO\Styles\StyleList
+    Facades\Terminal, STDIO, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Formatters\Formatter, STDIO\Outputs\Buffer, STDIO\Outputs\Output,
+    STDIO\Outputs\Renderer, STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -38,6 +38,34 @@ class Rect implements Renderer, Formatter, Stringable
     public static function create(?StyleList $styles = null)
     {
         return new static($styles);
+    }
+
+    public static function createFromElement(Element $elem): static
+    {
+        $rect = static::create($elem->getStyles());
+
+        $length = $elem->getAttribute('length');
+        $padding = $elem->getAttribute('padding');
+        $margin = $elem->getAttribute('margin');
+
+        if ($elem->hasAttribute('center')) {
+            $rect->setCenter($elem->getAttribute('center') !== false);
+        }
+
+        is_int($length) && $rect->setLength($length);
+        is_int($padding) && $rect->setPadding($padding);
+        is_int($margin) && $rect->setMargin($margin);
+
+        if ($length === 'auto') {
+            $rect->autoSetLength();
+        }
+
+        $style = $elem->getStyle();
+        if ( ! $style->isEmpty()) {
+            $rect->setStyle($style);
+        }
+
+        return $rect;
     }
 
     public function __construct(

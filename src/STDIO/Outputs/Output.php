@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Outputs;
 
 use NGSOFT\STDIO\Formatters\{
-    Formatter, TagFormatter
+    Formatter, NullFormatter
 };
 use RuntimeException,
     Stringable,
@@ -21,7 +21,7 @@ class Output
     public function __construct(protected ?Formatter $formatter = null)
     {
         $this->stream ??= fopen('php://stdout', 'w+');
-        $this->formatter ??= new TagFormatter();
+        $this->formatter ??= new NullFormatter();
     }
 
     /**

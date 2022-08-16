@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Formatters\Formatter, Formatters\TagFormatter, Formatters\Tags\Rect as TagRect, Helpers\Rect, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output,
-    Styles\Style, Styles\StyleList, Styles\Styles
+    Cursor, Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rect, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput,
+    Outputs\Output, Styles\Style, Styles\StyleList
 };
 use Stringable;
-use function str_contains;
 
 /**
  * STDIO Super Object
@@ -206,19 +205,12 @@ class STDIO
     public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
     {
 
-
-        $rect = (new TagRect($this->getStyles()))->createFromCode('rect;' . (is_string($style) ? $style : ''))->getRect();
-        if (is_string($style) && ! str_contains($style, ';')) {
-            $rstyle = $this->getStyles()->createFromStyleString($style);
-
-            if ( ! $rstyle->isEmpty()) {
-                $rect->setStyle($rstyle);
+        if ( ! is_string($style)) {
+            $rect = Rect::create($this->getStyles());
+            if ( ! is_null($style)) {
+                $rect->setStyle($style);
             }
-        }
-
-        if ($style instanceof Style) {
-            $rect->setStyle($style);
-        }
+        } else { $rect = RectElement::create($style, $this->getStyles())->getRect(); }
 
         return $this->write($rect->write($message));
     }

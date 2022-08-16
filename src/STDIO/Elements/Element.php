@@ -32,6 +32,14 @@ class Element implements Stringable
     protected bool $isStandalone = false;
     protected ?Style $style = null;
 
+    public static function create(
+            string $tag = '',
+            ?StyleList $styles = null
+    ): static
+    {
+        return new static($tag, $styles);
+    }
+
     public function __construct(
             protected string $tag = '',
             protected ?StyleList $styles = null
@@ -131,6 +139,11 @@ class Element implements Stringable
         unset($this->attributes[$attr]);
     }
 
+    public function getStyles(): StyleList
+    {
+        return $this->styles;
+    }
+
     public function getStyle(): Style
     {
         return $this->style ??= $this->styles->createStyleFromParams($this->attributes, $this->tag);
@@ -178,7 +191,7 @@ class Element implements Stringable
     public function pull(): string
     {
 
-        $text .= (string) $this;
+        $text = (string) $this;
         $this->reset();
 
         return $text;
