@@ -232,6 +232,10 @@ class Element implements Stringable, Countable
 
     public function removeChild(self $elem): void
     {
+        if ($elem->isActive()) {
+            return;
+        }
+
         $index = array_search($elem, $this->children);
 
         if (false !== $index) {
