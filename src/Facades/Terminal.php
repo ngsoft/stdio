@@ -26,6 +26,14 @@ class Terminal extends Facade
     }
 
     /**
+     * Checks if cursor is enabled
+     */
+    public function isCursorEnabled(): bool
+    {
+        return static::getFacadeRoot()->isCursorEnabled();
+    }
+
+    /**
      * Terminal color capability
      */
     public static function supportsColors(): bool

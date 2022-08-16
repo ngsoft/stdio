@@ -58,11 +58,12 @@ final class Term
         return $this->getSize()[1];
     }
 
+    /**
+     * Checks if cursor is enabled
+     */
     public function isCursorEnabled(): bool
     {
-        static $result;
-
-        return $result;
+        return Utils::isCursorPosEnabled(); ;
     }
 
     /**
@@ -76,15 +77,11 @@ final class Term
         static $canread;
 
         $canread ??= Utils::isCursorPosEnabled();
-
         $enabled = $canread;
-
         if ( ! $canread) {
             return [1, 1];
         }
-
-
-        return $this->readCursorPosition(); ;
+        return $this->readCursorPosition();
     }
 
     /**
