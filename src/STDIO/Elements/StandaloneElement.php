@@ -17,14 +17,6 @@ class StandaloneElement extends Element
 {
 
     protected bool $isStandalone = true;
-    protected ?string $rendered = null;
-
-    public function __construct(string $tag = '', ?StyleList $styles = null)
-    {
-        parent::__construct($tag, $styles);
-
-        $this->rendered = $this->render();
-    }
 
     public static function getPriority(): int
     {
@@ -38,12 +30,17 @@ class StandaloneElement extends Element
         return count($managed) - 1 === count(array_diff($managed, array_keys($attributes)));
     }
 
+    public function onPush(): void
+    {
+        $this->render();
+    }
+
     public function write(string $contents): void
     {
         // never used
     }
 
-    protected function renderThematicChange(): string
+    protected function renderThematicChange(): void
     {
 
         if (empty($char = $this->getAttribute('char') ?? $this->getAttribute('hr'))) {
@@ -81,12 +78,13 @@ class StandaloneElement extends Element
 
         $sep = mb_substr(str_repeat($char, $repeats), 0, $width);
 
-        $this->text = "\n{$pad}" . $sep . "{$pad}\n";
-
-        return ("\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n");
+        $this->message->format(
+                "\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n",
+                "\n{$pad}" . $sep . "{$pad}\n"
+        );
     }
 
-    protected function renderRepeatString(string $str, string $param): string
+    protected function renderRepeatString(string $str, string $param): void
     {
 
         $count = $this->getAttribute('count') ?? $this->getAttribute($param);
@@ -96,24 +94,18 @@ class StandaloneElement extends Element
         }
 
         $count = max(1, $count);
-        return $this->text = str_repeat($str, $count);
+        $result = str_repeat($str, $count);
+        $this->message->format($result, $result);
     }
 
-    protected function render(): string
+    protected function render(): void
     {
 
         if ($this->hasAttribute('hr')) {
-            return $this->renderThematicChange();
+            $this->renderThematicChange();
         } elseif ($this->hasAttribute('tab')) {
-            return $this->renderRepeatString("\t", 'tab');
-        }
-
-        return $this->renderRepeatString("\n", 'br');
-    }
-
-    public function __toString(): string
-    {
-        return $this->rendered;
+            $this->renderRepeatString("\t", 'tab');
+        } elseif ($this->hasAttribute('br')) { $this->renderRepeatString("\n", 'br'); }
     }
 
 }

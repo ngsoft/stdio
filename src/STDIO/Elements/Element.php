@@ -254,7 +254,7 @@ class Element implements Stringable, Countable
 
         $this->reset();
 
-        if ($this->isClone) {
+        if ($this->isClone || $this->isStandalone) {
             $this->parent?->removeChild($this);
         }
         return $text;
