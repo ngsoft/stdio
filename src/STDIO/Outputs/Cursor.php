@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
-use NGSOFT\STDIO\Enums\Ansi;
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\Ansi
+};
 
 final class Cursor
 {
@@ -199,9 +201,9 @@ final class Cursor
      * Get Cursor Position
      * @return int[] list($col,$line)
      */
-    public function getPosition(): array
+    public function getPosition(&$enabled = null): array
     {
-
+        return Terminal::getCursorPosition($enabled);
     }
 
 }

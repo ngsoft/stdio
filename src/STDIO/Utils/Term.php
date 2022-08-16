@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
+use NGSOFT\{
+    STDIO, STDIO\Outputs\Output
+};
+use function preg_exec;
+
 final class Term
 {
 
     public readonly bool $tty;
     public readonly bool $colors;
+    protected ?Output $output = null;
 
     public function __construct()
     {
@@ -53,6 +59,13 @@ final class Term
         return $this->getSize()[1];
     }
 
+    public function isCursorEnabled(): bool
+    {
+        static $result;
+
+        return $result;
+    }
+
     /**
      * Get cursor position
      * @param bool &$enabled true if position can be read
@@ -60,22 +73,40 @@ final class Term
      */
     public function getCursorPosition(&$enabled = null): array
     {
+
+        static $canread;
+
+        $canread ??= Utils::isCursorPosEnabled();
+
+        $enabled = $canread;
+
+        if ( ! $canread) {
+            return [1, 1];
+        }
+
+
+        return $this->readCursorPosition(); ;
+    }
+
+    /**
+     * @internal
+     */
+    public function readCursorPosition(): array
+    {
         static $input;
         $input ??= fopen('php://stdin', 'r+');
         $top = $left = 1;
-        $enabled = false;
 
         if (Utils::supportsPowershell()) {
             $top = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.Y') ?? '0')) + 1;
             $left = intval(trim(shell_exec('powershell.exe $Host.UI.RawUI.CursorPosition.X') ?? '0')) + 1;
-            $enabled = true;
         } elseif ($this->tty && Utils::supportsSTTY() && is_string($mode = shell_exec('stty -g'))) {
+
             shell_exec('stty -icanon -echo');
             @fwrite($input, "\x1b[6n");
             $code = fread($input, 1024);
             shell_exec(sprintf('stty %s', $mode));
             sscanf($code, "\x1b[%d;%dR", $top, $left);
-            $enabled = true;
         }
 
         return [(int) $left, (int) $top];

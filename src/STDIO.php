@@ -34,7 +34,7 @@ class STDIO
      */
     final public static function create(bool $forceColorSupport = null): static
     {
-        return static::$_instance = static::$_instances[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
+        return static::$_instances[json_encode($forceColorSupport)] ??= new static($forceColorSupport);
     }
 
     /**
@@ -47,14 +47,15 @@ class STDIO
 
     final public function __construct(bool $forceColorSupport = null)
     {
-        static::$_instance = static::$_instances[json_encode($forceColorSupport)] = $this;
+
 
         $this->buffer = new Buffer();
         $this->input = new Input();
         $this->styles = $styles = new StyleList($forceColorSupport);
         $this->formatter = $formatter = new TagFormatter($styles);
-        $this->output = $output = new Output($formatter);
+        $this->output = new Output($formatter);
         $this->errorOutput = new ErrorOutput($formatter);
+        static::$_instance = static::$_instances[json_encode($forceColorSupport)] = $this;
     }
 
     public function getOutput(): Output

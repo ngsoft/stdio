@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use InvalidArgumentException,
-    NGSOFT\Tools,
-    Throwable;
-use function preg_test;
+use InvalidArgumentException;
+use NGSOFT\{
+    STDIO\Outputs\Cursor, Tools
+};
+use Throwable;
+use function in_range,
+             preg_exec,
+             preg_test;
 
 class Utils
 {
@@ -147,6 +151,25 @@ class Utils
         return $result;
     }
 
+    public static function isCursorPosEnabled(): bool
+    {
+
+        static $result;
+
+        if (is_null($result)) {
+            $term = new Term();
+            $cursor = new Cursor();
+        }
+
+
+
+
+
+
+
+        return $result;
+    }
+
     /**
      * Run on windows
      */
@@ -165,7 +188,7 @@ class Utils
     public static function supportsSTTY(): bool
     {
         static $result;
-        return $result ??= ! self::isWindows() && ! empty(self::executeProcess('stty'));
+        return $result ??= ! empty(self::executeProcess('stty'));
     }
 
     public static function isRGBColor(string $color): bool

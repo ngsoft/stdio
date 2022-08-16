@@ -74,10 +74,14 @@ class Output
     public function getCursor(): Cursor
     {
 
+        // use null formatter for better performances (no pcre)
         if ( ! $this->cursor) {
-            $clone = clone $this;
-            $clone->formatter = new NullFormatter();
-            $this->cursor = new Cursor($clone);
+            $clone = $this;
+            if ($this->formatter instanceof NullFormatter === false) {
+                $clone = clone $this;
+                $clone->formatter = new NullFormatter();
+            }
+            $this->cursor = $clone->cursor = new Cursor($clone);
         }
 
         return $this->cursor;
