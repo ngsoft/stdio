@@ -247,6 +247,7 @@ class Element implements Stringable, Countable
         $this->children = [];
         $this->parent = null;
         $this->isClone = true;
+        $this->active = false;
     }
 
     public function reset(): void

@@ -42,7 +42,7 @@ class Document
         if ( ! $elem->isStandalone()) {
             $this->elements[] = $elem;
         }
-        $elem->onPush();
+        $elem->setActive()->onPush();
     }
 
     public function pop(?Element $elem = null): Element
@@ -59,7 +59,7 @@ class Document
         foreach (array_reverse($this->elements) as $index => $current) {
             if (str_starts_with($current->getTag(), $elem->getTag())) {
                 $this->elements = array_slice($this->elements, 0, $index);
-                $elem->onPop();
+                $elem->setActive(false)->onPop();
                 return $current;
             }
         }
@@ -72,7 +72,7 @@ class Document
         if (empty($this->elements)) {
             return $this->root;
         }
-        return $this->elements[count($this->elements) - 1];
+        return $this->elements[count($this->elements) - 1]->setActive(true);
     }
 
     public function isRoot(): bool
