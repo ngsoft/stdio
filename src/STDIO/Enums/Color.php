@@ -51,5 +51,6 @@ enum Color: int
     {
         return 'fg';
     }
+    
 
 }

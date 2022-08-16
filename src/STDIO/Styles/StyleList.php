@@ -22,11 +22,18 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
 {
 
     protected const FORMATS_ENUMS = [Format::class, Color::class, BackgroundColor::class];
+    protected const FORMATS_ALIASES = [
+        'purple' => 'magenta',
+        'bg:purple' => 'bg:magenta',
+        'purple:bright' => 'magenta:bright',
+        'bg:purple:bright' => 'bg:magenta:bright',
+        'gray:bright' => 'white',
+        'cyan' => 'aqua',
+        'bg:cyan' => 'bg:aqua',
+        'cyan:bright' => 'aqua:bright',
+        'bg:cyan:bright' => 'bg:aqua:bright',
+    ];
     protected const FORMATS_CUSTOM = [
-        ['magenta', Color::PURPLE],
-        ['bg:magenta', BackgroundColor::PURPLE],
-        ['white', Color::GRAY],
-        ['bg:white', BackgroundColor::GRAY],
         ['emergency', Color::YELLOW, BackgroundColor::RED, Format::BOLD],
         ['alert', Color::RED, Format::BOLD],
         ['bg:alert', Color::GRAY, BackgroundColor::RED, Format::BOLD],
@@ -294,20 +301,42 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         if (empty(self::$_styles)) {
             $styles = &self::$_styles;
             $formats = &self::$_formats;
+            $aliases = self::FORMATS_ALIASES;
 
             /** @var Color $format */
             foreach (self::FORMATS_ENUMS as $enum) {
                 foreach ($enum::cases() as $format) {
                     $prop = $format->getTagAttribute();
-                    $formats[$prop] ??= [];
-                    $formats[$prop][$format->getFormatName()] = $format;
+                    $name = $format->getFormatName();
+                    $tag = $format->getTag();
 
-                    $styles[$format->getTag()] = Style::createFrom($format->getTag(), $format);
+                    $formats[$prop] ??= [];
+                    $formats[$prop][$name] = $format;
+                    $styles[$tag] = Style::createFrom($tag, $format);
+
+                    if (isset($aliases[$name])) {
+                        $formats[$prop][$aliases[$name]] = $format;
+                    }
+
+                    if (isset($aliases[$tag])) {
+                        $styles[$aliases[$tag]] = Style::createFrom($aliases[$tag], $format);
+                    }
 
                     if ( ! $format->is(Color::DEFAULT, BackgroundColor::DEFAULT, ...Format::cases())) {
                         $bright = new BrightColor($format);
-                        $formats[$prop][$bright->getFormatName()] = $bright;
-                        $styles[$bright->getTag()] = Style::createFrom($bright->getTag(), $bright);
+
+                        $name = $bright->getFormatName();
+                        $tag = $bright->getTag();
+
+                        $formats[$prop][$name] = $bright;
+                        $styles[$tag] = Style::createFrom($tag, $bright);
+
+                        if (isset($aliases[$name])) {
+                            $formats[$prop][$aliases[$name]] = $bright;
+                        }
+                        if (isset($aliases[$tag])) {
+                            $styles[$aliases[$tag]] = Style::createFrom($aliases[$tag], $bright);
+                        }
                     }
                 }
             }
