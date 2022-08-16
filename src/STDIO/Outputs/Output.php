@@ -17,6 +17,7 @@ class Output
 
     /** @var resource */
     protected $stream;
+    protected ?Cursor $cursor = null;
 
     public function __construct(protected ?Formatter $formatter = null)
     {
@@ -65,6 +66,14 @@ class Output
     {
         $this->write($message);
         $this->write("\n");
+    }
+
+    /**
+     * Get Cursor for output
+     */
+    public function getCursor(): Cursor
+    {
+        return $this->cursor ??= new Cursor($this);
     }
 
     /**

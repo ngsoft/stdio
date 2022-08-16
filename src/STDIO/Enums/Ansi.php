@@ -58,13 +58,18 @@ interface Ansi
     /**
      * Save
      */
-    public const CURSOR_SAVE_POS = '\x1b7';
-    public const CURSOR_LOAD_POS = '\x1b8';
+    public const CURSOR_SAVE_POS = self::ESC . '7';
+    public const CURSOR_LOAD_POS = self::ESC . '8';
 
     /**
      * Visible
      */
     public const CURSOR_HIDE = self::ESC . '?25l';
     public const CURSOR_SHOW = self::ESC . '?25h';
+
+    /**
+     * Read
+     */
+    public const CURSOR_READ_POS = self::CSI . '6n';
 
 }
