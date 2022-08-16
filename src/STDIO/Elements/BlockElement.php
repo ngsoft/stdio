@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-class BlockElement extends Element
+abstract class BlockElement extends Element
 {
+
+    abstract public static function getTagName(): string;
 
     public static function getPriority(): int
     {
@@ -14,7 +16,11 @@ class BlockElement extends Element
 
     public static function managesAttributes(array $attribute): bool
     {
-        return false;
+        if (static::class === __CLASS__) {
+            return false;
+        }
+
+        return isset($attribute[self::getTagName()]);
     }
 
 }
