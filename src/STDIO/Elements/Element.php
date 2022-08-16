@@ -28,8 +28,7 @@ class Element implements Stringable, Countable
 
     /** @var array<string, ?string> */
     protected array $attributes = [];
-    protected string $text = '';
-    protected string $formated = '';
+    protected Message $message;
     protected bool $isStandalone = false;
     protected bool $isClone = false;
     protected ?Style $style = null;
@@ -49,6 +48,7 @@ class Element implements Stringable, Countable
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->message = new Message();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 
@@ -142,6 +142,16 @@ class Element implements Stringable, Countable
         unset($this->attributes[$attr]);
     }
 
+    public function getFormated(): string
+    {
+        return $this->message->getFormated();
+    }
+
+    public function getRaw(): string
+    {
+        return $this->message->getText();
+    }
+
     public function getStyles(): StyleList
     {
         return $this->styles;
@@ -164,13 +174,13 @@ class Element implements Stringable, Countable
             throw new RuntimeException('Cannot append Element.');
         }
 
-        if ( ! empty($this->text)) {
+        if ( ! $this->message->isEmpty()) {
             $clone = clone $this;
-            $this->text = '';
             $clone->parent = $this;
             $this->children[] = $clone;
         }
 
+        $this->reset();
 
         $this->children[] = $element;
         $element->parent = $this;
@@ -181,7 +191,6 @@ class Element implements Stringable, Countable
         $index = array_search($elem, $this->children);
 
         if (false !== $index) {
-
             $this->children = array_splice($this->children, $index, 1);
         }
 
@@ -190,6 +199,7 @@ class Element implements Stringable, Countable
 
     public function __clone(): void
     {
+        $this->message = clone $this->message;
         $this->children = [];
         $this->parent = null;
         $this->isClone = true;
@@ -197,15 +207,15 @@ class Element implements Stringable, Countable
 
     public function reset(): void
     {
-        $this->text = $this->formated = '';
+        $this->message->clear();
     }
 
     public function pull(): string
     {
-        if ($this->pulled) {
+        if ($this->pulled && $this->parent) {
             return '';
         }
-        $this->pulled = ! is_null($this->parent);
+        $this->pulled = true;
 
         $text = '';
 
@@ -213,8 +223,10 @@ class Element implements Stringable, Countable
             $text .= $elem->pull();
         }
 
-        $text .= (string) $this;
-        $this->text = $this->formated = '';
+        $text .= $this->getFormated();
+
+        $this->reset();
+
         if ($this->isClone) {
             $this->parent?->removeChild($this);
         }
@@ -223,7 +235,7 @@ class Element implements Stringable, Countable
 
     public function count(): int
     {
-        $len = mb_strlen($this->text);
+        $len = $this->message->count();
 
         foreach ($this->children as $elem) {
             $len += $elem->count();
@@ -234,7 +246,7 @@ class Element implements Stringable, Countable
 
     public function __toString(): string
     {
-        return $this->formated;
+        return $this->message->getFormated();
     }
 
     public function __debugInfo(): array
@@ -245,11 +257,10 @@ class Element implements Stringable, Countable
             'isStandalone' => $this->isStandalone,
             'isClone' => $this->isClone,
             'pulled' => $this->pulled,
-            'text' => $this->text,
-            'formated' => $this->formated,
             'attributes' => $this->attributes,
             'parent' => $this->parent,
             'children' => $this->children,
+            'message' => $this->message,
         ];
     }
 

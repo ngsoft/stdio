@@ -36,6 +36,11 @@ class Message implements \Stringable, \Countable
         return mb_strlen($this->text);
     }
 
+    public function clear(): void
+    {
+        $this->formated = $this->text = '';
+    }
+
     public function __toString(): string
     {
         return $this->getFormated();

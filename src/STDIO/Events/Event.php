@@ -11,4 +11,6 @@ abstract class Event implements StoppableEventInterface
 {
 
     use StoppableEventTrait;
+
+    abstract public function onEvent(): void;
 }
