@@ -139,9 +139,9 @@ class Utils
         if (is_null($result)) {
             $result = 8;
 
-            if ('truecolor' === getenv('COLORTERM') || self::supportsColors()) {
+            if ('truecolor' === getenv('COLORTERM')) {
                 $result = 16777215;
-            } elseif (preg_match('/(cygwin|xterm|256)/', getenv('TERM') ?: '')) {
+            } elseif (self::supportsColors()) {
                 $result = 256;
             } elseif ($value = self::executeProcess('tput colors')) {
                 $result = intval($value);

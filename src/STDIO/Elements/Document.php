@@ -16,7 +16,7 @@ class Document
 
     protected static PrioritySet $types;
     protected array $elements = [];
-    protected ?Element $root;
+    protected ?Element $root = null;
 
     public function __construct(
             protected ?StyleList $styles = null
@@ -108,7 +108,6 @@ class Document
         while ($current->getParent()) {
             $current = $current->getParent();
         }
-
         return $current->pull();
     }
 

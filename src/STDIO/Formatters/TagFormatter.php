@@ -95,6 +95,9 @@ class TagFormatter implements Formatter
 
         $output = $this->document->pullContents();
 
+        // cleanup element children
+        // $this->document->isRoot() && $this->document->reset();
+
         return strtr($output, [
             "\0" => '\\',
             '\\<' => '<',

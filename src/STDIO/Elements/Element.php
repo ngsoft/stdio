@@ -62,7 +62,6 @@ class Element implements Stringable
 
     public function write(string $contents): void
     {
-
         $this->pulled = false;
         $this->text .= $this->getStyle()->format($contents);
     }
@@ -169,6 +168,7 @@ class Element implements Stringable
             $this->children[] = $clone;
         }
 
+
         $this->children[] = $element;
         $element->parent = $this;
     }
@@ -181,12 +181,6 @@ class Element implements Stringable
 
     public function reset(): void
     {
-        // foreach ($this->children as $elem) {
-        //    $elem->reset();
-        //  $elem->pulled = true;
-        //}
-        // $this->parent = null;
-        // $this->children = [];
         $this->text = '';
     }
 
@@ -195,12 +189,11 @@ class Element implements Stringable
         if ($this->pulled) {
             return '';
         }
-        $this->pulled = true;
+        $this->pulled = ! is_null($this->parent);
 
         $text = '';
 
         foreach ($this->children as $elem) {
-
             $text .= $elem->pull();
         }
 
