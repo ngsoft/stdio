@@ -55,7 +55,6 @@ class STDIO
         $this->formatter = $formatter = new TagFormatter($styles);
         $this->output = $output = new Output($formatter);
         $this->errorOutput = new ErrorOutput($formatter);
-        $this->cursor = new Cursor($output);
     }
 
     public function getOutput(): Output
@@ -83,12 +82,6 @@ class STDIO
         static::$_instance = $this;
 
         return $this->buffer;
-    }
-
-    public function getCursor(): Cursor
-    {
-        static::$_instance = $this;
-        return $this->cursor;
     }
 
     public function getStyles(): StyleList
