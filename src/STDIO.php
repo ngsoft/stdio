@@ -47,8 +47,6 @@ class STDIO
 
     final public function __construct(bool $forceColorSupport = null)
     {
-
-
         $this->buffer = new Buffer();
         $this->input = new Input();
         $this->styles = $styles = new StyleList($forceColorSupport);

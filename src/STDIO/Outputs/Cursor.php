@@ -182,7 +182,9 @@ final class Cursor
      */
     public function hide()
     {
-
+        if ( ! Terminal::supportsColors()) {
+            return $this;
+        }
         return $this->printf(Ansi::CURSOR_HIDE);
     }
 
@@ -191,7 +193,9 @@ final class Cursor
      */
     public function show()
     {
-
+        if ( ! Terminal::supportsColors()) {
+            return $this;
+        }
         return $this->printf(Ansi::CURSOR_SHOW);
     }
 
