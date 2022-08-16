@@ -54,6 +54,14 @@ class Element implements Stringable, Countable
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 
+    final public function dispatchEvent(string $event): static
+    {
+
+        $method = sprintf('on%s', ucfirst(strtolower($event)));
+        $this->{$method}();
+        return $this;
+    }
+
     public function onPop(): void
     {
 
@@ -121,6 +129,13 @@ class Element implements Stringable, Countable
     public function setActive(bool $active = true): static
     {
         $this->active = $active;
+
+        if ($active) {
+            $this->parent?->setActive(false);
+            foreach ($this->children as $elem) {
+                $elem->setActive(false);
+            }
+        }
 
         return $this;
     }
@@ -216,6 +231,10 @@ class Element implements Stringable, Countable
 
         if ($element === $this || $element === $this->parent) {
             throw new RuntimeException('Cannot append Element.');
+        }
+
+        if ($this->isClone) {
+            return;
         }
 
         if ( ! $this->message->isEmpty()) {

@@ -16,7 +16,7 @@ class Document
 
     protected static PrioritySet $types;
     protected array $elements = [];
-    protected ?Element $root = null;
+    protected Element $root;
 
     public function __construct(
             protected ?StyleList $styles = null
@@ -38,11 +38,11 @@ class Document
     {
 
         $this->current()->appendChild($elem);
-
         if ( ! $elem->isStandalone()) {
             $this->elements[] = $elem;
         }
-        $elem->setActive()->onPush();
+
+        $elem->dispatchEvent('push');
     }
 
     public function pop(?Element $elem = null): Element
@@ -53,14 +53,13 @@ class Document
         }
 
         if ( ! $elem) {
-            return array_pop($this->elements);
+            return array_pop($this->elements)->dispatchEvent('pop');
         }
 
         foreach (array_reverse($this->elements) as $index => $current) {
             if (str_starts_with($current->getTag(), $elem->getTag())) {
                 $this->elements = array_slice($this->elements, 0, $index);
-                $elem->setActive(false)->onPop();
-                return $current;
+                return $current->dispatchEvent('pop');
             }
         }
 
@@ -70,7 +69,7 @@ class Document
     public function current(): Element
     {
         if (empty($this->elements)) {
-            return $this->root;
+            return $this->root->setActive(true);
         }
         return $this->elements[count($this->elements) - 1]->setActive(true);
     }
