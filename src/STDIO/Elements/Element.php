@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-use InvalidArgumentException,
+use Countable,
+    InvalidArgumentException,
     JsonException;
 use NGSOFT\{
     STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList
 };
-use RuntimeException;
+use RuntimeException,
+    Stringable;
 use function get_debug_type,
              is_stringable;
 
 /**
  * @phan-file-suppress PhanUnusedPublicNoOverrideMethodParameter
  */
-class Element
+class Element implements Stringable
 {
 
     protected ?self $parent = null;
@@ -165,6 +167,10 @@ class Element
 
     public function reset(): void
     {
+        foreach ($this->children as $elem) {
+            $elem->reset();
+        }
+        $this->parent = null;
         $this->children = [];
         $this->text = '';
     }
@@ -185,10 +191,7 @@ class Element
         foreach ($this->children as $element) {
             $text .= (string) $element;
         }
-
-
         $text .= $this->text;
-
         return $text;
     }
 

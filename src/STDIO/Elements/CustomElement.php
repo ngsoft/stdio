@@ -7,7 +7,7 @@ namespace NGSOFT\STDIO\Elements;
 abstract class CustomElement extends Element
 {
 
-    abstract public static function getTagName(): string;
+    abstract protected static function getTagName(): string;
 
     public static function getPriority(): int
     {
@@ -20,7 +20,7 @@ abstract class CustomElement extends Element
             return false;
         }
 
-        return isset($attribute[self::getTagName()]);
+        return isset($attributes[static::getTagName()]);
     }
 
 }

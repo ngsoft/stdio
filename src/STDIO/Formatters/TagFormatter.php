@@ -77,11 +77,6 @@ class TagFormatter implements Formatter
                 if ( ! empty($tag)) {
 
                     $element = $this->document->createElement($tag);
-
-                    if ($element->isStandalone()) {
-                        $this->document->push($element);
-                        continue;
-                    }
                 }
 
 
@@ -101,8 +96,6 @@ class TagFormatter implements Formatter
         $this->document->write(substr($message, $offset));
 
         $output = $this->document->pullContents();
-        $this->document->write("\nfollowed by something else");
-        $output .= $this->document->pullContents();
 
         return strtr($output, [
             "\0" => '\\',

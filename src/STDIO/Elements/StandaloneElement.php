@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
+/**
+ * @phan-file-suppress PhanUnusedPublicMethodParameter
+ */
 class StandaloneElement extends Element
 {
 
@@ -23,7 +26,12 @@ class StandaloneElement extends Element
 
     public function write(string $contents): void
     {
+        // never used
+    }
 
+    public function __toString(): string
+    {
+        return parent::__toString();
     }
 
 }
