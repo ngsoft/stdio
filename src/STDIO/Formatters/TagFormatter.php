@@ -53,17 +53,19 @@ class TagFormatter implements Formatter
 
         if (preg_match_all('#<(([a-z\#](?:[^\\\\<>]*+ | \\\\.)*)|/([a-z\#][^<>]*+)?)>#ix', $message, $matches, PREG_OFFSET_CAPTURE)) {
 
+
             foreach ($matches[0] as $i => $match) {
+
                 @list($text, $pos) = $match;
 
-                if (0 !== $pos && '\\' == $message[$pos - 1]) {
+                if (0 != $pos && '\\' == $message[$pos - 1]) {
                     continue;
                 }
 
 
-                $this->document->write(mb_substr($message, $offset, $pos - $offset));
+                $this->document->write(substr($message, $offset, $pos - $offset));
 
-                $offset = $pos + mb_strlen($text);
+                $offset = $pos + strlen($text);
 
                 $tag = $matches[1][$i][0];
                 if ($closing = str_starts_with($tag, '/')) {

@@ -61,6 +61,7 @@ class Rect implements Renderer, Formatter, Stringable
         }
 
         $style = $elem->getStyle();
+
         if ( ! $style->isEmpty()) {
             $rect->setStyle($style);
         }

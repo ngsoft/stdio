@@ -31,6 +31,7 @@ class Element implements Stringable
     protected string $text = '';
     protected bool $isStandalone = false;
     protected ?Style $style = null;
+    protected bool $pulled = false;
 
     public static function create(
             string $tag = '',
@@ -62,7 +63,7 @@ class Element implements Stringable
     public function write(string $contents): void
     {
 
-
+        $this->pulled = false;
         $this->text .= $this->getStyle()->format($contents);
     }
 
@@ -180,18 +181,30 @@ class Element implements Stringable
 
     public function reset(): void
     {
-        foreach ($this->children as $elem) {
-            $elem->reset();
-        }
-        $this->parent = null;
-        $this->children = [];
+        // foreach ($this->children as $elem) {
+        //    $elem->reset();
+        //  $elem->pulled = true;
+        //}
+        // $this->parent = null;
+        // $this->children = [];
         $this->text = '';
     }
 
     public function pull(): string
     {
+        if ($this->pulled) {
+            return '';
+        }
+        $this->pulled = true;
 
-        $text = (string) $this;
+        $text = '';
+
+        foreach ($this->children as $elem) {
+
+            $text .= $elem->pull();
+        }
+
+        $text .= (string) $this;
         $this->reset();
 
         return $text;
@@ -199,13 +212,7 @@ class Element implements Stringable
 
     public function __toString(): string
     {
-        $text = '';
-
-        foreach ($this->children as $element) {
-            $text .= (string) $element;
-        }
-        $text .= $this->text;
-        return $text;
+        return $this->text;
     }
 
     public function __debugInfo(): array

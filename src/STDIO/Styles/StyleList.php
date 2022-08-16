@@ -25,6 +25,7 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
     protected const FORMATS_CUSTOM = [
         ['magenta', Color::PURPLE],
         ['bg:magenta', BackgroundColor::PURPLE],
+        ['white', Color::GRAY],
         ['bg:white', BackgroundColor::GRAY],
         ['emergency', Color::YELLOW, BackgroundColor::RED, Format::BOLD],
         ['alert', Color::RED, Format::BOLD],
@@ -148,20 +149,25 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
                     continue;
                 }
 
+
+                if ( ! isset(self::$_formats[$key])) {
+                    continue;
+                }
+
+                $isOptions = false;
+
                 if ($key === 'options') {
                     $value = preg_split('#[;,]+#', $value);
+                    $isOptions = true;
                 } else { $value = preg_split('#;+#', $value); }
 
                 foreach ($value as $val) {
                     $val = mb_strtolower($val);
-
                     if (isset(self::$_formats[$key][$val])) {
-
-
                         $style = $style->withAddedFormats(self::$_formats[$key][$val]);
-                    } elseif (Utils::isHexColor($val)) {
+                    } elseif (Utils::isHexColor($val) && ! $isOptions) {
                         $style = $style->withAddedFormats(new HexColor($val, $isBG, $isGray));
-                    } elseif (Utils::isRGBColor($val)) {
+                    } elseif (Utils::isRGBColor($val) && ! $isOptions) {
                         $style = $style->withAddedFormats(new RGBColor($val, $isBG, $isGray));
                     }
                 }

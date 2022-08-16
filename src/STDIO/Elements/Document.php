@@ -73,6 +73,11 @@ class Document
         return $this->elements[count($this->elements) - 1];
     }
 
+    public function isRoot(): bool
+    {
+        return $this->root === $this->current();
+    }
+
     public function createElement(string $tag): Element
     {
 
@@ -99,6 +104,7 @@ class Document
     {
 
         $current = $this->current();
+
         while ($current->getParent()) {
             $current = $current->getParent();
         }

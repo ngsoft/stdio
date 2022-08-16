@@ -13,6 +13,7 @@ class StandaloneElement extends Element
 {
 
     protected bool $isStandalone = true;
+    protected bool $rendered = false;
 
     public static function getPriority(): int
     {
@@ -88,6 +89,13 @@ class StandaloneElement extends Element
 
     protected function render(): string
     {
+
+        if ($this->rendered) {
+            return '';
+        }
+
+        $this->rendered = true;
+
         if ($this->hasAttribute('hr')) {
             return $this->renderThematicChange();
         } elseif ($this->hasAttribute('tab')) {
@@ -99,7 +107,11 @@ class StandaloneElement extends Element
 
     public function __toString(): string
     {
-        return $this->render();
+        if ( ! $this->rendered) {
+            $this->text = $this->render();
+        }
+
+        return $this->text;
     }
 
 }
