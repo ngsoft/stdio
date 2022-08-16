@@ -33,9 +33,11 @@ class Document
     public function push(Element $elem)
     {
 
-        $this->root->appendChild($elem);
+        $this->current()->appendChild($elem);
 
-        $this->elements[] = $elem;
+        if ( ! $elem->isStandalone()) {
+            $this->elements[] = $elem;
+        }
     }
 
     public function pop(?Element $elem = null): Element

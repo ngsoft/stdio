@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-abstract class BlockElement extends Element
+abstract class CustomElement extends Element
 {
 
     abstract public static function getTagName(): string;
