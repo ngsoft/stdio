@@ -6,13 +6,15 @@ namespace NGSOFT\STDIO\Elements;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    STDIO, STDIO\Styles\StyleList
+    DataStructure\PrioritySet, STDIO, STDIO\Styles\StyleList
 };
-use function str_starts_with;
+use function NGSOFT\Filesystem\require_all_once,
+             str_starts_with;
 
 class Document
 {
 
+    protected static PrioritySet $types;
     protected array $elements = [];
     protected ?Element $root;
 
@@ -21,6 +23,8 @@ class Document
     )
     {
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        self::$types ??= new PrioritySet();
+        $this->autoRegister();
         $this->reset();
     }
 
@@ -77,6 +81,25 @@ class Document
     public function pullContents(): string
     {
         return $this->current()->pull();
+    }
+
+    public function register(string|Element $class)
+    {
+        if (is_a($class, Element::class, is_string($class))) {
+            self::$types->add(is_object($class) ? get_class($class) : $class, $class::getPriority());
+        }
+    }
+
+    protected function autoRegister(): void
+    {
+
+        if (self::$types->isEmpty()) {
+            require_all_once(__DIR__);
+
+            foreach (implements_class(Element::class) as $class) {
+                $this->register($class);
+            }
+        }
     }
 
 }

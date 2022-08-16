@@ -19,6 +19,8 @@ class TagFormatter implements Formatter
 
     public function __construct(protected ?StyleList $styles = null)
     {
+
+
         $this->styles ??= STDIO::getCurrentInstance()->getStyles();
         $this->document = new Document($this->styles);
     }
