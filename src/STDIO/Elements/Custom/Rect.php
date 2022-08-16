@@ -35,6 +35,12 @@ class Rect extends CustomElement
         $raw = $this->getRaw();
         $formated = $this->getFormated();
         $children = $this->children;
+
+        if ($this->parent?->isActive() || $this->isActive()) {
+
+        }
+
+
         foreach ($children as $elem) {
             $this->removeChild($elem);
         }
