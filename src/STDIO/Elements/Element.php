@@ -18,7 +18,7 @@ use function get_debug_type,
 /**
  * @phan-file-suppress PhanUnusedPublicNoOverrideMethodParameter
  */
-class Element implements Stringable
+class Element implements Stringable, Countable
 {
 
     protected ?self $parent = null;
@@ -201,6 +201,11 @@ class Element implements Stringable
         $this->reset();
 
         return $text;
+    }
+
+    public function count(): int
+    {
+        return mb_strlen($this->text);
     }
 
     public function __toString(): string
