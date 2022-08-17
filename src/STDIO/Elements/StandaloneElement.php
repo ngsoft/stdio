@@ -18,11 +18,6 @@ class StandaloneElement extends Element
 
     protected bool $isStandalone = true;
 
-    public static function getPriority(): int
-    {
-        return 10;
-    }
-
     public static function managesAttributes(array $attributes): bool
     {
         // manages only one of those, will not guess <br;hr;tab> is forbidden

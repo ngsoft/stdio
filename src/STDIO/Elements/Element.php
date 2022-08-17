@@ -79,7 +79,7 @@ class Element implements Stringable, Countable
 
     public static function getPriority(): int
     {
-        return 2;
+        return static::class === __CLASS__ ? 2 : 10;
     }
 
     public static function managesAttributes(array $attributes): bool
