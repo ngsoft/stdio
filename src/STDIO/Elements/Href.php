@@ -36,7 +36,7 @@ class Href extends Element
         );
 
         if ( ! Terminal::supportsColors()) {
-            $formatted = sprintf('[%s] %s', $link, $contents);
+            $formatted = $contents = sprintf('[%s] %s', $link, $contents);
         }
 
         $this->message->format($this->getStyle()->format($formatted), $contents);

@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
+    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
     STDIO\Styles\Style, STDIO\Styles\StyleList
 };
 use RuntimeException,
@@ -256,11 +256,14 @@ class Rectangle implements Renderer, Stringable
         $raws = preg_split('#\v+#', $raw);
 
         foreach ($raws as $index => $messageLine) {
-            $lines = split_string($messageLine, $lineLength);
 
-            $max = $lineLength;
 
-            $formatted = split_string($messages[$index], $max);
+            if ( ! empty($messageLine)) {
+                $lines = split_string($messageLine, $lineLength);
+                $max = $lineLength;
+                $formatted = split_string($messages[$index], $max);
+            } else { $lines = $formatted = ['']; }
+
 
             foreach ($lines as $i => $line) {
 

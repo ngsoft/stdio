@@ -73,12 +73,12 @@ class Output
 
         // use null formatter for better performances (no pcre)
         if ( ! $this->cursor) {
-            $clone = $this;
+            $out = $this;
             if ($this->formatter instanceof NullFormatter === false) {
-                $clone = clone $this;
-                $clone->formatter = new NullFormatter();
+                $out = clone $this;
+                $out->formatter = new NullFormatter();
             }
-            $this->cursor = new Cursor($clone);
+            $this->cursor = new Cursor($out);
         }
 
         return $this->cursor;

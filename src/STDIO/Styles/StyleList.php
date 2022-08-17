@@ -141,6 +141,8 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         if ($params) {
 
             $isGray = isset($params['grayscale']) || isset($params['gs']);
+            $types = array_keys(self::$_formats);
+            $hasParams = count($types) !== count(array_diff($types, array_keys($params)));
 
             foreach ($params as $key => $value) {
 
@@ -158,7 +160,10 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
                 }
 
 
-                if ( ! isset(self::$_formats[$key])) {
+                if (isset($this[$key]) && ! $hasParams) {
+                    $style = $style->withAddedStyle($this[$key]);
+                    continue;
+                } elseif ( ! isset(self::$_formats[$key])) {
                     continue;
                 }
 
