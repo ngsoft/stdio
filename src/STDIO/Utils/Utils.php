@@ -11,7 +11,8 @@ use NGSOFT\{
 use Throwable;
 use function in_range,
              preg_exec,
-             preg_test;
+             preg_test,
+             set_default_error_handler;
 
 class Utils
 {
@@ -25,7 +26,7 @@ class Utils
 
 
         try {
-            Tools::errors_as_exceptions();
+            set_default_error_handler();
 
             $process = @proc_open(
                             $command,
@@ -74,21 +75,47 @@ class Utils
         static $result;
 
         if (is_null($result)) {
-            if (getenv('NOCOLOR') !== false) { return $result = false; }
 
-            $stream = fopen("php://stdout", "w");
-            if (DIRECTORY_SEPARATOR === '\\') {
-                return
-                        $result = preg_match('/^(cygwin|xterm)/', getenv('TERM') ?: '') > 0 ||
-                        false !== getenv('ANSICON') ||
-                        'ON' === getenv('ConEmuANSI') ||
-                        (function_exists('sapi_windows_vt100_support') and @sapi_windows_vt100_support($stream));
+            if (
+                    isset($_SERVER['NO_COLOR']) ||
+                    getenv('NO_COLOR') !== false
+            ) {
+
+                return $result = false;
             }
-            if (function_exists('stream_isatty')) { return $result = @stream_isatty($stream); }
-            if (function_exists('posix_isatty')) { return $result = @posix_isatty($stream); }
-            $stat = @fstat($stream);
-            // Check if formatted mode is S_IFCHR
-            return $result = $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+
+            if (getenv('TERM_PROGRAM')) {
+                return $result = true;
+            }
+
+            try {
+
+                set_default_error_handler();
+
+                $stream = fopen("php://stdout", "w");
+
+                if (self::isWindows()) {
+
+                    if (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support($stream)) {
+                        return $result = true;
+                    }
+
+                    return $result = preg_test('#^(cygwin|xterm)#i', getenv('TERM') ?: '') ||
+                            false !== getenv('ANSICON') ||
+                            'ON' === getenv('ConEmuANSI');
+                } elseif (function_exists('stream_isatty')) {
+                    return $result = stream_isatty($stream);
+                } elseif (function_exists('posix_isatty')) {
+                    return $result = posix_isatty($stream);
+                }
+                $stat = fstat($stream);
+                // Check if formatted mode is S_IFCHR
+                return $result = $stat ? 0020000 === ($stat['mode'] & 0170000) : false;
+            } catch (\Throwable) {
+                return $result = false;
+            } finally {
+                isset($stream) && fclose($stream);
+            }
         }
 
         return $result;
@@ -106,7 +133,7 @@ class Utils
             if (function_exists('proc_open')) {
 
                 try {
-                    Tools::errors_as_exceptions();
+                    set_default_error_handler();
                     $supported = (bool) proc_open(
                                     'echo 1 >/dev/null',
                                     [
