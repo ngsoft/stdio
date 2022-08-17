@@ -97,9 +97,18 @@ class STDIO
      */
     public function print(string|Stringable|array $messages, string $style = null): static
     {
-        if (is_string($style)) {
-            $style = $this->getStyles()->createFromStyleString($style);
-            $messages = $style->format($messages);
+        if ( ! empty($style)) {
+
+            if ( ! is_array($messages)) {
+                $messages = [$messages];
+            }
+
+            $result = sprintf('<%s>', $style);
+            foreach ($messages as $message) {
+                $result .= (string) $message;
+            }
+
+            $messages = $result . '</>';
         }
         return $this->render($this->getOutput(), $messages);
     }
@@ -110,24 +119,8 @@ class STDIO
     public function println(string|Stringable|array $messages, string $style = null): static
     {
 
-        if ( ! is_array($messages)) {
-            $messages = [$messages];
-        }
-
-
-
-
-        if (is_string($style)) {
-
-            $style = $this->getStyles()->createFromStyleString($style);
-            $messages = $style->format($messages);
-        }
-
-
-
-        $messages[] = "\n";
-
-        return $this->render($this->getOutput(), $messages);
+        $this->print($messages, $style);
+        return $this->print("\n");
     }
 
     /**

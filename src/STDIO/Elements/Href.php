@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
+use NGSOFT\{
+    Facades\Terminal, STDIO\Enums\Ansi
+};
+use function class_basename,
+             preg_test;
+
 class Href extends Element
 {
 
@@ -14,16 +20,26 @@ class Href extends Element
 
     public static function managesAttributes(array $attributes): bool
     {
-
-        var_dump($attributes);
-        return preg_test('#^https?:#', $attributes['href'] ?? '');
+        return preg_test('#^https?://.+/?#', $attributes['href'] ?? '');
     }
 
     public function write(string $contents): void
     {
-        var_dump($contents);
+        $link = $this->getAttribute('href');
         $this->pulled = false;
-        $this->message->format($this->getStyle()->format($contents), $contents);
+
+        $formatted = sprintf(
+                "%s8;;%s%s\\%s%s8;;%s\\",
+                Ansi::OSC, $link, Ansi::ESC,
+                $contents,
+                Ansi::OSC, Ansi::ESC
+        );
+
+        if ( ! Terminal::supportsColors()) {
+            $formatted = sprintf('[%s] %s', $link, $contents);
+        }
+
+        $this->message->format($this->getStyle()->format($formatted), $contents);
     }
 
 }

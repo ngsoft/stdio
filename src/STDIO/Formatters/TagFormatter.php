@@ -42,20 +42,6 @@ class TagFormatter implements Formatter
         return $message;
     }
 
-    public function formatStyle(string|Stringable $message, string $style = ''): string
-    {
-
-
-
-
-        $message = (string) $message;
-        if ( ! empty($style)) {
-            $elem = $this->document->createElement($style);
-        } else { $elem = new Element(styles: $this->styles); }
-        $elem->write($message);
-        return $this->format($elem);
-    }
-
     /** {@inheritdoc} */
     public function format(string|Stringable $message): string
     {
