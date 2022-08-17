@@ -19,22 +19,6 @@ class Rect extends CustomElement
         return $this->rect ??= Rectangle::createFromElement($this);
     }
 
-    public function onPop(): void
-    {
-        if ($this->isClone) {
-            return;
-        }
-
-        $this->cache = null;
-
-        $this->getFormated();
-    }
-
-    protected function update(): void
-    {
-        $this->cache = null;
-    }
-
     public function pull(): string
     {
         if ($this->isClone) {
@@ -53,23 +37,19 @@ class Rect extends CustomElement
         foreach ($this->children as $elem) {
 
             if ($elem instanceof self && ! $elem->isClone) {
-                throw new RuntimeException(sprintf('Cannot put a Rectangle inside another Rectangle.'));
+                throw new RuntimeException('Cannot put a Rectangle inside another Rectangle.');
             }
 
             $this->removeChild($elem);
         }
-
 
         $this->message->format($this->getRect()->format($formated, $raw), $raw);
     }
 
     public function write(string $contents): void
     {
-        $this->cache = null;
         $this->pulled = false;
         $this->message->format($contents, $contents);
-
-        $this->getFormated();
     }
 
 }
