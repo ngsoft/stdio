@@ -34,6 +34,7 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         'bg:cyan:bright' => 'bg:aqua:bright',
     ];
     protected const FORMATS_CUSTOM = [
+        ['href', Color::CYAN, Format::UNDERLINE],
         ['emergency', Color::YELLOW, BackgroundColor::RED, Format::BOLD],
         ['alert', Color::RED, Format::BOLD],
         ['bg:alert', Color::GRAY, BackgroundColor::RED, Format::BOLD],
