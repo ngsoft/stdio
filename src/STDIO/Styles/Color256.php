@@ -65,18 +65,15 @@ class Color256 implements CustomColor
                     $this->color = sprintf('1;%d', $this->color - 8);
                 }
             } elseif ($color > 231) {
-                // grayscales to black / white
-                $color = ($color - 231) / 24; // [0-24] / 24
-                if ($color <= 0.5) {
-                    $this->color = 30;
-                } else { $this->color = 37; }
+                // grayscales => black / white
+                $this->color = 30 + ((int) round(($color - 232) / 24) * 7); // ([0-24] / 24) * 7
 
                 if ($isBackgroundColor) {
                     $this->color += 10;
                 }
             } else {
 
-                // convert to r,g,b using table
+                // convert to r,g,b indexes using table
                 $color -= 16;
                 $red = (int) floor($color / 36);
                 $color -= $red * 36;
