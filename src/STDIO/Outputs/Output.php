@@ -42,12 +42,9 @@ class Output
 
         foreach ($message as $line) {
 
-
-
             if ( ! is_string($line) && ! ($line instanceof Stringable)) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
-
 
             if (false === @fwrite($this->stream, $this->formatter->format((string) $line))) {
                 throw new RuntimeException('Unable to write output.');

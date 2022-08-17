@@ -109,14 +109,21 @@ class STDIO
      */
     public function println(string|Stringable|array $messages, string $style = null): static
     {
-        if (is_string($style)) {
-            $style = $this->getStyles()->createFromStyleString($style);
-            $messages = $style->format($messages);
-        }
 
         if ( ! is_array($messages)) {
             $messages = [$messages];
         }
+
+
+
+
+        if (is_string($style)) {
+
+            $style = $this->getStyles()->createFromStyleString($style);
+            $messages = $style->format($messages);
+        }
+
+
 
         $messages[] = "\n";
 
