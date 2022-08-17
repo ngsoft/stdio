@@ -66,6 +66,7 @@ class Spinner extends Helper
         if (empty($this->position)) {
             $this->position = $output->getCursor()->getPosition($enabled);
             $this->cursorEnabled = $enabled;
+
             $this->colors = Utils::getNumColorSupport() > 255;
             if (empty($this->theme)) {
                 $this->setTheme($this->colors ? self::THEME_DEFAULT : self::THEME_CLASSIC);

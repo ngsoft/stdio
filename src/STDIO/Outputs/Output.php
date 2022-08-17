@@ -12,7 +12,7 @@ use RuntimeException,
     TypeError;
 use function get_debug_type;
 
-class Output
+class Output implements OutputInterface
 {
 
     /** @var resource */

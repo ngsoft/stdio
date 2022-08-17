@@ -12,7 +12,7 @@ use Countable,
     TypeError;
 use function get_debug_type;
 
-class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable
+class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable, OutputInterface
 {
 
     /** @var string[] */
