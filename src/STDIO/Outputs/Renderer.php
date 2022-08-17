@@ -10,5 +10,5 @@ interface Renderer
     /**
      * Render to the Output
      */
-    public function render(Output $output): void;
+    public function render(OutputInterface $output): void;
 }

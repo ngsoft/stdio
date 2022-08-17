@@ -78,10 +78,10 @@ class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable, Out
     /**
      * Flush buffer into Output
      *
-     * @param Output $output
+     * @param OutputInterface $output
      * @return void
      */
-    public function flush(Output $output): void
+    public function flush(OutputInterface $output): void
     {
         $output->write($this->pull());
     }

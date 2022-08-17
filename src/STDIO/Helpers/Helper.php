@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Helpers;
 
 use NGSOFT\STDIO\{
-    Outputs\Buffer, Outputs\Output, Outputs\Renderer, Styles\Style, Styles\StyleList
+    Outputs\Buffer, Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList
 };
 use Stringable;
 
@@ -49,7 +49,7 @@ abstract class Helper implements Renderer, Stringable
     }
 
     /** {@inheritdoc} */
-    public function render(Output $output): void
+    public function render(OutputInterface $output): void
     {
         $output->write($this);
     }

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Outputs;
 
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Utils\Utils
 };
 
 final class Cursor
 {
 
     public function __construct(
-            protected ?Output $output = null
+            protected ?OutputInterface $output = null
     )
     {
         $this->output ??= new Output();
@@ -208,6 +208,14 @@ final class Cursor
     public function getPosition(&$enabled = null): array
     {
         return Terminal::getCursorPosition($enabled);
+    }
+
+    /**
+     * Checks if cursor position can be read
+     */
+    public function isCursorEnabled(): bool
+    {
+        return Utils::isCursorPosEnabled();
     }
 
 }

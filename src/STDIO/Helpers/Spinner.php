@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Helpers;
 
 use NGSOFT\STDIO\{
-    Enums\Ansi, Outputs\Output, Styles\StyleList, Utils\Utils
+    Enums\Ansi, Outputs\Cursor, Outputs\Output, Styles\StyleList, Utils\Utils
 };
 
 class Spinner extends Helper
@@ -21,6 +21,7 @@ class Spinner extends Helper
         165, 165, 201, 201, 200, 200, 199, 199, 198, 198, 197, 197,
     ];
 
+    protected Cursor $cursor;
     protected array $position = [];
     protected bool $cursorEnabled = true;
     protected bool $colors = true;
@@ -32,6 +33,8 @@ class Spinner extends Helper
     public function __construct(?StyleList $styles = null)
     {
         parent::__construct($styles);
+
+        $this->cursor = new Cursor($this->buffer);
     }
 
     public function getTheme(): array
@@ -85,7 +88,7 @@ class Spinner extends Helper
         }
 
         if ($this->cursorEnabled) {
-            $this->write(sprintf(Ansi::CURSOR_POS . Ansi::CLEAR_END_LINE, ...array_reverse($this->position)));
+            $this->write(sprintf(Ansi::CURSOR_POS . Ansi::CLEAR_END_LINE, $this->position[1], $this->position[0]));
         } else { $this->write(Ansi::CLEAR_LINE . "\r"); }
 
         $this->write($style->format($char));
