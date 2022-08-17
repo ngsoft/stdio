@@ -105,6 +105,25 @@ class STDIO
     }
 
     /**
+     * Writes message directly to the output
+     */
+    public function println(string|Stringable|array $messages, string $style = null): static
+    {
+        if (is_string($style)) {
+            $style = $this->getStyles()->createFromStyleString($style);
+            $messages = $style->format($messages);
+        }
+
+        if ( ! is_array($messages)) {
+            $messages = [$messages];
+        }
+
+        $messages[] = "\n";
+
+        return $this->render($this->getOutput(), $messages);
+    }
+
+    /**
      * Write message into the buffer
      *
      * @param string|Stringable|string[]|Stringable[] $messages

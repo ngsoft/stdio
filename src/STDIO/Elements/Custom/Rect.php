@@ -35,13 +35,17 @@ class Rect extends CustomElement
         $this->cache = null;
     }
 
-    public function onPull(): void
+    public function pull(): string
     {
-
         if ($this->isClone) {
-            return;
+            return '';
         }
 
+        return parent::pull();
+    }
+
+    public function onPull(): void
+    {
 
         $formated = $this->getFormated();
         $raw = $this->getRaw();
@@ -54,7 +58,6 @@ class Rect extends CustomElement
 
             $this->removeChild($elem);
         }
-
 
 
         $this->message->format($this->getRect()->format($formated, $raw), $raw);
