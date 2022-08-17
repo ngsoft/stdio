@@ -45,7 +45,7 @@ class Input
         return $result;
     }
 
-    public function readln(bool $allowEmptyline = false): string|false
+    public function readln(bool $allowEmptyline = true): string|false
     {
 
         $cp = 0;
