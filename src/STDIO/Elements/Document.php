@@ -86,6 +86,7 @@ class Document
 
         /** @var Element $class */
         foreach (self::$types as $class) {
+
             if ($class::managesAttributes($params)) {
 
                 return new $class($tag, $this->styles);
@@ -131,6 +132,7 @@ class Document
             require_all_once(__DIR__);
 
             foreach (implements_class(Element::class) as $class) {
+
                 $this->register($class);
             }
         }
