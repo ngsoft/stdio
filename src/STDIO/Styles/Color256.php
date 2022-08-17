@@ -106,7 +106,7 @@ class Color256 implements CustomColor
 
     public function getValue(): int|string
     {
-        return $color;
+        return $this->color;
     }
 
 }
