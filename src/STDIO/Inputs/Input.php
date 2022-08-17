@@ -37,15 +37,13 @@ class Input
         $result = [];
 
         while (count($result) < $lines) {
-
-
             $result[] = $this->readln($allowEmptyLines);
         }
 
         return $result;
     }
 
-    public function readln(bool $allowEmptyline = true): string|false
+    public function readln(bool $allowEmptyline = true): string
     {
 
         $cp = 0;
@@ -56,19 +54,15 @@ class Input
             sapi_windows_cp_set(sapi_windows_cp_get('oem'));
         }
 
-        try {
-
-            while (false === $result) {
-                $line = fgets($this->stream, 4096);
-                $line = rtrim($line, "\r\n");
-                if (empty($line) && ! $allowEmptyline) {
-                    continue;
-                }
-                $result = $line;
+        while (false === $result) {
+            $line = @fgets($this->stream, 4096);
+            $line = rtrim($line, "\r\n");
+            if (empty($line) && ! $allowEmptyline) {
+                continue;
             }
-        } catch (\Throwable) {
-            $result = false;
+            $result = empty($line) ? '' : $line;
         }
+
 
         if (0 !== $cp) {
             sapi_windows_cp_set($cp);

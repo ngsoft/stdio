@@ -36,7 +36,7 @@ class HiddenInput extends Input
         }
     }
 
-    public function readln(bool $allowEmptyline = true): string|false
+    public function readln(bool $allowEmptyline = true): string
     {
 
         $out = $this->output;
@@ -51,7 +51,7 @@ class HiddenInput extends Input
                 if ( ! $allowEmptyline && empty($line)) {
                     continue;
                 }
-                $result = $line;
+                $result = empty($line) ? '' : $line;
             }
             return $result;
         } elseif (Utils::supportsSTTY() && $mode = @shell_exec('stty -g')) {
@@ -67,7 +67,7 @@ class HiddenInput extends Input
                     continue;
                 }
 
-                $result = $line;
+                $result = empty($line) ? '' : $line;
             }
 
             shell_exec(sprintf('stty %s', $mode));
