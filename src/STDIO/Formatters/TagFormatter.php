@@ -19,8 +19,6 @@ class TagFormatter implements Formatter
 
     public function __construct(protected ?StyleList $styles = null)
     {
-
-
         $this->styles ??= new StyleList();
         $this->document = new Document($this->styles);
     }
@@ -42,6 +40,18 @@ class TagFormatter implements Formatter
             $message .= str_repeat("\0", $len - mb_strlen($message));
         }
         return $message;
+    }
+
+    public function formatStyle(string|Stringable $message, string $style = ''): string
+    {
+
+        $message = (string) $message;
+        if ( ! empty($style)) {
+            $message = sprintf('<%s>%s</>', $style, $message);
+        }
+
+
+        return $this->format($message);
     }
 
     /** {@inheritdoc} */
