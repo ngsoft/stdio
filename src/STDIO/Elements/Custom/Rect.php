@@ -36,8 +36,8 @@ class Rect extends CustomElement
 
         foreach ($this->children as $elem) {
 
-            if ($elem instanceof self && ! $elem->isClone) {
-                throw new RuntimeException('Cannot put a Rectangle inside another Rectangle.');
+            if ($elem instanceof CustomElement && ! $elem->isClone) {
+                throw new RuntimeException(sprintf('Cannot put %s inside a Rect.', class_basename(get_class($elem))));
             }
 
             $this->removeChild($elem);
