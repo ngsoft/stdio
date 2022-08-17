@@ -36,7 +36,7 @@ class Rect extends CustomElement
 
         foreach ($this->children as $elem) {
 
-            if ($elem instanceof CustomElement && ! $elem->isClone) {
+            if ($elem instanceof CustomElement && ! $elem->isClone && ! $elem->isStandalone) {
                 throw new RuntimeException(sprintf('Cannot put %s inside a Rect.', class_basename(get_class($elem))));
             }
 
