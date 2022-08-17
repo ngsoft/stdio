@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Helpers;
 
 use NGSOFT\STDIO\{
-    Enums\Ansi, Outputs\Cursor, Outputs\Output, Styles\StyleList, Utils\Utils
+    Enums\Ansi, Outputs\Cursor, Styles\StyleList, Utils\Utils
 };
 
 class Spinner extends Helper
@@ -20,20 +20,22 @@ class Spinner extends Helper
         51, 51, 45, 45, 39, 39, 33, 33, 27, 27, 56, 56, 57, 57, 93, 93, 129, 129,
         165, 165, 201, 201, 200, 200, 199, 199, 198, 198, 197, 197,
     ];
+    protected const COLORS_CLASSIC = [
+        1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1
+    ];
 
     protected Cursor $cursor;
     protected array $position = [];
-    protected bool $cursorEnabled = true;
-    protected bool $colors = true;
     protected int $index = -1;
     protected array $theme = [];
+    protected array $colors = [];
     protected string $label = '';
     protected float $interval = .1;
 
     public function __construct(?StyleList $styles = null)
     {
         parent::__construct($styles);
-
+        // use the buffer as output to pre write the ansi codes
         $this->cursor = new Cursor($this->buffer);
     }
 
@@ -63,16 +65,16 @@ class Spinner extends Helper
 
     protected function update(): void
     {
-        static $output;
-        $output ??= new Output();
+        $cursor = $this->cursor;
 
         if (empty($this->position)) {
-            $this->position = $output->getCursor()->getPosition($enabled);
-            $this->cursorEnabled = $enabled;
-
-            $this->colors = Utils::getNumColorSupport() > 255;
+            $this->position = $cursor->getPosition();
+            $colors = Utils::getNumColorSupport() > 255;
             if (empty($this->theme)) {
-                $this->setTheme($this->colors ? self::THEME_DEFAULT : self::THEME_CLASSIC);
+                $this->setTheme($colors ? self::THEME_DEFAULT : self::THEME_CLASSIC);
+            }
+            if (empty($this->colors)) {
+                $this->colors = $colors ? self::COLORS : self::COLORS_CLASSIC;
             }
         }
 
@@ -83,25 +85,38 @@ class Spinner extends Helper
 
         $style = $this->getStyle();
         if ($style->isEmpty()) {
-            $indexColor = $this->index % count(self::COLORS);
-            $style = $this->styles->createFromStyleString('c' . self::COLORS[$indexColor]);
+            $indexColor = $this->index % count($this->colors);
+            $style = $this->styles->createFromStyleString('c' . $this->colors[$indexColor]);
         }
 
-        if ($this->cursorEnabled) {
-            $this->write(sprintf(Ansi::CURSOR_POS . Ansi::CLEAR_END_LINE, $this->position[1], $this->position[0]));
-        } else { $this->write(Ansi::CLEAR_LINE . "\r"); }
+        if ($cursor->isCursorEnabled()) {
+            list($x, $y) = $this->position;
 
-        $this->write($style->format($char));
+            $cursor->setPosition($x, $y);
+            $cursor->clearRight();
+        } else {
+            // position the cursor at the beginning of the line
+            $this->write(Ansi::RESET);
+            $cursor->col();
+            $cursor->clearLine();
+            // we must be on windows with a dummy vt that think that "\r" == "\n" (ie: netbeans run command)
+            //$this->write("\r");
+        }
+
+        $label = $char;
 
         if ( ! empty($this->label)) {
-            $this->write(' ' . $this->label);
+            $label .= ' ' . $this->label;
         }
+
+
+        $this->write($style->format($label));
     }
 
     public function __toString(): string
     {
         $this->update();
-        return implode('', $this->buffer->pull());
+        return (string) $this->buffer;
     }
 
 }
