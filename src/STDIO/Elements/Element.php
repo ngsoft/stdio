@@ -7,8 +7,8 @@ namespace NGSOFT\STDIO\Elements;
 use Countable,
     InvalidArgumentException,
     JsonException;
-use NGSOFT\{
-    STDIO, STDIO\Styles\Style, STDIO\Styles\StyleList
+use NGSOFT\STDIO\Styles\{
+    Style, StyleList
 };
 use RuntimeException,
     Stringable;
@@ -278,6 +278,9 @@ class Element implements Stringable, Countable
         $this->message->clear();
     }
 
+    /**
+     * @phan-suppress PhanNonClassMethodCall
+     */
     public function pull(): string
     {
         if ($this->pulled && $this->parent) {
