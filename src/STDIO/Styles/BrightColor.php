@@ -11,7 +11,7 @@ use NGSOFT\STDIO\{
 /**
  * Bright background/colors decorator
  */
-class BrightColor
+class BrightColor implements CustomColor
 {
 
     protected bool $isBackgroundColor = false;

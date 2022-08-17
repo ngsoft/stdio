@@ -119,7 +119,7 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
     /**
      * Creates a style
      */
-    public function create(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): Style
+    public function create(string $label, Format|Color|BackgroundColor|CustomColor ...$styles): Style
     {
         $this->register($style = Style::createFrom($label, ...$styles)->withColorSupport($this->colors));
         return $style;

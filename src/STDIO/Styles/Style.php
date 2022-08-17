@@ -33,19 +33,19 @@ class Style
         return new static();
     }
 
-    public static function createFrom(string $label, Format|Color|BackgroundColor|HexColor|BrightColor ...$styles): static
+    public static function createFrom(string $label, Format|Color|BackgroundColor|CustomColor ...$styles): static
     {
         return self::createEmpty()->withLabel($label)->withFormats(...$styles);
     }
 
-    public function withFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$formats): static
+    public function withFormats(Format|Color|BackgroundColor|CustomColor ...$formats): static
     {
         $clone = clone $this;
         $clone->set = $clone->unset = [];
         return $this->withAddedFormats(...$formats);
     }
 
-    public function withAddedFormats(Format|Color|BackgroundColor|HexColor|BrightColor ...$formats)
+    public function withAddedFormats(Format|Color|BackgroundColor|CustomColor ...$formats)
     {
         $clone = clone $this;
 
