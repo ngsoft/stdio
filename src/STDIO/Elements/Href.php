@@ -7,9 +7,14 @@ namespace NGSOFT\STDIO\Elements;
 class Href extends Element
 {
 
-    public static function getPriority(): int
+    protected static function getTagName(): string
     {
-        return 10;
+        return strtolower(class_basename(static::class));
+    }
+
+    public static function managesAttributes(array $attributes): bool
+    {
+        return preg_test('#^https?:#', $attributes['href'] ?? '');
     }
 
 }
