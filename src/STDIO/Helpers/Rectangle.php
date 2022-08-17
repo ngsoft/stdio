@@ -6,8 +6,8 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Outputs\Renderer,
-    STDIO\Styles\Style, STDIO\Styles\StyleList
+    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Styles\Style,
+    STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -19,7 +19,7 @@ use function NGSOFT\Tools\{
 /**
  * Draws Rectangles
  */
-class Rectangle implements Renderer, Stringable
+class Rectangle extends Helper
 {
 
     protected const DEFAULT_STYLE = [
@@ -28,17 +28,11 @@ class Rectangle implements Renderer, Stringable
         BackgroundColor::GRAY
     ];
 
-    protected Style $style;
     protected Buffer $buffer;
     protected int $padding = 4;
     protected int $margin = 2;
     protected int $length = 0;
     protected bool $center = false;
-
-    public static function create(?StyleList $styles = null)
-    {
-        return new static($styles);
-    }
 
     public static function createFromElement(Element $elem): static
     {
@@ -73,8 +67,7 @@ class Rectangle implements Renderer, Stringable
             protected ?StyleList $styles = null
     )
     {
-        $this->buffer = new Buffer();
-        $this->styles ??= new StyleList();
+        parent::__construct($styles);
         $this->style = $this->styles->create(...self::DEFAULT_STYLE);
     }
 
@@ -142,31 +135,6 @@ class Rectangle implements Renderer, Stringable
         }
 
         $this->margin = max(0, min($margin, 10));
-        return $this;
-    }
-
-    public function getStyle(): Style
-    {
-        return $this->style;
-    }
-
-    public function setStyle(Style $style): static
-    {
-        $this->style = $style;
-        return $this;
-    }
-
-    public function render(Output $output): void
-    {
-        $output->write($this);
-    }
-
-    /**
-     * Add a line to the rectangle
-     */
-    public function write(string|Stringable $message): static
-    {
-        $this->buffer->write($message);
         return $this;
     }
 
