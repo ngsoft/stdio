@@ -18,7 +18,7 @@ class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable, Out
     /** @var string[] */
     private $buffer = [];
 
-    public function render(Output $output): void
+    public function render(OutputInterface $output): void
     {
         $this->flush($output);
     }
