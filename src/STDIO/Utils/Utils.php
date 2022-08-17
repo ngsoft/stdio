@@ -229,6 +229,11 @@ class Utils
         return preg_test('/^#?[0-9A-F]{3,6}$/i', $color);
     }
 
+    public static function is256Color(string $color): bool
+    {
+        return preg_test('#^c\d{1,3}$#i', $color);
+    }
+
     public static function convertRgbToAnsi(string $rgbColor, bool $isBackgroundColor = false, bool $isGrayscale = false)
     {
         static $mode;
@@ -364,7 +369,7 @@ class Utils
         return 16 + (36 * $lRed) + (6 * $lGreen) + $lBlue;
     }
 
-    protected static function degradeToAnsi(int $red, int $green, int $blue): int
+    public static function degradeToAnsi(int $red, int $green, int $blue): int
     {
         return (int) (floor($red / 128) + (floor($green / 128) * 2) + (floor($blue / 128) * 4));
     }
