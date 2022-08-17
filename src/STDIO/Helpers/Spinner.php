@@ -27,6 +27,7 @@ class Spinner extends Helper
     protected int $index = -1;
     protected array $theme = [];
     protected string $label = '';
+    protected float $interval = .1;
 
     public function __construct(?StyleList $styles = null)
     {
