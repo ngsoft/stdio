@@ -48,21 +48,10 @@ abstract class Helper implements Renderer, Stringable
         return $this;
     }
 
-    /**
-     * Format the message
-     */
-    abstract public function format(string|Stringable $message): string;
-
     /** {@inheritdoc} */
     public function render(Output $output): void
     {
         $output->write($this);
-    }
-
-    /** {@inheritdoc} */
-    public function __toString(): string
-    {
-        return $this->format($this->buffer);
     }
 
 }
