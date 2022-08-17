@@ -29,7 +29,7 @@ class Href extends Element
         $this->pulled = false;
 
         $formatted = sprintf(
-                "%s8;;%s%s\\[ %s ]%s8;;%s\\",
+                "%s8;;%s%s\\%s%s8;;%s\\",
                 Ansi::OSC, $link, Ansi::ESC,
                 $contents,
                 Ansi::OSC, Ansi::ESC
