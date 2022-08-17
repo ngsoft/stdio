@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Cursor, Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rectangle, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput,
-    Outputs\Output, Styles\Style, Styles\StyleList
+    Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rectangle, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output,
+    Styles\Style, Styles\StyleList
 };
 use Stringable;
 
@@ -21,13 +21,12 @@ class STDIO
 
     protected static $_instances = [];
     protected static self $_instance;
-    protected Output $output;
-    protected ErrorOutput $errorOutput;
-    protected Input $input;
-    protected Buffer $buffer;
-    protected Cursor $cursor;
-    protected StyleList $styles;
-    protected Formatter $formatter;
+    protected ?Output $output = null;
+    protected ?ErrorOutput $errorOutput = null;
+    protected ?Input $input = null;
+    protected ?Buffer $buffer = null;
+    protected ?StyleList $styles = null;
+    protected ?Formatter $formatter = null;
 
     /**
      * Get STDIO Instance
@@ -47,62 +46,50 @@ class STDIO
 
     final public function __construct(bool $forceColorSupport = null)
     {
+        static::$_instances[json_encode($forceColorSupport)] = static::$_instance = $this;
         $this->buffer = new Buffer();
         $this->input = new Input();
-        $this->styles = $styles = new StyleList($forceColorSupport);
-        $this->formatter = $formatter = new TagFormatter($styles);
-        $this->output = new Output($formatter);
-        $this->errorOutput = new ErrorOutput($formatter);
-        static::$_instance = static::$_instances[json_encode($forceColorSupport)] = $this;
+        $this->styles = new StyleList($forceColorSupport);
     }
 
     public function getOutput(): Output
     {
-        static::$_instance = $this;
-        return $this->output;
+        return $this->output ??= new Output($this->getFormatter());
     }
 
     public function getErrorOutput(): ErrorOutput
     {
-        static::$_instance = $this;
-        return $this->errorOutput;
+        return $this->errorOutput ??= new ErrorOutput($this->getFormatter());
     }
 
     public function getInput(): Input
     {
-        static::$_instance = $this;
-
-        return $this->input;
+        return $this->input ??= new Input();
     }
 
     public function getBuffer(): Buffer
     {
-
-        static::$_instance = $this;
-
         return $this->buffer;
     }
 
     public function getStyles(): StyleList
     {
-        static::$_instance = $this;
         return $this->styles;
     }
 
     public function getFormatter(): Formatter
     {
-        static::$_instance = $this;
-        return $this->formatter;
+        return $this->formatter ??= new TagFormatter($this->getStyles());
     }
 
     ////////////////////////////   Helpers   ////////////////////////////
 
     /**
-     * Write message into the buffer using printf
+     * Write message directly to the output using printf
      */
     public function printf(string $pattern, mixed ...$arguments): static
     {
-        return $this->write(sprintf($pattern, ...$arguments));
+        return $this->render($this->getOutput(), sprintf($pattern, ...$arguments));
     }
 
     /**

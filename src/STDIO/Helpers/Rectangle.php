@@ -74,7 +74,7 @@ class Rectangle implements Renderer, Stringable
     )
     {
         $this->buffer = new Buffer();
-        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->styles ??= new StyleList();
         $this->style = $this->styles->create(...self::DEFAULT_STYLE);
     }
 
@@ -263,8 +263,6 @@ class Rectangle implements Renderer, Stringable
             $formatted = split_string($messages[$index], $max);
 
             foreach ($lines as $i => $line) {
-
-
 
                 $result[] = $margin;
                 $result[] = $center;

@@ -49,7 +49,7 @@ class Element implements Stringable, Countable
             protected ?StyleList $styles = null
     )
     {
-        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->styles ??= new StyleList();
         $this->message = new Message();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
@@ -296,7 +296,7 @@ class Element implements Stringable, Countable
 
         $this->reset();
 
-        if ($this->isClone || $this->isStandalone || ! $this->active) {
+        if ($this->isClone || $this->isStandalone) {
             $this->parent?->removeChild($this);
         }
         return $text;

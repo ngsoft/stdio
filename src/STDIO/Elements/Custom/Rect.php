@@ -7,6 +7,7 @@ namespace NGSOFT\STDIO\Elements\Custom;
 use NGSOFT\STDIO\{
     Elements\CustomElement, Helpers\Rectangle
 };
+use RuntimeException;
 
 class Rect extends CustomElement
 {
@@ -23,6 +24,15 @@ class Rect extends CustomElement
         if ($this->isClone) {
             return;
         }
+
+        $this->cache = null;
+
+        $this->getFormated();
+    }
+
+    protected function update(): void
+    {
+        $this->cache = null;
     }
 
     public function onPull(): void
@@ -32,30 +42,31 @@ class Rect extends CustomElement
             return;
         }
 
-        $raw = $this->getRaw();
+
         $formated = $this->getFormated();
-        $children = $this->children;
+        $raw = $this->getRaw();
 
-        if ($this->parent?->isActive() || $this->isActive()) {
+        foreach ($this->children as $elem) {
 
-        }
+            if ($elem instanceof self && ! $elem->isClone) {
+                throw new RuntimeException(sprintf('Cannot put a Rectangle inside another Rectangle.'));
+            }
 
-
-        foreach ($children as $elem) {
             $this->removeChild($elem);
         }
 
-        $this->message->format($this->getRect()->format($formated, $raw), $raw);
 
-        if ($this->active) {
-            var_dump($this);
-        }
+
+        $this->message->format($this->getRect()->format($formated, $raw), $raw);
     }
 
     public function write(string $contents): void
     {
+        $this->cache = null;
         $this->pulled = false;
         $this->message->format($contents, $contents);
+
+        $this->getFormated();
     }
 
 }

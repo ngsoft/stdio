@@ -21,7 +21,7 @@ class TagFormatter implements Formatter
     {
 
 
-        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->styles ??= new StyleList();
         $this->document = new Document($this->styles);
     }
 

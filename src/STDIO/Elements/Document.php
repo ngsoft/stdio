@@ -22,7 +22,7 @@ class Document
             protected ?StyleList $styles = null
     )
     {
-        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->styles ??= new StyleList();
         self::$types ??= new PrioritySet();
         $this->autoRegister();
         $this->reset();

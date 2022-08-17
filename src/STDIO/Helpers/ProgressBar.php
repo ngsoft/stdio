@@ -31,7 +31,7 @@ class ProgressBar implements Stringable, IteratorAggregate, Renderer
             protected int $current = 0
     )
     {
-        $this->styles ??= STDIO::getCurrentInstance()->getStyles();
+        $this->styles ??= new StyleList();
 
         $this->addElement(new ProgressBar\Bar($this, $this->styles));
     }
