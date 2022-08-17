@@ -24,7 +24,7 @@ class Color256 implements CustomColor
         $isSupported ??= Utils::getNumColorSupport() > 255;
 
         if ( ! is_int($color) && preg_match('#\d+#', $color, $matches)) {
-            $color = $matches[0];
+            $color = intval($matches[0]);
         }
 
         if ( ! is_int($color)) {

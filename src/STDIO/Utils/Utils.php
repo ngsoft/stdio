@@ -226,12 +226,12 @@ class Utils
 
     public static function isHexColor(string $color): bool
     {
-        return preg_test('/^#?[0-9A-F]{3,6}$/i', $color);
+        return preg_test('/^#?([0-9A-F]{3}){1,2}$/i', $color);
     }
 
     public static function is256Color(string $color): bool
     {
-        return preg_test('#^c\d{1,3}$#i', $color);
+        return preg_test('#^c([0-1]{0,1}[0-9]{2}|2[0-4][0-9]|25[0-5])$#i', $color);
     }
 
     public static function convertRgbToAnsi(string $rgbColor, bool $isBackgroundColor = false, bool $isGrayscale = false)

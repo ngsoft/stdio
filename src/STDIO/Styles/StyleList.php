@@ -151,6 +151,8 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
                 if (empty($value)) {
                     if (isset($this[$key])) {
                         $style = $style->withAddedStyle($this[$key]);
+                    } elseif (Utils::is256Color($key)) {
+                        $style = $style->withAddedFormats(new Color256($key, $isBG));
                     } elseif (Utils::isHexColor($key)) {
                         $style = $style->withAddedFormats(new HexColor($key, $isBG, $isGray));
                     } elseif (Utils::isRGBColor($key)) {
@@ -178,6 +180,8 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
                     $val = mb_strtolower($val);
                     if (isset(self::$_formats[$key][$val])) {
                         $style = $style->withAddedFormats(self::$_formats[$key][$val]);
+                    } elseif (Utils::is256Color($val)) {
+                        $style = $style->withAddedFormats(new Color256($val, $isBG));
                     } elseif (Utils::isHexColor($val) && ! $isOptions) {
                         $style = $style->withAddedFormats(new HexColor($val, $isBG, $isGray));
                     } elseif (Utils::isRGBColor($val) && ! $isOptions) {
@@ -346,7 +350,6 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
                     }
                 }
             }
-
 
             foreach (self::FORMATS_CUSTOM as $args) {
                 $styles[$args[0]] = Style::createFrom(...$args);
