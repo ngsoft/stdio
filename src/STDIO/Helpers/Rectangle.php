@@ -6,8 +6,7 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Outputs\Output, STDIO\Styles\Style,
-    STDIO\Styles\StyleList
+    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
