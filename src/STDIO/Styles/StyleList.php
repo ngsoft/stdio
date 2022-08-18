@@ -116,8 +116,8 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
             return;
         }
 
-        if ( ! $this->offsetExists($style->getLabel())) {
-            $this->offsetSet($style->getLabel(), $style);
+        if ( ! $this->offsetExists($label)) {
+            $this->offsetSet($label, $style);
         }
     }
 
