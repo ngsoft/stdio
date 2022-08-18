@@ -21,7 +21,19 @@ class Spinner extends Helper
         165, 165, 201, 201, 200, 200, 199, 199, 198, 198, 197, 197,
     ];
     protected const COLORS_CLASSIC = [
-        1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1
+        1, 1,
+        2, 2, 2, 2,
+        3, 3, 3, 3,
+        4, 4, 4, 4,
+        5, 5, 5, 5,
+        6, 6, 6, 6,
+        7, 7, 7, 7,
+        6, 6, 6, 6,
+        5, 5, 5, 5,
+        4, 4, 4, 4,
+        3, 3, 3, 3,
+        2, 2, 2, 2,
+        1, 1,
     ];
 
     protected Cursor $cursor;
@@ -70,6 +82,7 @@ class Spinner extends Helper
         if (empty($this->position)) {
             $this->position = $cursor->getPosition();
             $colors = Utils::getNumColorSupport() > 255;
+
             if (empty($this->theme)) {
                 $this->setTheme($colors ? self::THEME_DEFAULT : self::THEME_CLASSIC);
             }
@@ -103,10 +116,10 @@ class Spinner extends Helper
             //$this->write("\r");
         }
 
-        $label = $char;
+        $label = $char . ' ';
 
         if ( ! empty($this->label)) {
-            $label .= ' ' . $this->label;
+            $label .= $this->label . ' ';
         }
 
 

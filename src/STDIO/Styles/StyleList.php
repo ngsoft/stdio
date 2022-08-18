@@ -56,6 +56,11 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         ['whisper', Color::GRAY, Format::DIM],
         ['shout', Color::RED, Format::BOLD],
     ];
+    protected const FORMATS_COLOR = [
+        Color256::class,
+        HexColor::class,
+        RGBColor::class,
+    ];
 
     /** @var Style[] */
     protected static $_styles = [];
