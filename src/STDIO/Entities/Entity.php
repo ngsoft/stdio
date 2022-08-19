@@ -60,7 +60,7 @@ abstract class Entity implements Stringable, Countable, Renderer
         if (empty($message)) {
             return;
         }
-
+        $this->formatted = null;
         $this->children[] = Message::create($message, $this->getStyle());
     }
 
@@ -70,6 +70,7 @@ abstract class Entity implements Stringable, Countable, Renderer
     public function clear(): void
     {
 
+        $this->formatted = null;
         $children = $this->children;
         /** @var Message|self $entity */
         foreach ($children as $index => $entity) {
@@ -122,7 +123,7 @@ abstract class Entity implements Stringable, Countable, Renderer
         if ($entity === $this || $entity === $this->parent) {
             throw new InvalidArgumentException('Cannot append Entity.');
         }
-
+        $this->formatted = null;
         if ( ! $this->message->isEmpty()) {
             $this->children[] = $this->message;
             $this->message = clone $this->message;
@@ -157,6 +158,7 @@ abstract class Entity implements Stringable, Countable, Renderer
 
         $index = array_search($entity, $this->children);
         if (false !== $index) {
+            $this->formatted = null;
             $entity->parent = null;
             $this->children = array_splice($this->children, $index, 1);
         }
@@ -305,10 +307,7 @@ abstract class Entity implements Stringable, Countable, Renderer
             $result = &$this->formatted;
 
             foreach ($this->children as $entity) {
-
-                if ($entity instanceof Message) {
-                    $result .= $entity->getFormatted();
-                }
+                $result .= (string) $entity;
             }
         }
 
