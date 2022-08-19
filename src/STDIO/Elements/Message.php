@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Elements;
 
-class Message implements \Stringable, \Countable
+use Countable,
+    NGSOFT\STDIO\Utils\Utils,
+    Stringable;
+use function mb_strlen;
+
+class Message implements Stringable, Countable
 {
 
     public string $formated = '';
@@ -20,10 +25,10 @@ class Message implements \Stringable, \Countable
         return $this->text;
     }
 
-    public function format(string $formated, string $text)
+    public function format(string $formated, ?string $text = null)
     {
         $this->formated = $formated;
-        $this->text = $text;
+        $this->text = $text ?? Utils::removeStyling($formated);
     }
 
     public function isEmpty(): bool

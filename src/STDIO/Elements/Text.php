@@ -23,8 +23,7 @@ class Text implements Stringable, Countable
             ?Style $style = null
     )
     {
-
-        $this->text = Utils::removeStyling($text);
+        $this->text = $text;
         $this->style = $style;
     }
 
