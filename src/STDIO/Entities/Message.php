@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NGSOFT\STDIO\Formatters;
+namespace NGSOFT\STDIO\Entities;
 
 use Countable,
     NGSOFT\STDIO\Styles\Style,
@@ -19,7 +19,14 @@ class Message implements Stringable, Countable
     protected ?string $formatted = null;
     protected ?Style $style = null;
 
-    public function __clone()
+    public static function create(string $text = '', ?Style $style = null)
+    {
+        $ins = new static();
+        $ins->text = $text;
+        $ins->style = $style;
+    }
+
+    public function __clone(): void
     {
         $this->formatted = $this->style = null;
         $this->text = '';
@@ -27,10 +34,26 @@ class Message implements Stringable, Countable
 
     public function format(string $text, ?Style $style = null): static
     {
-        $clone = clone $this;
-        $clone->text = $text;
-        $clone->style = $style;
-        return $clone;
+        $this->text = $text;
+        $this->style = $style;
+        return $this;
+    }
+
+    public function setStyle(Style $style): static
+    {
+        $this->style = $style;
+        return $this;
+    }
+
+    public function setFormatted(string $formatted): static
+    {
+        $this->formatted = $formatted;
+        return $this;
+    }
+
+    public function getStyle(): ?Style
+    {
+        return $this->style;
     }
 
     public function getText(): string
