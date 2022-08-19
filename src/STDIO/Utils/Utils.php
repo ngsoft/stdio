@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use InvalidArgumentException;
-use NGSOFT\{
-    STDIO\Outputs\Cursor, Tools
-};
-use Throwable;
+use InvalidArgumentException,
+    NGSOFT\STDIO\Outputs\Cursor,
+    Throwable;
 use function in_range,
              preg_exec,
              preg_test,
@@ -378,6 +376,14 @@ class Utils
     public static function degradeToAnsi(int $red, int $green, int $blue): int
     {
         return (int) (floor($red / 128) + (floor($green / 128) * 2) + (floor($blue / 128) * 4));
+    }
+
+    /**
+     * Removes the styles escapes characters from a message
+     */
+    public static function removeStyling(string|\Stringable $message): string
+    {
+        return preg_replace('#(?:\x1b|\033)\[[^m]+m#i', '', (string) $message);
     }
 
 }

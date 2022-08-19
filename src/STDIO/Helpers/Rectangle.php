@@ -137,6 +137,25 @@ class Rectangle extends Helper
         return $this;
     }
 
+    protected function removeStyling(string $string): string
+    {
+        return $this->styles->removeStyles($string);
+    }
+
+    protected function getWords(string $string): array
+    {
+        $result = [];
+
+        foreach (preg_split('#[\h\v]+#', $string) as $index => $word) {
+
+            $raw = $this->removeStyling($word);
+
+            $result[] = [$word, $raw, mb_strlen($word), mb_strlen($raw)];
+        }
+
+        return $result;
+    }
+
     /**
      * Format a message to be displayed as a rectangle
      * @param string|Stringable $message The formatted message to be displayed
@@ -156,7 +175,7 @@ class Rectangle extends Helper
 
         $raw ??= $this->styles->removeStyles($message);
 
-        var_dump($raw, mb_strlen($raw), $message, mb_strlen($message));
+        var_dump($this->getWords($message));
 
         $style = $this->style;
 
@@ -232,7 +251,7 @@ class Rectangle extends Helper
                 $max = $lineLength;
                 $formatted = split_string($messages[$index], $max);
             } else { $lines = $formatted = ['']; }
-
+            var_dump([$lines, $formatted]);
 
             foreach ($lines as $i => $line) {
 
