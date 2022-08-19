@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use Stringable;
+use Countable,
+    Stringable;
 
 /**
  * The entities used by the tag formatter
  */
-interface FormattedEntity extends Stringable
+interface FormattedEntity extends Stringable, Countable
 {
 
     /**
@@ -28,4 +29,25 @@ interface FormattedEntity extends Stringable
      * Write the message into the entity
      */
     public function write(string $message): void;
+
+    /**
+     * Empty the message stack
+     */
+    public function clear(): void;
+
+    /**
+     * Flag to check if entity has contents
+     * if set to true, the entity does not have contents
+     */
+    public function isStandalone(): bool;
+
+    /**
+     * Adds an entity as a children
+     */
+    public function appendChild(self $entity);
+
+    /**
+     * Removes a child
+     */
+    public function removeChild(self $entity);
 }

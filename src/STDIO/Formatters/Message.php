@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use NGSOFT\STDIO\Styles\Style,
+use Countable,
+    NGSOFT\STDIO\Styles\Style,
     Stringable;
+use function mb_strlen;
 
 /**
  * A Formatted Message
  */
-class Message implements Stringable, \Countable
+class Message implements Stringable, Countable
 {
 
     protected string $text = '';
@@ -31,6 +33,16 @@ class Message implements Stringable, \Countable
         return $clone;
     }
 
+    public function getText(): string
+    {
+        return $this->text;
+    }
+
+    public function getFormatted(): string
+    {
+        return $this->formatted ??= $this->style?->format($this->text) ?? $this->text;
+    }
+
     public function count(): int
     {
         return mb_strlen($this->text);
@@ -43,7 +55,7 @@ class Message implements Stringable, \Countable
 
     public function __toString(): string
     {
-        return $this->style?->format($this->text) ?? $this->text;
+        return $this->getFormatted();
     }
 
 }
