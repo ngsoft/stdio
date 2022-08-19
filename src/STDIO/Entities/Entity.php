@@ -29,12 +29,16 @@ abstract class Entity implements Stringable, Countable, Renderer
     /** @var self[]|Message[] */
     protected array $children = [];
 
+    public static function create(string $tag = '', ?StyleList $styles = null)
+    {
+        return new static($tag, $styles);
+    }
+
     public function __construct(
             protected string $tag = '',
             protected ?StyleList $styles = null
     )
     {
-        $this->message = new Message();
         $this->styles ??= new StyleList();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
