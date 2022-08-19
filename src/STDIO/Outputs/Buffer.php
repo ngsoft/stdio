@@ -38,7 +38,7 @@ class Buffer implements Countable, IteratorAggregate, Renderer, \Stringable, Out
         }
 
         foreach ($message as $line) {
-            if (( ! is_string($line) && $line instanceof \Stringable === false) || $line instanceof self) {
+            if (( ! is_string($line) && $line instanceof \Stringable === false) || $line === $this) {
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
             $this->buffer[] = (string) $line;

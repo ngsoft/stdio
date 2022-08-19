@@ -138,7 +138,7 @@ class Rectangle extends Helper
     }
 
     /**
-     * Format a message to be displayes as a rectangle
+     * Format a message to be displayed as a rectangle
      * @param string|Stringable $message The formatted message to be displayed
      * @param ?string $raw the raw message without styles \x1b[...m
      */
@@ -154,7 +154,9 @@ class Rectangle extends Helper
             return '';
         }
 
-        $raw ??= $message;
+        $raw ??= $this->styles->removeStyles($message);
+
+        var_dump($raw, mb_strlen($raw), $message, mb_strlen($message));
 
         $style = $this->style;
 

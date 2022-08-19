@@ -91,6 +91,11 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         return $this->createFromStyleString($styleString)->format($messages);
     }
 
+    public function removeStyles(string|\Stringable $message): string
+    {
+        return preg_replace('#(\x1b|\033)\[[^m]+m#i', '', (string) $message);
+    }
+
     /**
      * Display Styles to the output
      */
