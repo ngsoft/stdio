@@ -7,14 +7,17 @@ namespace NGSOFT\STDIO\Formatters;
 use Countable,
     IteratorAggregate;
 use NGSOFT\{
-    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Styles\StyleList
+    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Events\EntityEvent, STDIO\Styles\StyleList, Traits\DispatcherAware
 };
-use Stringable;
+use Stringable,
+    Traversable;
 use function implements_class,
              NGSOFT\Filesystem\require_all_once;
 
 class FormatterStack implements IteratorAggregate, Countable, Stringable
 {
+
+    use DispatcherAware;
 
     /** @var PrioritySet<string> */
     protected static ?PrioritySet $_types = null;
@@ -58,6 +61,12 @@ class FormatterStack implements IteratorAggregate, Countable, Stringable
         }
     }
 
+    protected function dispatchEvent(EntityEvent $event): EntityEvent
+    {
+
+        return ($this->eventDispatcher?->dispatch($event) ?? $event)->onEvent();
+    }
+
     public function reset(): void
     {
         $this->root = new DefaultEntity('', $this->styles);
@@ -70,9 +79,35 @@ class FormatterStack implements IteratorAggregate, Countable, Stringable
         if (empty($this->stack)) {
             return $this->root->setActive();
         }
+
+        return $this->stack[$this->count() - 1]->setActive();
+    }
+
+    public function isRoot(): bool
+    {
+        return $this->current() === $this->root;
     }
 
     public function push(Entity $entity): void
+    {
+
+        $this->current()->appendChild($entity);
+        if ( ! $entity->isStandalone()) {
+            $this->stack[] = $entity;
+        }
+    }
+
+    public function count(): int
+    {
+        return count($this->stack);
+    }
+
+    public function getIterator(): Traversable
+    {
+
+    }
+
+    public function __toString(): string
     {
 
     }

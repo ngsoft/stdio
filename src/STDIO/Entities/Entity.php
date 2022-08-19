@@ -227,7 +227,7 @@ abstract class Entity implements Stringable, Countable, Renderer
     /**
      * Helper to get attribute value as float
      */
-    protected function getFloat(mixed $value, float $default): int
+    protected function getFloat(mixed $value, float $default): float
     {
 
         if (is_int($value)) {
@@ -244,7 +244,7 @@ abstract class Entity implements Stringable, Countable, Renderer
     /**
      * Helper to get attribute value as bool
      */
-    protected function getBool(mixed $value, bool $default): int
+    protected function getBool(mixed $value, bool $default): bool
     {
 
         if ( ! is_bool($value)) {
