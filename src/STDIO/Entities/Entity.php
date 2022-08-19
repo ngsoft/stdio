@@ -7,15 +7,15 @@ namespace NGSOFT\STDIO\Entities;
 use Countable,
     InvalidArgumentException,
     JsonException;
-use NGSOFT\STDIO\Styles\{
-    Style, StyleList
+use NGSOFT\STDIO\{
+    Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList
 };
 use Stringable,
     Traversable;
 use function get_debug_type,
              is_stringable;
 
-abstract class Entity implements Stringable, Countable
+abstract class Entity implements Stringable, Countable, Renderer
 {
 
     /** @var array<string, string> */
@@ -24,6 +24,10 @@ abstract class Entity implements Stringable, Countable
     protected bool $active = false;
     protected ?self $parent = null;
     protected ?Style $style = null;
+    protected ?string $formatted = null;
+
+    /** @var self[]|Message[] */
+    protected array $children = [];
 
     public function __construct(
             protected string $tag = '',
@@ -34,9 +38,6 @@ abstract class Entity implements Stringable, Countable
         $this->styles ??= new StyleList();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
-
-    /** @var self[]|Message[] */
-    protected array $children = [];
 
     /**
      * The priority in the stack [1-INF]
@@ -55,14 +56,12 @@ abstract class Entity implements Stringable, Countable
      */
     public function write(string $message): void
     {
-        static $empty;
-        $empty ??= new Message();
 
-        $msg = clone $empty;
+        if (empty($message)) {
+            return;
+        }
 
-        $msg->format($message, $this->getStyle());
-
-        $this->children[] = $msg;
+        $this->children[] = Message::create($message, $this->getStyle());
     }
 
     /**
@@ -292,6 +291,42 @@ abstract class Entity implements Stringable, Countable
     public function removeAttribute(string $attr): void
     {
         unset($this->attributes[$attr]);
+    }
+
+    public function render(OutputInterface $output): void
+    {
+        $output->write($this);
+    }
+
+    protected function build(): string
+    {
+        if ( ! $this->formatted) {
+            $this->formatted = '';
+            $result = &$this->formatted;
+
+            foreach ($this->children as $entity) {
+
+                if ($entity instanceof Message) {
+                    $result .= $entity->getFormatted();
+                }
+            }
+        }
+
+        return $this->formatted;
+    }
+
+    public function count(): int
+    {
+        $len = 0;
+        foreach ($this->children as $entity) {
+            $len += count($entity);
+        }
+        return $len;
+    }
+
+    public function __toString(): string
+    {
+        return $this->build();
     }
 
 }
