@@ -124,15 +124,10 @@ abstract class Entity implements Stringable, Countable, Renderer
     public function appendChild(self $entity): void
     {
 
-        if ($entity === $this || $entity === $this->parent) {
+        if ($entity === $this || $entity === $this->parent || in_array($entity, $this->children)) {
             throw new InvalidArgumentException('Cannot append Entity.');
         }
         $this->formatted = null;
-        if ( ! $this->message->isEmpty()) {
-            $this->children[] = $this->message;
-            $this->message = clone $this->message;
-        }
-
 
         $this->children[] = $entity;
         $entity->parent = $this;
