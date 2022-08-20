@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Helpers;
 
-class WordWrap extends Helper implements \NGSOFT\STDIO\Formatters\Formatter
+use NGSOFT\STDIO\{
+    Enums\Align, Formatters\Formatter
+};
+use Stringable;
+
+class WordWrap extends Helper implements Formatter
 {
 
     protected int $max;
     protected int $min;
-    protected int $align;
+    protected Align $align = Align::RIGHT;
 
-    public function format(string|\Stringable $message): string
+    public function format(string|Stringable $message): string
     {
 
         $message = (string) $message;
