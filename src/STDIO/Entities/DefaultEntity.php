@@ -20,4 +20,16 @@ final class DefaultEntity extends Entity
         return true;
     }
 
+    public function onPull()
+    {
+        if ($this->isActive()) {
+
+            foreach ($this->getChildrenEntities() as $entity) {
+                if (method_exists($entity, __FUNCTION__)) {
+                    call_user_func([$entity, __FUNCTION__]);
+                }
+            }
+        }
+    }
+
 }

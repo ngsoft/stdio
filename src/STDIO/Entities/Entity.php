@@ -77,14 +77,20 @@ abstract class Entity implements Stringable, Countable, Renderer
         $this->formatted = null;
         $children = $this->children;
         /** @var Message|self $entity */
-        foreach ($children as $index => $entity) {
+        foreach (array_reverse($children) as $index => $entity) {
             if ($entity instanceof self) {
                 $this->removeChild($entity);
                 continue;
             }
+
             // message
             $this->children = array_splice($this->children, $index, 1);
         }
+    }
+
+    public function pull(): string
+    {
+
     }
 
     /**

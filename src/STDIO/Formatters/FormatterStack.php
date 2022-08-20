@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use Countable,
-    InvalidArgumentException,
-    IteratorAggregate;
+    InvalidArgumentException;
 use NGSOFT\{
-    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Events\EntityEvent, STDIO\Events\EntityPop, STDIO\Events\EntityPush,
-    STDIO\Styles\StyleList, Traits\DispatcherAware
+    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Events\EntityEvent, STDIO\Events\EntityPop, STDIO\Events\EntityPull,
+    STDIO\Events\EntityPush, STDIO\Styles\StyleList, Traits\DispatcherAware
 };
-use Stringable,
-    Traversable;
+use Stringable;
 use function implements_class,
              NGSOFT\Filesystem\require_all_once,
              str_starts_with;
@@ -148,9 +146,13 @@ class FormatterStack implements Countable, Stringable
 
     public function pull(): string
     {
+        $entity = $this->root;
 
+        $this->dispatchEvent(EntityPull::create($entity));
 
-        $result = (string) $this->root;
+        $result = (string) $entity;
+        $entity->clear();
+        return $result;
     }
 
     public function isEmpty(): bool
