@@ -7,6 +7,11 @@ namespace NGSOFT\STDIO\Entities;
 abstract class BuiltinEntity extends Entity
 {
 
+    protected static function getTagName(): string
+    {
+        return strtolower(class_basename(static::class));
+    }
+
     public static function getPriority(): int
     {
         return 10;
@@ -14,7 +19,7 @@ abstract class BuiltinEntity extends Entity
 
     public static function matches(array $attributes): bool
     {
-        return isset($attributes[strtolower(class_basename(static::class))]);
+        return isset($attributes[self::getTagName()]);
     }
 
 }
