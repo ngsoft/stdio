@@ -28,7 +28,10 @@ class StandaloneEntity extends Entity
     {
 
 
-        $char = $this->getValue($this->getAttribute('char') ?? $this->getAttribute('hr')) ?? '─';
+        if (empty($char = $this->getValue($this->getAttribute('char') ?? $this->getAttribute('hr')))) {
+            $char = '─';
+        }
+
 
         $padding = $this->getInt($this->getAttribute('padding'), 4);
 
