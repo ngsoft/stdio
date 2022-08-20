@@ -9,21 +9,36 @@ use NGSOFT\STDIO\Entities\Entity;
 class EntityEvent extends Event
 {
 
+    public function create(Entity $entity): static
+    {
+        return new static($entity);
+    }
+
     public function __construct(
-            public Entity $entity
+            protected Entity $entity
     )
     {
 
     }
 
+    protected function getMethod(): string
+    {
+        return 'on' . str_replace('Entity', '', class_basename($this));
+    }
+
+    public function getEntity(): Entity
+    {
+        return $this->entity;
+    }
+
+    /**
+     * Gets triggered even if propagation has been stopped
+     */
     public function onEvent(): static
     {
-
-        if ( ! $this->propagationStopped) {
-
-        }
-
-
+        $entity = $this->getEntity();
+        $method = $this->getMethod();
+        call_user_func([$this->getEntity(), $this->getMethod()]);
         return $this;
     }
 
