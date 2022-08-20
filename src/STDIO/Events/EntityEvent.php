@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Events;
 
 use NGSOFT\STDIO\Entities\Entity;
 
-class EntityEvent extends Event
+abstract class EntityEvent extends Event
 {
 
     public function create(Entity $entity): static
@@ -38,7 +38,13 @@ class EntityEvent extends Event
     {
         $entity = $this->getEntity();
         $method = $this->getMethod();
-        call_user_func([$this->getEntity(), $this->getMethod()]);
+
+        // lazy
+        if (method_exists($entity, $method)) {
+            call_user_func([$entity, $method]);
+        }
+
+
         return $this;
     }
 
