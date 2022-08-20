@@ -12,6 +12,8 @@ use function preg_test;
 class Href extends BuiltinEntity
 {
 
+    protected $linkDisplayed = false;
+
     public static function matches(array $attributes): bool
     {
         return preg_test('#^https?://.+/?#', $attributes['href'] ?? '');
@@ -23,7 +25,14 @@ class Href extends BuiltinEntity
             return parent::format($message);
         }
 
+
+
+
         $message = (string) $message;
+
+        if (empty($message)) {
+            return $message;
+        }
 
         $link = $this->getAttribute('href');
 
@@ -35,8 +44,11 @@ class Href extends BuiltinEntity
         );
 
         if ( ! Terminal::supportsColors()) {
-            $formatted = sprintf('[%s] %s', $link, $message);
+            $formatted = $this->linkDisplayed ? $message : sprintf('[%s: %s]', $link, $message);
+            $this->linkDisplayed = true;
         }
+
+
 
 
         return $this->getStyle()->format($formatted);

@@ -288,6 +288,11 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
 
     public function format(string|Stringable $message): string
     {
+
+        if (empty($message)) {
+            return $message;
+        }
+
         return $this->getStyle()->format($message);
     }
 

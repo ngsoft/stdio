@@ -110,18 +110,15 @@ class FormatterStack implements Countable, Stringable
         }
 
         if ( ! $entity) {
-            $entity = array_pop($this->stack);
-            $entity->setActive(false);
-
-            $this->dispatchEvent(EntityPop::create($entity));
-            return $entity;
+            $entity = $this->current();
         }
+
         /** @var Entity $current */
-        foreach (array_reverse($this->stack) as $index => $current) {
+        foreach (array_reverse($this->stack, true) as $index => $current) {
+
 
             if (str_starts_with($current->getTag(), $entity->getTag())) {
                 $this->stack = array_slice($this->stack, 0, $index);
-
                 $entity = $current;
                 $entity->setActive(false);
                 $this->dispatchEvent(EntityPop::create($entity));
