@@ -24,4 +24,9 @@ trait HelperEnumTrait
         return strtolower($this->getName());
     }
 
+    public static function DEFAULT(): static
+    {
+        return static::cases()[0];
+    }
+
 }
