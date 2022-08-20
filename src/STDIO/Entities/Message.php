@@ -19,11 +19,13 @@ class Message implements Stringable, Countable
     protected ?string $formatted = null;
     protected ?Style $style = null;
 
-    public static function create(string $text = '', ?Style $style = null)
+    public static function create(string $text = '', ?Style $style = null): static
     {
         $ins = new static();
         $ins->text = $text;
         $ins->style = $style;
+
+        return $ins;
     }
 
     public function __clone(): void

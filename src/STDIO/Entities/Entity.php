@@ -61,10 +61,12 @@ abstract class Entity implements Stringable, Countable, Renderer
     public function write(string $message): void
     {
 
+        $this->formatted = null;
+
         if (empty($message)) {
             return;
         }
-        $this->formatted = null;
+
         $this->children[] = Message::create($message, $this->getStyle());
     }
 

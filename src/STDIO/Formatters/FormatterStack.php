@@ -31,6 +31,8 @@ class FormatterStack implements Countable, Stringable
     {
         self::autoRegister();
         $this->styles ??= new StyleList();
+
+        $this->reset();
     }
 
     protected static function getTypes(): PrioritySet
@@ -127,6 +129,8 @@ class FormatterStack implements Countable, Stringable
 
     public function createEntity(string $tag): Entity
     {
+
+
         $params = $this->styles->getParamsFromStyleString($tag);
 
         /** @var Entity $class */

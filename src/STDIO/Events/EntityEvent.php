@@ -36,6 +36,7 @@ abstract class EntityEvent extends Event
      */
     public function onEvent(): static
     {
+
         $entity = $this->getEntity();
         $method = $this->getMethod();
 

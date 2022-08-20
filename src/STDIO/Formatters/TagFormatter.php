@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Formatters;
 
-use NGSOFT\{
-    STDIO, STDIO\Elements\Document, STDIO\Styles\StyleList
-};
-use Stringable;
+use NGSOFT\STDIO\Styles\StyleList,
+    Stringable;
 use function mb_strlen,
              str_ends_with,
              str_starts_with;
@@ -15,12 +13,12 @@ use function mb_strlen,
 class TagFormatter implements Formatter
 {
 
-    protected Document $document;
+    protected FormatterStack $stack;
 
     public function __construct(protected ?StyleList $styles = null)
     {
         $this->styles ??= new StyleList();
-        $this->document = new Document($this->styles);
+        $this->stack = new FormatterStack($this->styles);
     }
 
     /**
@@ -63,7 +61,7 @@ class TagFormatter implements Formatter
                 }
 
 
-                $this->document->write(substr($message, $offset, $pos - $offset));
+                $this->stack->write(substr($message, $offset, $pos - $offset));
 
                 $offset = $pos + strlen($text);
 
@@ -74,26 +72,26 @@ class TagFormatter implements Formatter
 
                 $tag = rtrim($tag, ',;');
 
-                $element = null;
+                $entity = null;
 
                 if ( ! empty($tag)) {
-                    $element = $this->document->createElement($tag);
+                    $entity = $this->stack->createEntity($tag);
                 }
 
                 if ($closing) {
-                    $this->document->pop($element);
+                    $this->stack->pop($entity);
                     continue;
                 }
 
 
-                $element && $this->document->push($element);
+                $entity && $this->stack->push($entity);
             }
         }
 
 
-        $this->document->write(substr($message, $offset));
+        $this->stack->write(substr($message, $offset));
 
-        $output = $this->document->pullContents();
+        $output = $this->stack->pull();
 
         // cleanup element children
         // $this->document->isRoot() && $this->document->reset();
