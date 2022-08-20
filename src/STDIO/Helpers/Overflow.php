@@ -9,9 +9,9 @@ enum Overflow
 
     use HelperEnumTrait;
 
+    case NONE;
     case CROP;
     case FOLD;
     case ELLISIS;
-    case NONE;
 
 }
