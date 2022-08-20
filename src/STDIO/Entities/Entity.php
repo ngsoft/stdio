@@ -88,11 +88,6 @@ abstract class Entity implements Stringable, Countable, Renderer
         }
     }
 
-    public function pull(): string
-    {
-
-    }
-
     /**
      * Flag to check if entity has contents
      * if set to true, the entity does not have contents
