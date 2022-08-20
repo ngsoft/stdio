@@ -40,7 +40,8 @@ return [
     //       to `exclude_analysis_directory_list`.
     "exclude_analysis_directory_list" => [
         'vendor/',
-        '../tools/'
+        '../tools/',
+        'src/STDIO/Helpers'
     ],
     // A list of plugin files to execute.
     // See https://github.com/phan/phan/tree/master/.phan/plugins for even more.
@@ -71,6 +72,7 @@ return [
         'PhanUnusedPublicFinalMethodParameter',
         'PhanRedefinedInheritedInterface',
         'PhanParamTooManyInternal',
+        'PhanTypeInstantiateAbstractStatic',
     //'PhanUnreferencedUseNormal',
     ]
 ];

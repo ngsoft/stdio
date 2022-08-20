@@ -141,6 +141,18 @@ class FormatterStack implements Countable, Stringable
         return DefaultEntity::create($tag, $this->styles);
     }
 
+    public function write(string $message): void
+    {
+        $this->current()->write($message);
+    }
+
+    public function pull(): string
+    {
+
+
+        $result = (string) $this->root;
+    }
+
     public function isEmpty(): bool
     {
         return $this->count() === 0;

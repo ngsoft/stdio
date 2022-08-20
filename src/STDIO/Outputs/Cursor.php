@@ -18,6 +18,9 @@ final class Cursor
         $this->output ??= new Output();
     }
 
+    /**
+     * @phan-suppress PhanPluginPrintfVariableFormatString
+     */
     protected function printf(string $format, int ...$arguments): static
     {
         $this->output->write(sprintf($format, ...$arguments));

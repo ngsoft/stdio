@@ -86,6 +86,7 @@ class STDIO
 
     /**
      * Write message directly to the output using printf
+     * @phan-suppress PhanPluginPrintfVariableFormatString
      */
     public function printf(string $pattern, mixed ...$arguments): static
     {

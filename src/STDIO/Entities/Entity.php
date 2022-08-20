@@ -106,14 +106,19 @@ abstract class Entity implements Stringable, Countable, Renderer
 
     public function setActive(bool $active = true): static
     {
-        if ($this->active = $active) {
-            $this->parent?->setActive(false);
+
+        if ($active) {
+
+            // set tree to root => $this to true
+            $this->parent?->setActive(true);
+            /** @var self $entity */
+            foreach ($this->getChildrenEntities() as $entity) {
+                $entity->setActive(false);
+            }
         }
 
-        /** @var self $entity */
-        foreach ($this->getChildrenEntities() as $entity) {
-            $entity->setActive(false);
-        }
+
+        $this->active = $active;
 
         return $this;
     }
@@ -280,6 +285,9 @@ abstract class Entity implements Stringable, Countable, Renderer
         return ! is_null($this->getAttribute($attr));
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchProperty
+     */
     public function setAttribute(string $attr, mixed $value): void
     {
         if (is_null($value)) {

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
-use Stringable,
-    TypeError;
+use Stringable;
 
 interface OutputInterface
 {

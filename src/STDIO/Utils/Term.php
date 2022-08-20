@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Utils;
 
-use NGSOFT\{
-    STDIO, STDIO\Outputs\Output
-};
 use function preg_exec;
 
 final class Term
