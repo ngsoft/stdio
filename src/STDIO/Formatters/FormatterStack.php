@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Formatters;
 
 use Countable,
+    InvalidArgumentException,
     IteratorAggregate;
 use NGSOFT\{
-    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Events\EntityEvent, STDIO\Styles\StyleList, Traits\DispatcherAware
+    DataStructure\PrioritySet, STDIO\Entities\DefaultEntity, STDIO\Entities\Entity, STDIO\Events\EntityEvent, STDIO\Events\EntityPop, STDIO\Events\EntityPush,
+    STDIO\Styles\StyleList, Traits\DispatcherAware
 };
 use Stringable,
     Traversable;
 use function implements_class,
-             NGSOFT\Filesystem\require_all_once;
+             NGSOFT\Filesystem\require_all_once,
+             str_starts_with;
 
-class FormatterStack implements IteratorAggregate, Countable, Stringable
+class FormatterStack implements Countable, Stringable
 {
 
     use DispatcherAware;
@@ -95,6 +98,52 @@ class FormatterStack implements IteratorAggregate, Countable, Stringable
         if ( ! $entity->isStandalone()) {
             $this->stack[] = $entity;
         }
+
+        $this->dispatchEvent(EntityPush::create($entity));
+    }
+
+    public function pop(?Entity $entity = null)
+    {
+
+        if ($this->isEmpty()) {
+            return $this->root;
+        }
+
+        if ( ! $entity) {
+            $entity = end($this->stack);
+        }
+        /** @var Entity $current */
+        foreach (array_reverse($this->stack) as $index => $current) {
+
+            if (str_starts_with($current->getTag(), $entity->getTag())) {
+                $this->stack = array_splice($this->stack, 0, $index);
+
+                $entity = $current;
+                $this->dispatchEvent(EntityPop::create($entity));
+                return $entity;
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf('Incorrect closing tag "</%s>" found.', $entity->getTag()));
+    }
+
+    public function createEntity(string $tag): Entity
+    {
+        $params = $this->styles->getParamsFromStyleString($tag);
+
+        /** @var Entity $class */
+        foreach (self::$_types as $class) {
+            if ($class::matches($params)) {
+                return $class::create($tag, $this->styles);
+            }
+        }
+
+        return DefaultEntity::create($tag, $this->styles);
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
     }
 
     public function count(): int
@@ -102,14 +151,9 @@ class FormatterStack implements IteratorAggregate, Countable, Stringable
         return count($this->stack);
     }
 
-    public function getIterator(): Traversable
-    {
-
-    }
-
     public function __toString(): string
     {
-
+        return (string) $this->root;
     }
 
 }

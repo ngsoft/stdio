@@ -9,7 +9,7 @@ use NGSOFT\STDIO\Entities\Entity;
 abstract class EntityEvent extends Event
 {
 
-    public function create(Entity $entity): static
+    public static function create(Entity $entity): static
     {
         return new static($entity);
     }
