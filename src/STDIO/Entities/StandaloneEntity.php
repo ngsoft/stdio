@@ -74,7 +74,7 @@ class StandaloneEntity extends Entity
     public function format(string|\Stringable $message): string
     {
         if ( ! static::matches($this->attributes)) {
-            return parent::format($message);
+            return '';
         }
 
         if ($this->hasAttribute('hr')) {
