@@ -33,9 +33,8 @@ class StandaloneEntity extends Entity
 
         $char = $this->getValue($char);
 
-        if ( ! is_int($padding = $this->getAttribute('padding'))) {
-            $padding = 4;
-        }
+        $padding = $this->getInt($this->getAttribute('padding'), 4);
+
         $padding = max(0, min($padding, 16));
 
         if ($padding % 2 === 1) {
@@ -45,9 +44,7 @@ class StandaloneEntity extends Entity
 
         $width = $max = Terminal::getWidth() - ($padding * 2);
 
-        if (is_int($this->getAttribute('length'))) {
-            $width = $this->getAttribute('length');
-        }
+        $width = $this->getInt($this->getAttribute('length'), $width);
 
         $width = max(16, min($max, $width));
 
@@ -73,11 +70,7 @@ class StandaloneEntity extends Entity
     {
 
         $count = $this->getAttribute('count') ?? $this->getAttribute($param);
-
-        if ( ! is_int($count)) {
-            $count = 1;
-        }
-
+        $count = $this->getInt($count, 1);
         $count = max(1, $count);
         $result = str_repeat($str, $count);
 

@@ -224,12 +224,7 @@ abstract class Entity implements Stringable, Countable, Renderer
      */
     protected function getInt(mixed $value, int $default): int
     {
-
-        if ( ! is_int($value)) {
-            return $default;
-        }
-
-        return $value;
+        return is_int($value) ? $value : $default;
     }
 
     /**
@@ -241,12 +236,7 @@ abstract class Entity implements Stringable, Countable, Renderer
         if (is_int($value)) {
             $value = floatval($value);
         }
-
-        if ( ! is_float($value)) {
-            return $default;
-        }
-
-        return $value;
+        return is_float($value) ? $value : $default;
     }
 
     /**
@@ -254,12 +244,7 @@ abstract class Entity implements Stringable, Countable, Renderer
      */
     protected function getBool(mixed $value, bool $default): bool
     {
-
-        if ( ! is_bool($value)) {
-            return $default;
-        }
-
-        return $value;
+        return is_bool($value) ? $value : $default;
     }
 
     public function getAttributes(): array
@@ -269,7 +254,7 @@ abstract class Entity implements Stringable, Countable, Renderer
 
     public function getAttribute(string $attr): mixed
     {
-        $value = $this->getValue($this->attributes[$attr] ?? null);
+        $value = $this->attributes[$attr] ?? null;
 
         if (is_string($value)) {
 
