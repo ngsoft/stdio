@@ -111,6 +111,7 @@ class STDIO
 
             $messages = $result . '</>';
         }
+
         return $this->render($this->getOutput(), $messages);
     }
 

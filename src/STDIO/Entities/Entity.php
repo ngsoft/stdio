@@ -66,7 +66,6 @@ abstract class Entity implements Stringable, Countable, Renderer
         if (empty($message)) {
             return;
         }
-
         $this->children[] = Message::create($message, $this->getStyle());
     }
 
@@ -82,11 +81,12 @@ abstract class Entity implements Stringable, Countable, Renderer
         foreach (array_reverse($children) as $index => $entity) {
             if ($entity instanceof self) {
                 $this->removeChild($entity);
+                $entity->clear();
                 continue;
             }
 
             // message
-            $this->children = array_splice($this->children, $index, 1);
+            array_splice($this->children, $index, 1);
         }
     }
 
@@ -167,7 +167,7 @@ abstract class Entity implements Stringable, Countable, Renderer
         if (false !== $index) {
             $this->formatted = null;
             $entity->parent = null;
-            $this->children = array_splice($this->children, $index, 1);
+            array_splice($this->children, $index, 1);
         }
     }
 
@@ -336,6 +336,19 @@ abstract class Entity implements Stringable, Countable, Renderer
     public function __toString(): string
     {
         return $this->build();
+    }
+
+    public function __debugInfo(): array
+    {
+
+
+        return [
+            'parent' => $this->parent,
+            'children' => $this->children,
+            'standalone' => $this->standalone,
+            'active' => $this->active,
+            'style' => $this->getStyle(),
+        ];
     }
 
 }

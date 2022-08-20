@@ -46,7 +46,7 @@ class Output implements OutputInterface
                 throw new TypeError(sprintf('Invalid message type %s.', get_debug_type($line)));
             }
 
-            if (false === @fwrite($this->stream, $this->formatter->format((string) $line))) {
+            if (false === @fwrite($this->stream, $this->formatter->format($line))) {
                 throw new RuntimeException('Unable to write output.');
             }
             fflush($this->stream);

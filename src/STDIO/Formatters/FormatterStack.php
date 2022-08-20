@@ -116,9 +116,10 @@ class FormatterStack implements Countable, Stringable
         foreach (array_reverse($this->stack) as $index => $current) {
 
             if (str_starts_with($current->getTag(), $entity->getTag())) {
-                $this->stack = array_splice($this->stack, 0, $index);
+                $this->stack = array_slice($this->stack, 0, $index);
 
                 $entity = $current;
+                $entity->setActive(false);
                 $this->dispatchEvent(EntityPop::create($entity));
                 return $entity;
             }
@@ -152,10 +153,13 @@ class FormatterStack implements Countable, Stringable
     {
         $entity = $this->root;
 
+        //var_dump($entity);
+
         $this->dispatchEvent(EntityPull::create($entity));
 
         $result = (string) $entity;
         $entity->clear();
+
         return $result;
     }
 

@@ -36,14 +36,20 @@ class Message implements Stringable, Countable
 
     public function format(string $text, ?Style $style = null): static
     {
-        $this->text = $text;
         $this->style = $style;
-        return $this;
+        return $this->setText($text);
     }
 
     public function setStyle(Style $style): static
     {
         $this->style = $style;
+        return $this;
+    }
+
+    public function setText(string $text)
+    {
+        $this->formatted = null;
+        $this->text = $text;
         return $this;
     }
 
