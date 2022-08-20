@@ -167,6 +167,11 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         }
     }
 
+    public function getStyles(): StyleList
+    {
+        return $this->styles;
+    }
+
     public function getStyle(): Style
     {
         return $this->style ??= $this->styles->createStyleFromParams($this->attributes);
@@ -195,7 +200,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     /**
      * Transform value to a string
      */
-    protected function getValue(mixed $value): ?string
+    public function getValue(mixed $value): ?string
     {
 
         if (is_null($value)) {
@@ -218,7 +223,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     /**
      * Helper to get attribute value as int
      */
-    protected function getInt(mixed $value, int $default): int
+    public function getInt(mixed $value, int $default): int
     {
         return is_int($value) ? $value : $default;
     }
@@ -226,7 +231,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     /**
      * Helper to get attribute value as float
      */
-    protected function getFloat(mixed $value, float $default): float
+    public function getFloat(mixed $value, float $default): float
     {
 
         if (is_int($value)) {
@@ -238,7 +243,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     /**
      * Helper to get attribute value as bool
      */
-    protected function getBool(mixed $value, bool $default): bool
+    public function getBool(mixed $value, bool $default): bool
     {
         return is_bool($value) ? $value : $default;
     }

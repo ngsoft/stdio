@@ -6,7 +6,7 @@ namespace NGSOFT\STDIO\Helpers;
 
 use InvalidArgumentException;
 use NGSOFT\{
-    Facades\Terminal, STDIO\Elements\Element, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Styles\StyleList
+    Facades\Terminal, STDIO\Elements\Element, STDIO\Entities\Entity, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Outputs\Buffer, STDIO\Styles\StyleList
 };
 use RuntimeException,
     Stringable;
@@ -32,6 +32,34 @@ class Rectangle extends Helper
     protected int $margin = 2;
     protected int $length = 0;
     protected bool $center = false;
+
+    public static function createFromEntity(Entity $entity): static
+    {
+
+        $rect = static::create($entity->getStyles());
+
+        $length = $entity->getAttribute('length');
+
+        if ($length === 'auto') {
+            $rect->autoSetLength();
+        } elseif (is_int($length)) {
+            $rect->setLength($length);
+        }
+        $rect->setPadding($entity->getInt($entity->getAttribute('padding'), 4));
+        $rect->setMargin($entity->getInt($entity->getAttribute('margin'), 2));
+
+        if ($entity->hasAttribute('center')) {
+            $rect->setCenter($entity->getAttribute('center') !== false);
+        }
+
+
+
+
+
+
+
+        return $rect;
+    }
 
     public static function createFromElement(Element $elem): static
     {
@@ -144,13 +172,13 @@ class Rectangle extends Helper
 
     protected function getWords(string $string): array
     {
+
         $result = [];
 
         foreach (preg_split('#[\h\v]+#', $string) as $index => $word) {
 
             $raw = $this->removeStyling($word);
-
-            $result[] = [$word, $raw, mb_strlen($word), mb_strlen($raw)];
+            $result[] = [$raw, $word];
         }
 
         return $result;
@@ -161,7 +189,7 @@ class Rectangle extends Helper
      * @param string|Stringable $message The formatted message to be displayed
      * @param ?string $raw the raw message without styles \x1b[...m
      */
-    public function format(string|Stringable $message, string $raw = null): string
+    public function formatOld(string|Stringable $message, string $raw = null): string
     {
         if ($message instanceof self) {
             throw new InvalidArgumentException('$message cannot be instance of ' . __CLASS__);
