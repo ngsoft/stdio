@@ -288,6 +288,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
 
     public function format(string|Stringable $message): string
     {
+        $message = (string) $message;
 
         if (empty($message)) {
             return $message;

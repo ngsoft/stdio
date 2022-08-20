@@ -12,7 +12,7 @@ use function preg_test;
 class Href extends BuiltinEntity
 {
 
-    protected $linkDisplayed = false;
+    protected bool $linkDisplayed = false;
 
     public static function matches(array $attributes): bool
     {
@@ -24,9 +24,6 @@ class Href extends BuiltinEntity
         if ( ! static::matches($this->attributes)) {
             return parent::format($message);
         }
-
-
-
 
         $message = (string) $message;
 
