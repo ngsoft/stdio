@@ -27,7 +27,6 @@ class Rectangle extends Helper
         BackgroundColor::GRAY
     ];
 
-    protected Buffer $buffer;
     protected int $padding = 4;
     protected int $margin = 2;
     protected int $length = 0;
@@ -52,40 +51,12 @@ class Rectangle extends Helper
             $rect->setCenter($entity->getAttribute('center') !== false);
         }
 
-
-
-
-
-
-
-        return $rect;
-    }
-
-    public static function createFromElement(Element $elem): static
-    {
-        $rect = static::create($elem->getStyles());
-
-        $length = $elem->getAttribute('length');
-        $padding = $elem->getAttribute('padding');
-        $margin = $elem->getAttribute('margin');
-
-        if ($elem->hasAttribute('center')) {
-            $rect->setCenter($elem->getAttribute('center') !== false);
-        }
-
-        is_int($length) && $rect->setLength($length);
-        is_int($padding) && $rect->setPadding($padding);
-        is_int($margin) && $rect->setMargin($margin);
-
-        if ($length === 'auto') {
-            $rect->autoSetLength();
-        }
-
-        $style = $elem->getStyle();
+        $style = $entity->getStyle();
 
         if ( ! $style->isEmpty()) {
             $rect->setStyle($style);
         }
+
 
         return $rect;
     }
@@ -180,6 +151,17 @@ class Rectangle extends Helper
             $raw = $this->removeStyling($word);
             $result[] = [$raw, $word];
         }
+
+        return $result;
+    }
+
+    public function format(string|Stringable $message): string
+    {
+
+
+        $message = (string) $message;
+
+        $raw = $this->removeStyling($message);
 
         return $result;
     }
