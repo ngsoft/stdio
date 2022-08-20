@@ -8,14 +8,14 @@ use Countable,
     InvalidArgumentException,
     JsonException;
 use NGSOFT\STDIO\{
-    Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList
+    Formatters\Formatter, Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList
 };
 use Stringable,
     Traversable;
 use function get_debug_type,
              is_stringable;
 
-abstract class Entity implements Stringable, Countable, Renderer
+abstract class Entity implements Stringable, Countable, Renderer, Formatter
 {
 
     /** @var array<string, string> */
@@ -119,8 +119,6 @@ abstract class Entity implements Stringable, Countable, Renderer
                 $entity->setActive(false);
             }
         }
-
-
         $this->active = $active;
 
         return $this;
@@ -288,6 +286,11 @@ abstract class Entity implements Stringable, Countable, Renderer
     public function removeAttribute(string $attr): void
     {
         unset($this->attributes[$attr]);
+    }
+
+    public function format(string|Stringable $message): string
+    {
+        return $this->getStyle()->format($message);
     }
 
     public function render(OutputInterface $output): void
