@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Entities;
 
 use Countable,
-    NGSOFT\STDIO\Styles\Style,
     Stringable;
 use function mb_strlen;
 
 /**
- * A Formatted Message
+ * A Message
  */
 class Message implements Stringable, Countable
 {
