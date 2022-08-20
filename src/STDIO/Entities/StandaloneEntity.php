@@ -27,11 +27,8 @@ class StandaloneEntity extends Entity
     protected function renderThematicChange(): string
     {
 
-        if (empty($char = $this->getAttribute('char') ?? $this->getAttribute('hr'))) {
-            $char = '─';
-        }
 
-        $char = $this->getValue($char);
+        $char = $this->getValue($this->getAttribute('char') ?? $this->getAttribute('hr')) ?? '─';
 
         $padding = $this->getInt($this->getAttribute('padding'), 4);
 

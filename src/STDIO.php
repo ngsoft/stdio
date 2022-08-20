@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace NGSOFT;
 
 use NGSOFT\STDIO\{
-    Elements\Custom\Rect as RectElement, Formatters\Formatter, Formatters\TagFormatter, Helpers\Rectangle, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output,
-    Styles\Style, Styles\StyleList
+    Formatters\Formatter, Formatters\TagFormatter, Helpers\Rectangle, Inputs\Input, Outputs\Buffer, Outputs\ErrorOutput, Outputs\Output, Styles\Style, Styles\StyleList
 };
 use Stringable;
 
@@ -202,17 +201,16 @@ class STDIO
      * @param Rectangle &$rect
      * @return static
      */
-    public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
-    {
+    /* public function rect(string|\Stringable $message, Style|null|string $style = null, &$rect = null): static
+      {
 
-        if ( ! is_string($style)) {
-            $rect = Rectangle::create($this->getStyles());
-            if ( ! is_null($style)) {
-                $rect->setStyle($style);
-            }
-        } else { $rect = RectElement::create($style, $this->getStyles())->getRect(); }
+      if ( ! is_string($style)) {
+      $rect = Rectangle::create($this->getStyles());
+      if ( ! is_null($style)) {
+      $rect->setStyle($style);
+      }
+      } else { $rect = RectElement::create($style, $this->getStyles())->getRect(); }
 
-        return $this->write($rect->write($message));
-    }
-
+      return $this->write($rect->write($message));
+      } */
 }
