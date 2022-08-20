@@ -35,7 +35,7 @@ class Href extends BuiltinEntity
         );
 
         if ( ! Terminal::supportsColors()) {
-            $formatted = $message = sprintf('[%s] %s', $link, $message);
+            $formatted = sprintf('[%s] %s', $link, $message);
         }
 
 

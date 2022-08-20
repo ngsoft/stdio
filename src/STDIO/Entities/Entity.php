@@ -66,7 +66,6 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         if (empty($message)) {
             return;
         }
-
         $this->children[] = Message::create($message);
     }
 
@@ -77,17 +76,14 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     {
 
         $this->formatted = null;
-        $children = $this->children;
-        /** @var Message|self $entity */
-        foreach (array_reverse($children) as $index => $entity) {
+
+        foreach ($this->children as $index => $entity) {
             if ($entity instanceof self) {
-                $this->removeChild($entity);
                 $entity->clear();
+                $this->removeChild($entity);
                 continue;
             }
-
-            // message
-            array_splice($this->children, $index, 1);
+            unset($this->children[$index]);
         }
     }
 
@@ -112,14 +108,15 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     {
 
         if ($active) {
-
-            // set tree to root => $this to true
-            $this->parent?->setActive(true);
             /** @var self $entity */
             foreach ($this->getChildrenEntities() as $entity) {
                 $entity->setActive(false);
             }
+
+            // set tree to root => $this to true
+            $this->parent?->setActive(true);
         }
+
         $this->active = $active;
 
         return $this;
@@ -166,7 +163,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         if (false !== $index) {
             $this->formatted = null;
             $entity->parent = null;
-            array_splice($this->children, $index, 1);
+            unset($this->children[$index]);
         }
     }
 
@@ -328,8 +325,6 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
 
     public function __debugInfo(): array
     {
-
-
         return [
             'parent' => $this->parent,
             'children' => $this->children,

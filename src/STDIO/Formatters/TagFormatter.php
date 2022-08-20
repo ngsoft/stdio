@@ -61,7 +61,9 @@ class TagFormatter implements Formatter
                 }
 
 
-                $this->stack->write(substr($message, $offset, $pos - $offset));
+                $msg = substr($message, $offset, $pos - $offset);
+
+                $this->stack->write($msg);
 
                 $offset = $pos + strlen($text);
 
@@ -89,12 +91,11 @@ class TagFormatter implements Formatter
         }
 
 
-        $this->stack->write(substr($message, $offset));
+        $msg = substr($message, $offset);
+
+        $this->stack->write($msg);
 
         $output = $this->stack->pull();
-
-        // cleanup element children
-        // $this->document->isRoot() && $this->document->reset();
 
         return strtr($output, [
             "\0" => '\\',
