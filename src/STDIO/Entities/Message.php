@@ -15,63 +15,25 @@ use function mb_strlen;
 class Message implements Stringable, Countable
 {
 
-    protected string $text = '';
-    protected ?string $formatted = null;
-    protected ?Style $style = null;
-
-    public static function create(string $text = '', ?Style $style = null): static
+    public function __construct(protected string $text = '')
     {
-        $ins = new static();
-        $ins->text = $text;
-        $ins->style = $style;
 
-        return $ins;
     }
 
-    public function __clone(): void
+    public static function create(string $text = ''): static
     {
-        $this->formatted = $this->style = null;
-        $this->text = '';
-    }
-
-    public function format(string $text, ?Style $style = null): static
-    {
-        $this->style = $style;
-        return $this->setText($text);
-    }
-
-    public function setStyle(Style $style): static
-    {
-        $this->style = $style;
-        return $this;
+        return new static($text);
     }
 
     public function setText(string $text)
     {
-        $this->formatted = null;
         $this->text = $text;
         return $this;
-    }
-
-    public function setFormatted(string $formatted): static
-    {
-        $this->formatted = $formatted;
-        return $this;
-    }
-
-    public function getStyle(): ?Style
-    {
-        return $this->style;
     }
 
     public function getText(): string
     {
         return $this->text;
-    }
-
-    public function getFormatted(): string
-    {
-        return $this->formatted ??= $this->style?->format($this->text) ?? $this->text;
     }
 
     public function count(): int
@@ -86,7 +48,7 @@ class Message implements Stringable, Countable
 
     public function __toString(): string
     {
-        return $this->getFormatted();
+        return $this->text;
     }
 
 }

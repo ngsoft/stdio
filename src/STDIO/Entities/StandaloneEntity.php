@@ -24,7 +24,7 @@ class StandaloneEntity extends Entity
         return count($managed) - 1 === count(array_diff($managed, array_keys($attributes)));
     }
 
-    protected function renderThematicChange(): void
+    protected function renderThematicChange(): string
     {
 
         if (empty($char = $this->getAttribute('char') ?? $this->getAttribute('hr'))) {
@@ -59,36 +59,31 @@ class StandaloneEntity extends Entity
 
         $sep = mb_substr(str_repeat($char, $repeats), 0, $width);
 
-        $this->children = [
-                    Message::create()
-                    ->setText("\n{$pad}" . $sep . "{$pad}\n")
-                    ->setFormatted("\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n")
-        ];
+        return "\n{$pad}" . $this->getStyle()->format($sep) . "{$pad}\n";
     }
 
-    protected function renderRepeatString(string $str, string $param): void
+    protected function renderRepeatString(string $str, string $param): string
     {
 
         $count = $this->getAttribute('count') ?? $this->getAttribute($param);
         $count = $this->getInt($count, 1);
         $count = max(1, $count);
-        $result = str_repeat($str, $count);
-
-        $this->children = [Message::create($result)];
+        return str_repeat($str, $count);
     }
 
-    protected function build(): string
+    public function format(string|\Stringable $message): string
     {
-        if ( ! $this->formatted) {
-            if ($this->hasAttribute('hr')) {
-                $this->renderThematicChange();
-            } elseif ($this->hasAttribute('tab')) {
-                $this->renderRepeatString("\t", 'tab');
-            } elseif ($this->hasAttribute('br')) {
-                $this->renderRepeatString("\n", 'br');
-            }
+        if ( ! static::matches($this->attributes)) {
+            return parent::format($message);
         }
-        return parent::build();
+
+        if ($this->hasAttribute('hr')) {
+            return $this->renderThematicChange();
+        } elseif ($this->hasAttribute('tab')) {
+            return $this->renderRepeatString("\t", 'tab');
+        }
+
+        return $this->renderRepeatString("\n", 'br');
     }
 
 }

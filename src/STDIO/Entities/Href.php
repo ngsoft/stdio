@@ -17,17 +17,13 @@ class Href extends BuiltinEntity
         return preg_test('#^https?://.+/?#', $attributes['href'] ?? '');
     }
 
-    public function write(string $message): void
+    public function format(string|\Stringable $message): string
     {
-
-
         if ( ! static::matches($this->attributes)) {
-
-            // render message normally
-            parent::write($message);
-
-            return;
+            return parent::format($message);
         }
+
+        $message = (string) $message;
 
         $link = $this->getAttribute('href');
 
@@ -42,7 +38,8 @@ class Href extends BuiltinEntity
             $formatted = $message = sprintf('[%s] %s', $link, $message);
         }
 
-        $this->children[] = Message::create($message, $this->getStyle())->setFormatted($formatted);
+
+        return $this->getStyle()->format($formatted);
     }
 
 }

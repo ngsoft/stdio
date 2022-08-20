@@ -66,7 +66,8 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         if (empty($message)) {
             return;
         }
-        $this->children[] = Message::create($message, $this->getStyle());
+
+        $this->children[] = Message::create($message);
     }
 
     /**
@@ -301,12 +302,11 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     protected function build(): string
     {
         if ( ! $this->formatted) {
-            $this->formatted = '';
-            $result = &$this->formatted;
-
+            $str = '';
             foreach ($this->children as $entity) {
-                $result .= (string) $entity;
+                $str .= (string) $entity;
             }
+            $this->formatted = $this->format($str);
         }
 
         return $this->formatted;
