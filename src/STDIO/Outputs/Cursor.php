@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Outputs;
 
-use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Utils\Term, STDIO\Utils\Utils
+use NGSOFT\STDIO\{
+    Enums\Ansi, Utils\Term
 };
 
 final class Cursor
@@ -188,7 +188,7 @@ final class Cursor
      */
     public function hide()
     {
-        if ( ! Terminal::supportsColors()) {
+        if ( ! $this->terminal->supportsColors()) {
             return $this;
         }
         return $this->printf(Ansi::CURSOR_HIDE);
@@ -199,7 +199,7 @@ final class Cursor
      */
     public function show()
     {
-        if ( ! Terminal::supportsColors()) {
+        if ( ! $this->terminal->supportsColors()) {
             return $this;
         }
         return $this->printf(Ansi::CURSOR_SHOW);

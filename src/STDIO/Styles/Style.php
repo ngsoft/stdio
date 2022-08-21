@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Styles;
 
-use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format
+use NGSOFT\STDIO\{
+    Enums\Ansi, Enums\BackgroundColor, Enums\Color, Enums\Format, Utils\Utils
 };
 use Stringable;
 
@@ -25,7 +25,7 @@ class Style
 
     public function __construct()
     {
-        $this->colors = Terminal::supportsColors();
+        $this->colors = Utils::supportsColors();
     }
 
     public static function createEmpty(): static
@@ -158,7 +158,7 @@ class Style
 
     public function __unserialize(array $data): void
     {
-        $this->colors = Terminal::supportsColors();
+        $this->colors = Utils::supportsColors();
         @list($this->label, $this->set, $this->unset) = $data;
     }
 
