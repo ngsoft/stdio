@@ -6,11 +6,13 @@ namespace NGSOFT\STDIO\Entities;
 
 use Stringable;
 use function mb_strlen,
-             mb_substr;
+             mb_substr,
+             NGSOFT\Tools\search_iterable;
 
 class StandaloneEntity extends Entity
 {
 
+    protected static $managed = ['br', 'hr', 'tab'];
     protected bool $standalone = true;
 
     public static function getPriority(): int
@@ -20,8 +22,7 @@ class StandaloneEntity extends Entity
 
     public static function matches(array $attributes): bool
     {
-        static $managed = ['br', 'hr', 'tab'];
-        return count($managed) - 1 === count(array_diff($managed, array_keys($attributes)));
+        return count(static::$managed) - 1 === count(array_diff(static::$managed, array_keys($attributes)));
     }
 
     protected function renderThematicChange(): string
@@ -76,13 +77,23 @@ class StandaloneEntity extends Entity
      */
     public function format(string|Stringable $message): string
     {
-        if ($this->hasAttribute('hr')) {
-            return $this->renderThematicChange();
-        } elseif ($this->hasAttribute('tab')) {
-            return $this->renderRepeatString("\t", 'tab');
+
+        $tag = search_iterable(fn($key) => in_array($key, static::$managed), array_keys($this->attributes));
+
+        $char = '';
+
+        switch ($tag) {
+            case 'hr':
+                return $this->renderThematicChange();
+            case 'br':
+                $char = "\n";
+                break;
+            case 'tab':
+                $char = "\t";
+                break;
         }
 
-        return $this->renderRepeatString("\n", 'br');
+        return $this->renderRepeatString($char, $tag);
     }
 
 }
