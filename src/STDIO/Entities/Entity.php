@@ -43,6 +43,10 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         $this->styles ??= new StyleList();
         $this->terminal = Term::create();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
+
+        if ( ! static::matches($this->attributes)) {
+            throw new RuntimeException(sprintf('Entity %s does not matches <%s>', get_class($this), $tag));
+        }
     }
 
     /**
