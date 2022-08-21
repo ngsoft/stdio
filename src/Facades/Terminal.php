@@ -38,7 +38,7 @@ class Terminal extends Facade
      */
     public static function supportsColors(): bool
     {
-        return static::getFacadeRoot()->colors;
+        return static::getFacadeRoot()->supportsColors();
     }
 
     /**

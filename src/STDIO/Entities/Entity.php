@@ -8,7 +8,7 @@ use Countable,
     InvalidArgumentException,
     JsonException;
 use NGSOFT\STDIO\{
-    Formatters\Formatter, Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList
+    Formatters\Formatter, Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList, Utils\Term
 };
 use Stringable,
     Traversable;
@@ -41,7 +41,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     )
     {
         $this->styles ??= new StyleList();
-
+        $this->terminal = Term::create();
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 

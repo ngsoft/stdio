@@ -12,7 +12,7 @@ final class Term
     public readonly bool $tty;
     public readonly bool $colors;
 
-    public function create(): static
+    public static function create(): static
     {
         static $instance;
         return $instance ??= new static();
@@ -22,6 +22,14 @@ final class Term
     {
         $this->tty = Utils::supportsTTY();
         $this->colors = Utils::supportsColors();
+    }
+
+    /**
+     * Color Support
+     */
+    public function supportsColors(): bool
+    {
+        return $this->colors;
     }
 
     /**
@@ -66,7 +74,7 @@ final class Term
      */
     public function isCursorEnabled(): bool
     {
-        return Utils::isCursorPosEnabled(); ;
+        return Utils::isCursorPosEnabled();
     }
 
     /**

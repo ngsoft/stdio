@@ -40,7 +40,7 @@ class Href extends BuiltinEntity
                 Ansi::OSC, Ansi::ESC
         );
 
-        if ( ! Terminal::supportsColors()) {
+        if ( ! $this->terminal->colors) {
             $formatted = $this->linkDisplayed ? $message : sprintf('[%s: %s]', $link, $message);
             $this->linkDisplayed = true;
         }
