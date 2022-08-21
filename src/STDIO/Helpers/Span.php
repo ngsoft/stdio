@@ -79,10 +79,7 @@ class Span extends Tuple
             return $this;
         }
 
-        return $this->cloneWith([
-                    $this->start,
-                    $offset
-        ]);
+        return $this->cloneWith([$this->start, $offset]);
     }
 
 }

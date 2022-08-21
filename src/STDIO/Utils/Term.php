@@ -12,6 +12,12 @@ final class Term
     public readonly bool $tty;
     public readonly bool $colors;
 
+    public function create(): static
+    {
+        static $instance;
+        return $instance ??= new static();
+    }
+
     public function __construct()
     {
         $this->tty = Utils::supportsTTY();

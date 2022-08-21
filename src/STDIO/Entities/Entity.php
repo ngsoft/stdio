@@ -25,6 +25,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     protected ?self $parent = null;
     protected ?Style $style = null;
     protected ?string $formatted = null;
+    protected Term $terminal;
 
     /** @var self[]|Message[] */
     protected array $children = [];
@@ -40,6 +41,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
     )
     {
         $this->styles ??= new StyleList();
+
         $this->attributes = $this->styles->getParamsFromStyleString($tag);
     }
 
