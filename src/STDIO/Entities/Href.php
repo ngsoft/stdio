@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Entities;
 
-use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi
-};
+use NGSOFT\STDIO\Enums\Ansi,
+    Stringable;
 use function preg_test;
 
 class Href extends BuiltinEntity
@@ -19,7 +18,7 @@ class Href extends BuiltinEntity
         return preg_test('#^https?://.+/?#', $attributes['href'] ?? '');
     }
 
-    public function format(string|\Stringable $message): string
+    public function format(string|Stringable $message): string
     {
         if ( ! static::matches($this->attributes)) {
             return parent::format($message);

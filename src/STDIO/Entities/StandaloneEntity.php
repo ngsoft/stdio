@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Entities;
 
-use NGSOFT\Facades\Terminal;
+use Stringable;
 use function mb_strlen,
              mb_substr;
 
@@ -42,7 +42,7 @@ class StandaloneEntity extends Entity
         }
 
 
-        $width = $max = Terminal::getWidth() - ($padding * 2);
+        $width = $max = $this->terminal->getWidth() - ($padding * 2);
 
         $width = $this->getInt($this->getAttribute('length'), $width);
 
@@ -71,7 +71,7 @@ class StandaloneEntity extends Entity
         return str_repeat($str, $count);
     }
 
-    public function format(string|\Stringable $message): string
+    public function format(string|Stringable $message): string
     {
         if ( ! static::matches($this->attributes)) {
             return '';

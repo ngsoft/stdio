@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace NGSOFT\STDIO\Outputs;
 
 use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Utils\Utils
+    Facades\Terminal, STDIO\Enums\Ansi, STDIO\Utils\Term, STDIO\Utils\Utils
 };
 
 final class Cursor
 {
+
+    protected Term $terminal;
 
     public function __construct(
             protected ?OutputInterface $output = null
     )
     {
         $this->output ??= new Output();
+        $this->terminal = Term::create();
     }
 
     /**
@@ -210,7 +213,7 @@ final class Cursor
      */
     public function getPosition(&$enabled = null): array
     {
-        return Terminal::getCursorPosition($enabled);
+        return $this->terminal->getCursorPosition($enabled);
     }
 
     /**
@@ -218,7 +221,7 @@ final class Cursor
      */
     public function isCursorEnabled(): bool
     {
-        return Utils::isCursorPosEnabled();
+        return $this->terminal->isCursorEnabled();
     }
 
 }

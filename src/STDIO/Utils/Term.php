@@ -87,7 +87,7 @@ final class Term
 
         static $canread;
 
-        $canread ??= Utils::isCursorPosEnabled();
+        $canread ??= $this->isCursorEnabled();
         $enabled = $canread;
         if ( ! $canread) {
             return [1, 1];
