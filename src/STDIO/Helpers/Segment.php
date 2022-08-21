@@ -22,7 +22,6 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
 
     protected string $text;
     protected ?Style $style = null;
-    protected bool $isControl;
 
     public static function create(string $text = '', ?Style $style = null)
     {
@@ -39,7 +38,7 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
 
                 $list = explode("\n", $text);
 
-                for ($i = 0; $i < count($list); $i ++) {
+                for ($i = 0; $i < count($list); $i ++ ) {
 
                     $line->append(new static($list[$i], $style));
 
@@ -62,17 +61,22 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
     {
         $this->text = $text;
         $this->style = $style;
-        $this->isControl = str_starts_with($text, Ansi::ESC);
+    }
+
+    public function withText(string $text): static
+    {
+
+        return $this->cloneWith(['text' => $text,]);
     }
 
     public function getLength(): int
     {
-        return $this->isControl ? 0 : mb_strlen($this->text);
+        return $this->isControl() ? 0 : mb_strlen($this->text);
     }
 
     public function isControl(): bool
     {
-        return $this->isControl;
+        return str_starts_with($this->text, Ansi::ESC);
     }
 
     public function isEmpty(): bool
@@ -95,7 +99,7 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
     {
         $times = max(1, $times);
 
-        for ($i = 0; $i <= $times; $i ++ ) {
+        for ($i = 0; $i <= $times; $i ++) {
             yield from $this;
         }
     }
