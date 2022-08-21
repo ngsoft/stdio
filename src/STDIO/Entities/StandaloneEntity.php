@@ -76,10 +76,6 @@ class StandaloneEntity extends Entity
      */
     public function format(string|Stringable $message): string
     {
-        if ( ! static::matches($this->attributes)) {
-            return '';
-        }
-
         if ($this->hasAttribute('hr')) {
             return $this->renderThematicChange();
         } elseif ($this->hasAttribute('tab')) {
