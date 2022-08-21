@@ -71,6 +71,9 @@ class StandaloneEntity extends Entity
         return str_repeat($str, $count);
     }
 
+    /**
+     * @phan-suppress PhanUnusedPublicMethodParameter
+     */
     public function format(string|Stringable $message): string
     {
         if ( ! static::matches($this->attributes)) {
