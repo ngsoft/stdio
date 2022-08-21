@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace NGSOFT\STDIO\Entities;
 
-use Countable,
-    Stringable;
-use function mb_strlen;
+use NGSOFT\DataStructure\Text;
 
 /**
  * A Message
  */
-class Message implements Stringable, Countable
+class Message extends Text
 {
-
-    public function __construct(protected string $text = '')
-    {
-
-    }
 
     public static function create(string $text = ''): static
     {
@@ -31,21 +24,6 @@ class Message implements Stringable, Countable
     }
 
     public function getText(): string
-    {
-        return $this->text;
-    }
-
-    public function count(): int
-    {
-        return mb_strlen($this->text);
-    }
-
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
-    }
-
-    public function __toString(): string
     {
         return $this->text;
     }

@@ -38,7 +38,7 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
 
                 $list = explode("\n", $text);
 
-                for ($i = 0; $i < count($list); $i ++) {
+                for ($i = 0; $i < count($list); $i ++ ) {
 
                     $line->append(new static($list[$i], $style));
 
@@ -97,7 +97,7 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
     {
         $times = max(1, $times);
 
-        for ($i = 0; $i <= $times; $i ++ ) {
+        for ($i = 0; $i <= $times; $i ++) {
             yield from $this;
         }
     }
@@ -110,7 +110,7 @@ class Segment extends Tuple implements IteratorAggregate, Countable, Stringable
     public function __toString(): string
     {
 
-        if ($this->isControl) {
+        if ($this->isControl()) {
             return $this->text;
         }
 
