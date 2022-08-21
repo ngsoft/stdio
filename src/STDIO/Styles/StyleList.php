@@ -7,8 +7,8 @@ namespace NGSOFT\STDIO\Styles;
 use ArrayAccess,
     Countable,
     IteratorAggregate;
-use NGSOFT\{
-    Facades\Terminal, STDIO\Enums\BackgroundColor, STDIO\Enums\Color, STDIO\Enums\Format, STDIO\Formatters\NullFormatter, STDIO\Outputs\Output, STDIO\Utils\Utils
+use NGSOFT\STDIO\{
+    Enums\BackgroundColor, Enums\Color, Enums\Format, Formatters\NullFormatter, Outputs\Output, Utils\Utils
 };
 use OutOfBoundsException,
     Stringable,
@@ -56,11 +56,6 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
         ['whisper', Color::GRAY, Format::DIM],
         ['shout', Color::RED, Format::BOLD],
     ];
-    protected const FORMATS_COLOR = [
-        Color256::class,
-        HexColor::class,
-        RGBColor::class,
-    ];
 
     /** @var Style[] */
     protected static $_styles = [];
@@ -74,7 +69,7 @@ class StyleList implements ArrayAccess, IteratorAggregate, Countable
             bool $forceColorSupport = null
     )
     {
-        $this->colors = $forceColorSupport ?? Terminal::supportsColors();
+        $this->colors = $forceColorSupport ?? Utils::supportsColors();
         self::createDefaultStyles();
     }
 
