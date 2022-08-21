@@ -10,7 +10,8 @@ use Countable,
 use NGSOFT\STDIO\{
     Formatters\Formatter, Outputs\OutputInterface, Outputs\Renderer, Styles\Style, Styles\StyleList, Utils\Term
 };
-use Stringable,
+use RuntimeException,
+    Stringable,
     Traversable;
 use function get_debug_type,
              is_stringable;

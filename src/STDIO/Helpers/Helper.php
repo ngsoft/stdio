@@ -12,7 +12,7 @@ use Stringable;
 class Helper
 {
 
-    protected Style $style = null;
+    protected ?Style $style = null;
 
     public function __construct(
             protected ?StyleList $styles = null
@@ -23,7 +23,7 @@ class Helper
 
     public function getStyle(): Style
     {
-        return $this->style ??= $this->getStyles()->create('');
+        return $this->style ??= $this->styles->create('');
     }
 
     public function setStyle(Style $style): void
