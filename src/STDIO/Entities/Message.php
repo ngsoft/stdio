@@ -17,12 +17,6 @@ class Message extends Text
         return new static($text);
     }
 
-    public function setText(string $text)
-    {
-        $this->text = $text;
-        return $this;
-    }
-
     public function getText(): string
     {
         return $this->text;
