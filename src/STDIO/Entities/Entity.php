@@ -73,7 +73,7 @@ abstract class Entity implements Stringable, Countable, Renderer, Formatter
         if (empty($message)) {
             return;
         }
-        $this->children[] = Message::create($message);
+        $this->children[] = new Message($message);
     }
 
     /**

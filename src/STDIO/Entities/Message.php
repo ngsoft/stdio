@@ -12,11 +12,6 @@ use NGSOFT\DataStructure\Text;
 class Message extends Text
 {
 
-    public static function create(string $text = ''): static
-    {
-        return new static($text);
-    }
-
     public function getText(): string
     {
         return $this->text;
